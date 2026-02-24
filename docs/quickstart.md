@@ -1,12 +1,12 @@
 # Quickstart
 
-## 1) Verifica ambiente
+## 1) Verify environment
 
 ```bash
 python3 scripts/check_env.py --sdk-dir sdk
 ```
 
-## 2) Crea app
+## 2) Create app
 
 ```bash
 python3 scripts/new_app.py --name "My App" --id myapp
@@ -18,6 +18,6 @@ python3 scripts/new_app.py --name "My App" --id myapp
 make APP_ID=myapp build
 ```
 
-Bundle pronto in `dist/myapp.app/`.
+Bundle is ready in `dist/myapp.app/`.
 
-Fine: ora puoi distribuire direttamente `dist/myapp.app/`.
+Done: you can now distribute `dist/myapp.app/` directly.

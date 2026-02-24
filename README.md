@@ -1,45 +1,46 @@
 # Starlight App Kit
 
-Repository standalone per creare e distribuire app `.app` per Starlight.
-Il flusso compila localmente e produce un bundle pronto in `dist/`.
+Standalone repository to create and distribute `.app` bundles for Starlight.
+The workflow builds locally and produces a ready-to-share bundle in `dist/`.
 
 ## Cosa include
-- generator progetto app (`scripts/new_app.py`)
-- Makefile standalone-first (`Makefile`)
-- template sorgente + manifest (`templates/`)
-- guida rapida e troubleshooting (`docs/`)
+## What it includes
+- app project generator (`scripts/new_app.py`)
+- standalone-first Makefile (`Makefile`)
+- source + manifest templates (`templates/`)
+- quickstart and troubleshooting guides (`docs/`)
 
-## Requisiti
+## Requirements
 - Python 3.9+
 - toolchain `x86_64-elf-*` disponibile nel PATH
 
-- SDK locale già presente in `sdk/` (`include/`, `lib/libpeos.a`, `crt0.S`, `linker.ld`)
+- Local SDK already present in `sdk/` (`include/`, `lib/libpeos.a`, `crt0.S`, `linker.ld`)
 
 ## Quick Start
 
-1) Crea una nuova app nel kit:
+1) Create a new app in the kit:
 
 ```bash
-python3 scripts/new_app.py --name "Calcolatrice" --id calcolatrice
+python3 scripts/new_app.py --name "Calculator" --id calculator
 ```
 
-2) Build standalone bundle:
+2) Build the standalone bundle:
 
 ```bash
-make APP_ID=calcolatrice build
+make APP_ID=calculator build
 ```
 
 Output:
-- `dist/calcolatrice.app/app.bin`
-- `dist/calcolatrice.app/app.ini`
+- `dist/calculator.app/app.bin`
+- `dist/calculator.app/app.ini`
 
-## Struttura progetto app generato
-Ogni app nel kit vive in `examples/<app_id>/`:
+## Generated app project structure
+Each app in the kit lives in `examples/<app_id>/`:
 - `src/main.c`
 - `bundle/app.ini`
 - `README.md`
 
-## Note UI
-Il template usa l'SDK esportato (`peos/starlight_ui.h`) con pattern performante:
-- render solo quando stato cambia (`dirty`)
-- trigger bottoni su `mouse_up`
+## UI notes
+The template uses the exported SDK (`peos/starlight_ui.h`) with a performant pattern:
+- render only when state changes (`dirty`)
+- button actions triggered on `mouse_up`
