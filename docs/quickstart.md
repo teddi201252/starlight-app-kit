@@ -20,4 +20,7 @@ make APP_ID=myapp build
 
 Bundle is ready in `dist/myapp.app/`.
 
+If your project has `examples/myapp/resources/`, files are copied to
+`dist/myapp.app/resources/`.
+
 Done: you can now distribute `dist/myapp.app/` directly.
