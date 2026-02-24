@@ -3,7 +3,6 @@
 Standalone repository to create and distribute `.app` bundles for Starlight.
 The workflow builds locally and produces a ready-to-share bundle in `dist/`.
 
-## Cosa include
 ## What it includes
 - app project generator (`scripts/new_app.py`)
 - standalone-first Makefile (`Makefile`)
@@ -12,7 +11,7 @@ The workflow builds locally and produces a ready-to-share bundle in `dist/`.
 
 ## Requirements
 - Python 3.9+
-- toolchain `x86_64-elf-*` disponibile nel PATH
+- toolchain `x86_64-elf-*` installed in `$PATH`
 
 - Local SDK already present in `sdk/` (`include/`, `lib/libpeos.a`, `crt0.S`, `linker.ld`)
 
@@ -39,6 +38,8 @@ Each app in the kit lives in `examples/<app_id>/`:
 - `src/main.c`
 - `bundle/app.ini`
 - `README.md`
+
+So you can have multiple apps in the same kit.
 
 ## UI notes
 The template uses the exported SDK (`peos/starlight_ui.h`) with a performant pattern:
