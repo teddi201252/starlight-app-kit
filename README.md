@@ -32,11 +32,13 @@ make APP_ID=calculator build
 Output:
 - `dist/calculator.app/app.bin`
 - `dist/calculator.app/app.ini`
+- `dist/calculator.app/resources/*` (if present in project)
 
 ## Generated app project structure
 Each app in the kit lives in `examples/<app_id>/`:
 - `src/main.c`
 - `bundle/app.ini`
+- `resources/` (optional app assets copied to `.app/resources/`)
 - `README.md`
 
 So you can have multiple apps in the same kit.

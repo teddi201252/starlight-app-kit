@@ -5,6 +5,7 @@ SDK_DIR ?= sdk
 BUILD_DIR ?= build/$(APP_ID)
 DIST_DIR ?= dist/$(APP_ID).app
 APP_SRC_ROOT := examples/$(APP_ID)/src
+APP_RES_ROOT := examples/$(APP_ID)/resources
 
 CC := x86_64-elf-gcc
 CFLAGS ?= -std=gnu11 -O2 -Wall -Wextra -ffreestanding -fno-stack-protector -fno-pie -mno-red-zone -mcmodel=kernel
@@ -26,6 +27,8 @@ SDK_INCLUDE := $(SDK_DIR)/include
 BUILD_CRT0 := $(BUILD_DIR)/crt0.o
 DIST_BIN := $(DIST_DIR)/app.bin
 DIST_MANIFEST := $(DIST_DIR)/app.ini
+APP_RES_FILES := $(shell find $(APP_RES_ROOT) -type f ! -name '.DS_Store' 2>/dev/null)
+DIST_RES_FILES := $(patsubst $(APP_RES_ROOT)/%,$(DIST_DIR)/resources/%,$(APP_RES_FILES))
 
 .PHONY: help check-env scaffold check-sources build package clean
 
@@ -70,7 +73,11 @@ $(DIST_MANIFEST): $(APP_MANIFEST)
 	@mkdir -p "$(DIST_DIR)"
 	cp "$<" "$@"
 
-build: $(DIST_BIN) $(DIST_MANIFEST)
+$(DIST_DIR)/resources/%: $(APP_RES_ROOT)/%
+	@mkdir -p "$(dir $@)"
+	cp "$<" "$@"
+
+build: $(DIST_BIN) $(DIST_MANIFEST) $(DIST_RES_FILES)
 	@echo "Standalone bundle ready: $(DIST_DIR)"
 
 package: build
