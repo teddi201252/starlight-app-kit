@@ -45,3 +45,10 @@ So you can have multiple apps in the same kit.
 The template uses the exported SDK (`peos/starlight_ui.h`) with a performant pattern:
 - render only when state changes (`dirty`)
 - button actions triggered on `mouse_up`
+
+## SDK sync status
+The bundled SDK in `sdk/` is aligned with Starlight Phase 5:
+- protocol handshake and host capability negotiation
+- structured host errors (`SLUI_EVENT_HOST_ERROR`)
+- image command support (`slui_image_file`, `IMAGE_FILE` capability)
+- explicit SDK/protocol version macros and query helpers
