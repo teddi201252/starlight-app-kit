@@ -18,7 +18,7 @@ typedef enum {
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
-#define SLUI_SDK_VERSION_MINOR 1u
+#define SLUI_SDK_VERSION_MINOR 2u
 #define SLUI_SDK_VERSION_PATCH 0u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
@@ -41,6 +41,9 @@ typedef enum {
 #define SLUI_CAP_EVENT_TEXT_INPUT (1u << 12)
 #define SLUI_CAP_EVENT_SCROLL_V   (1u << 13)
 #define SLUI_CAP_CLIP             (1u << 14)
+#define SLUI_CAP_SEPARATOR        (1u << 15)
+#define SLUI_CAP_LIST_ITEM        (1u << 16)
+#define SLUI_CAP_DISABLED_STATE   (1u << 17)
 
 #define SLUI_EVENT_TEXT_MAX 192u
 
@@ -201,30 +204,57 @@ void slui_label(uint32_t x, uint32_t y, const char *text,
 void slui_button(uint32_t id,
                  uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                  const char *text);
+void slui_button_state(uint32_t id,
+                       uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                       uint8_t enabled, const char *text);
 
 void slui_slider_u32(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w,
                      uint32_t min_v, uint32_t max_v, uint32_t value);
+void slui_slider_u32_state(uint32_t id,
+                           uint32_t x, uint32_t y, uint32_t w,
+                           uint32_t min_v, uint32_t max_v, uint32_t value,
+                           uint8_t enabled);
 
 void slui_toggle(uint32_t id,
                  uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                  uint8_t value, const char *text);
+void slui_toggle_state(uint32_t id,
+                       uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                       uint8_t value, uint8_t enabled, const char *text);
 
 void slui_select(uint32_t id,
                  uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                  uint32_t option_count, uint32_t selected,
                  const char *options_pipe);
+void slui_select_state(uint32_t id,
+                       uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                       uint32_t option_count, uint32_t selected,
+                       uint8_t enabled, const char *options_pipe);
 
 void slui_text_input(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                      uint32_t max_chars, const char *text);
+void slui_text_input_state(uint32_t id,
+                           uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                           uint32_t max_chars, uint8_t enabled, const char *text);
 
 void slui_scroll_v(uint32_t id,
                    uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                    uint32_t content_h, uint32_t offset);
+void slui_scroll_v_state(uint32_t id,
+                         uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                         uint32_t content_h, uint32_t offset, uint8_t enabled);
 
 void slui_clip_push(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void slui_clip_pop(void);
+
+void slui_separator(uint32_t x, uint32_t y, uint32_t w);
+void slui_list_item(uint32_t id,
+                    uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                    uint8_t enabled,
+                    const char *title,
+                    const char *subtitle);
 
 typedef struct {
     uint32_t x;
