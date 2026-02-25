@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.2.0] - 2026-02-25
+- Allineamento App Kit con release SDK SLUI 1.2
+
 ## [0.1.2] - 2026-02-25
 - App Kit synced with SDK 1.0.1 and updated demo for scroll clipping
 
