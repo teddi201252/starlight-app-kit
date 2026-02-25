@@ -11,11 +11,15 @@ typedef enum {
     SLUI_EVENT_BUTTON = 1,
     SLUI_EVENT_SLIDER = 2,
     SLUI_EVENT_HOST_ERROR = 3,
+    SLUI_EVENT_TOGGLE = 4,
+    SLUI_EVENT_SELECT = 5,
+    SLUI_EVENT_TEXT_INPUT = 6,
+    SLUI_EVENT_SCROLL_V = 7,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 0u
+#define SLUI_SDK_VERSION_PATCH 1u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -28,12 +32,165 @@ typedef enum {
 #define SLUI_CAP_EVENT_BUTTON (1u << 3)
 #define SLUI_CAP_EVENT_SLIDER (1u << 4)
 #define SLUI_CAP_IMAGE_FILE   (1u << 5)
+#define SLUI_CAP_TOGGLE       (1u << 6)
+#define SLUI_CAP_SELECT       (1u << 7)
+#define SLUI_CAP_TEXT_INPUT   (1u << 8)
+#define SLUI_CAP_SCROLL_V     (1u << 9)
+#define SLUI_CAP_EVENT_TOGGLE     (1u << 10)
+#define SLUI_CAP_EVENT_SELECT     (1u << 11)
+#define SLUI_CAP_EVENT_TEXT_INPUT (1u << 12)
+#define SLUI_CAP_EVENT_SCROLL_V   (1u << 13)
+#define SLUI_CAP_CLIP             (1u << 14)
+
+#define SLUI_EVENT_TEXT_MAX 192u
 
 typedef struct {
     slui_event_type_t type;
     uint32_t id;
     uint32_t value;
+    char text[SLUI_EVENT_TEXT_MAX];
 } slui_event_t;
+
+typedef enum {
+    SLUI_STACK_HORIZONTAL = 0,
+    SLUI_STACK_VERTICAL = 1,
+} slui_stack_axis_t;
+
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t w;
+    uint32_t h;
+    uint32_t spacing;
+    uint32_t cursor;
+    slui_stack_axis_t axis;
+} slui_stack_t;
+
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t w;
+    uint32_t h;
+    uint32_t cols;
+    uint32_t rows;
+    uint32_t gap_x;
+    uint32_t gap_y;
+    uint32_t cursor;
+} slui_grid_t;
+
+static inline void slui_stack_begin(slui_stack_t *stack,
+                                    uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                                    slui_stack_axis_t axis, uint32_t spacing) {
+    if (!stack) return;
+    stack->x = x;
+    stack->y = y;
+    stack->w = w;
+    stack->h = h;
+    stack->spacing = spacing;
+    stack->cursor = 0u;
+    stack->axis = axis;
+}
+
+static inline int slui_stack_next(slui_stack_t *stack, uint32_t primary_size,
+                                  uint32_t *out_x, uint32_t *out_y,
+                                  uint32_t *out_w, uint32_t *out_h) {
+    if (!stack || !out_x || !out_y || !out_w || !out_h || primary_size == 0u) return 0;
+
+    if (stack->axis == SLUI_STACK_VERTICAL) {
+        if (stack->cursor > stack->h) return 0;
+        if (primary_size > (stack->h - stack->cursor)) return 0;
+
+        *out_x = stack->x;
+        *out_y = stack->y + stack->cursor;
+        *out_w = stack->w;
+        *out_h = primary_size;
+    } else {
+        if (stack->cursor > stack->w) return 0;
+        if (primary_size > (stack->w - stack->cursor)) return 0;
+
+        *out_x = stack->x + stack->cursor;
+        *out_y = stack->y;
+        *out_w = primary_size;
+        *out_h = stack->h;
+    }
+
+    uint32_t next_cursor = stack->cursor + primary_size;
+    if (next_cursor < stack->cursor) return 0;
+    if (stack->spacing > 0u) {
+        if (next_cursor > 0xFFFFFFFFu - stack->spacing) return 0;
+        next_cursor += stack->spacing;
+    }
+    stack->cursor = next_cursor;
+    return 1;
+}
+
+static inline void slui_grid_begin(slui_grid_t *grid,
+                                   uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                                   uint32_t cols, uint32_t rows,
+                                   uint32_t gap_x, uint32_t gap_y) {
+    if (!grid) return;
+    grid->x = x;
+    grid->y = y;
+    grid->w = w;
+    grid->h = h;
+    grid->cols = cols;
+    grid->rows = rows;
+    grid->gap_x = gap_x;
+    grid->gap_y = gap_y;
+    grid->cursor = 0u;
+}
+
+static inline int slui_grid_metrics(const slui_grid_t *grid, uint32_t *cell_w, uint32_t *cell_h) {
+    if (!grid || !cell_w || !cell_h || grid->cols == 0u || grid->rows == 0u) return 0;
+
+    uint64_t gaps_x = (uint64_t)(grid->cols - 1u) * (uint64_t)grid->gap_x;
+    uint64_t gaps_y = (uint64_t)(grid->rows - 1u) * (uint64_t)grid->gap_y;
+    if (gaps_x >= (uint64_t)grid->w || gaps_y >= (uint64_t)grid->h) return 0;
+
+    *cell_w = (uint32_t)(((uint64_t)grid->w - gaps_x) / (uint64_t)grid->cols);
+    *cell_h = (uint32_t)(((uint64_t)grid->h - gaps_y) / (uint64_t)grid->rows);
+    return (*cell_w > 0u && *cell_h > 0u) ? 1 : 0;
+}
+
+static inline int slui_grid_cell(const slui_grid_t *grid, uint32_t col, uint32_t row,
+                                 uint32_t *out_x, uint32_t *out_y,
+                                 uint32_t *out_w, uint32_t *out_h) {
+    if (!grid || !out_x || !out_y || !out_w || !out_h) return 0;
+    if (col >= grid->cols || row >= grid->rows) return 0;
+
+    uint32_t cell_w = 0u;
+    uint32_t cell_h = 0u;
+    if (!slui_grid_metrics(grid, &cell_w, &cell_h)) return 0;
+
+    uint64_t step_x = (uint64_t)cell_w + (uint64_t)grid->gap_x;
+    uint64_t step_y = (uint64_t)cell_h + (uint64_t)grid->gap_y;
+    uint64_t px = (uint64_t)grid->x + ((uint64_t)col * step_x);
+    uint64_t py = (uint64_t)grid->y + ((uint64_t)row * step_y);
+    if (px > 0xFFFFFFFFu || py > 0xFFFFFFFFu) return 0;
+
+    *out_x = (uint32_t)px;
+    *out_y = (uint32_t)py;
+    *out_w = cell_w;
+    *out_h = cell_h;
+    return 1;
+}
+
+static inline int slui_grid_next(slui_grid_t *grid,
+                                 uint32_t *out_x, uint32_t *out_y,
+                                 uint32_t *out_w, uint32_t *out_h) {
+    if (!grid || !out_x || !out_y || !out_w || !out_h) return 0;
+    if (grid->cols == 0u || grid->rows == 0u) return 0;
+
+    uint64_t total = (uint64_t)grid->cols * (uint64_t)grid->rows;
+    if ((uint64_t)grid->cursor >= total) return 0;
+
+    uint32_t col = grid->cursor % grid->cols;
+    uint32_t row = grid->cursor / grid->cols;
+    if (!slui_grid_cell(grid, col, row, out_x, out_y, out_w, out_h)) return 0;
+
+    grid->cursor++;
+    return 1;
+}
 
 void slui_begin_frame(void);
 void slui_end_frame(void);
@@ -48,6 +205,100 @@ void slui_button(uint32_t id,
 void slui_slider_u32(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w,
                      uint32_t min_v, uint32_t max_v, uint32_t value);
+
+void slui_toggle(uint32_t id,
+                 uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                 uint8_t value, const char *text);
+
+void slui_select(uint32_t id,
+                 uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                 uint32_t option_count, uint32_t selected,
+                 const char *options_pipe);
+
+void slui_text_input(uint32_t id,
+                     uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                     uint32_t max_chars, const char *text);
+
+void slui_scroll_v(uint32_t id,
+                   uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                   uint32_t content_h, uint32_t offset);
+
+void slui_clip_push(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+void slui_clip_pop(void);
+
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t w;
+    uint32_t h;
+    uint32_t content_h;
+    uint32_t offset;
+    uint32_t cursor_y;
+} slui_scroll_view_t;
+
+static inline void slui_scroll_view_begin(slui_scroll_view_t *view,
+                                          uint32_t scrollbar_id,
+                                          uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                                          uint32_t content_h, uint32_t *offset) {
+    if (!view || !offset) return;
+
+    uint32_t max_off = 0u;
+    if (content_h > h) max_off = content_h - h;
+    if (*offset > max_off) *offset = max_off;
+
+    uint32_t bar_w = (w >= 14u) ? 12u : ((w > 4u) ? (w - 2u) : w);
+    uint32_t content_w = (w > (bar_w + 4u)) ? (w - bar_w - 4u) : w;
+    uint32_t bar_x = x + ((content_w < w) ? (content_w + 4u) : 0u);
+
+    slui_scroll_v(scrollbar_id, bar_x, y, bar_w, h, content_h, *offset);
+    slui_clip_push(x, y, content_w, h);
+
+    view->x = x;
+    view->y = y;
+    view->w = content_w;
+    view->h = h;
+    view->content_h = content_h;
+    view->offset = *offset;
+    view->cursor_y = 0u;
+}
+
+static inline int slui_scroll_view_next(slui_scroll_view_t *view,
+                                        uint32_t item_h, uint32_t spacing,
+                                        uint32_t *out_x, uint32_t *out_y,
+                                        uint32_t *out_w, uint32_t *out_h) {
+    if (!view || !out_x || !out_y || !out_w || !out_h || item_h == 0u) return 0;
+
+    uint32_t logical_y = view->cursor_y;
+    uint32_t item_top = logical_y;
+    uint32_t item_bottom = logical_y + item_h;
+    if (item_bottom < item_top) item_bottom = 0xFFFFFFFFu;
+
+    uint32_t window_top = view->offset;
+    uint32_t window_bottom = view->offset + view->h;
+    if (window_bottom < window_top) window_bottom = 0xFFFFFFFFu;
+
+    int visible = (item_bottom > window_top && item_top < window_bottom) ? 1 : 0;
+
+    int64_t y64 = (int64_t)view->y + (int64_t)item_top - (int64_t)window_top;
+    uint32_t y = (y64 < 0) ? 0u : ((y64 > 0xFFFFFFFFll) ? 0xFFFFFFFFu : (uint32_t)y64);
+
+    uint32_t next = logical_y + item_h;
+    if (next >= logical_y && spacing > 0u && next <= 0xFFFFFFFFu - spacing) {
+        next += spacing;
+    }
+    view->cursor_y = next;
+
+    *out_x = view->x;
+    *out_y = y;
+    *out_w = view->w;
+    *out_h = item_h;
+    return visible;
+}
+
+static inline void slui_scroll_view_end(const slui_scroll_view_t *view) {
+    (void)view;
+    slui_clip_pop();
+}
 
 void slui_image_file(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                      const char *path);
