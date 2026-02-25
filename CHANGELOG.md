@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.2.1] - 2026-02-25
+- App Kit patch release aligned with SDK/UI dialog and alpha updates
+
 ## [0.2.0] - 2026-02-25
 - Allineamento App Kit con release SDK SLUI 1.2
 
