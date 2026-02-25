@@ -90,7 +90,9 @@ typedef struct peos_mouse_event {
     int32_t dx;
     int32_t dy;
     uint8_t buttons;
-    uint8_t reserved[3];
+    int8_t wheel_y;
+    int8_t wheel_x;
+    uint8_t reserved;
     uint64_t time_ns;
 } peos_mouse_event_t;
 #endif
