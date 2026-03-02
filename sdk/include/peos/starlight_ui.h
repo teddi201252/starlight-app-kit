@@ -16,6 +16,7 @@ typedef enum {
     SLUI_EVENT_SELECT = 5,
     SLUI_EVENT_TEXT_INPUT = 6,
     SLUI_EVENT_SCROLL_V = 7,
+    SLUI_EVENT_TEXT_AREA = 8,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
@@ -47,8 +48,10 @@ typedef enum {
 #define SLUI_CAP_DISABLED_STATE   (1u << 17)
 #define SLUI_CAP_RECT             (1u << 18)
 #define SLUI_CAP_RECT_ALPHA       (1u << 19)
+#define SLUI_CAP_TEXT_AREA        (1u << 20)
+#define SLUI_CAP_EVENT_TEXT_AREA  (1u << 21)
 
-#define SLUI_EVENT_TEXT_MAX 192u
+#define SLUI_EVENT_TEXT_MAX 4096u
 
 typedef struct {
     slui_event_type_t type;
@@ -241,6 +244,12 @@ void slui_text_input(uint32_t id,
 void slui_text_input_state(uint32_t id,
                            uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                            uint32_t max_chars, uint8_t enabled, const char *text);
+void slui_text_area(uint32_t id,
+                    uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                    uint32_t max_chars, const char *text);
+void slui_text_area_state(uint32_t id,
+                          uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                          uint32_t max_chars, uint8_t enabled, const char *text);
 
 void slui_scroll_v(uint32_t id,
                    uint32_t x, uint32_t y, uint32_t w, uint32_t h,
