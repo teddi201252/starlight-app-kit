@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.2.2] - 2026-03-02
+- Add keyboard event types/modifiers and text area API updates
+
 ## [1.2.1] - 2026-02-25
 - SDK UI: slui_dialog_* helpers and slui_rect_a alpha primitive
 

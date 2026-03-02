@@ -17,11 +17,14 @@ typedef enum {
     SLUI_EVENT_TEXT_INPUT = 6,
     SLUI_EVENT_SCROLL_V = 7,
     SLUI_EVENT_TEXT_AREA = 8,
+    SLUI_EVENT_KEY_DOWN = 9,
+    SLUI_EVENT_KEY_UP = 10,
+    SLUI_EVENT_KEY_REPEAT = 11,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 2u
-#define SLUI_SDK_VERSION_PATCH 1u
+#define SLUI_SDK_VERSION_PATCH 2u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -50,6 +53,12 @@ typedef enum {
 #define SLUI_CAP_RECT_ALPHA       (1u << 19)
 #define SLUI_CAP_TEXT_AREA        (1u << 20)
 #define SLUI_CAP_EVENT_TEXT_AREA  (1u << 21)
+#define SLUI_CAP_EVENT_KEYBOARD   (1u << 22)
+
+#define SLUI_MOD_SHIFT (1u << 0)
+#define SLUI_MOD_CTRL  (1u << 1)
+#define SLUI_MOD_ALT   (1u << 2)
+#define SLUI_MOD_SUPER (1u << 3)
 
 #define SLUI_EVENT_TEXT_MAX 4096u
 
@@ -57,6 +66,8 @@ typedef struct {
     slui_event_type_t type;
     uint32_t id;
     uint32_t value;
+    uint16_t keycode;
+    uint16_t mods;
     char text[SLUI_EVENT_TEXT_MAX];
 } slui_event_t;
 
