@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.2.2] - 2026-03-02
+- Sync app-kit for SDK keyboard/text-area updates
+
 ## [0.2.1] - 2026-02-25
 - App Kit patch release aligned with SDK/UI dialog and alpha updates
 
