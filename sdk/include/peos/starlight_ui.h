@@ -536,6 +536,7 @@ uint32_t slui_protocol_version(void);
 uint32_t slui_host_protocol_version(void);
 uint32_t slui_host_capabilities(void);
 const char *slui_last_host_error(void);
+void slui_reload_display(void);
 
 #ifdef __cplusplus
 }
