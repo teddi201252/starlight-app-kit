@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.3.4] - 2026-03-03
+- Maintenance update.
+
 ## [1.3.3] - 2026-03-03
 - Patch maintenance release.
 
