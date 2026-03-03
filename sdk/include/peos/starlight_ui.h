@@ -23,8 +23,8 @@ typedef enum {
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
-#define SLUI_SDK_VERSION_MINOR 2u
-#define SLUI_SDK_VERSION_PATCH 2u
+#define SLUI_SDK_VERSION_MINOR 3u
+#define SLUI_SDK_VERSION_PATCH 0u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -54,6 +54,7 @@ typedef enum {
 #define SLUI_CAP_TEXT_AREA        (1u << 20)
 #define SLUI_CAP_EVENT_TEXT_AREA  (1u << 21)
 #define SLUI_CAP_EVENT_KEYBOARD   (1u << 22)
+#define SLUI_CAP_THEME_TOKENS     (1u << 23)
 
 #define SLUI_MOD_SHIFT (1u << 0)
 #define SLUI_MOD_CTRL  (1u << 1)
@@ -70,6 +71,26 @@ typedef struct {
     uint16_t mods;
     char text[SLUI_EVENT_TEXT_MAX];
 } slui_event_t;
+
+typedef enum {
+    SLUI_COLOR_BG_CANVAS = 0,
+    SLUI_COLOR_BG_PANEL,
+    SLUI_COLOR_BG_CONTROL,
+    SLUI_COLOR_BG_CONTROL_HOVER,
+    SLUI_COLOR_BG_CONTROL_ACTIVE,
+    SLUI_COLOR_BORDER,
+    SLUI_COLOR_BORDER_FOCUS,
+    SLUI_COLOR_TEXT_PRIMARY,
+    SLUI_COLOR_TEXT_SECONDARY,
+    SLUI_COLOR_TEXT_DISABLED,
+    SLUI_COLOR_ACCENT,
+    SLUI_COLOR_ACCENT_HOVER,
+    SLUI_COLOR_ACCENT_ACTIVE,
+    SLUI_COLOR_DANGER,
+    SLUI_COLOR_SUCCESS,
+    SLUI_COLOR_WARNING,
+    SLUI_COLOR_COUNT
+} slui_color_token_t;
 
 typedef enum {
     SLUI_STACK_HORIZONTAL = 0,
@@ -217,6 +238,7 @@ void slui_end_frame(void);
 
 void slui_label(uint32_t x, uint32_t y, const char *text,
                 uint8_t r, uint8_t g, uint8_t b);
+void slui_label_theme(uint32_t x, uint32_t y, slui_color_token_t token, const char *text);
 
 void slui_button(uint32_t id,
                  uint32_t x, uint32_t y, uint32_t w, uint32_t h,
@@ -277,6 +299,8 @@ void slui_rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                uint8_t r, uint8_t g, uint8_t b);
 void slui_rect_a(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                  uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void slui_rect_theme(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_color_token_t token);
+void slui_rect_a_theme(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_color_token_t token, uint8_t a);
 void slui_list_item(uint32_t id,
                     uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                     uint8_t enabled,
@@ -557,6 +581,10 @@ uint32_t slui_host_protocol_version(void);
 uint32_t slui_host_capabilities(void);
 const char *slui_last_host_error(void);
 void slui_reload_display(void);
+void slui_reload_theme(void);
+void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
+void slui_theme_reset_override(void);
+int slui_theme_query(slui_color_token_t token, uint8_t *r, uint8_t *g, uint8_t *b);
 
 #ifdef __cplusplus
 }

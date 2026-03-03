@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.3.0] - 2026-03-03
+- Expose themed SLUI APIs and color tokens in app kit SDK
+
 ## [0.2.2] - 2026-03-02
 - Sync app-kit for SDK keyboard/text-area updates
 
