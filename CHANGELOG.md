@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.3.1] - 2026-03-03
+- Expose updated SDK headers for RGBA theming
+
 ## [0.3.0] - 2026-03-03
 - Expose themed SLUI APIs and color tokens in app kit SDK
 
