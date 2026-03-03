@@ -20,11 +20,12 @@ typedef enum {
     SLUI_EVENT_KEY_DOWN = 9,
     SLUI_EVENT_KEY_UP = 10,
     SLUI_EVENT_KEY_REPEAT = 11,
+    SLUI_EVENT_PANEL_INPUT = 12,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 3u
-#define SLUI_SDK_VERSION_PATCH 1u
+#define SLUI_SDK_VERSION_PATCH 2u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -55,6 +56,8 @@ typedef enum {
 #define SLUI_CAP_EVENT_TEXT_AREA  (1u << 21)
 #define SLUI_CAP_EVENT_KEYBOARD   (1u << 22)
 #define SLUI_CAP_THEME_TOKENS     (1u << 23)
+#define SLUI_CAP_GRADIENT_2D      (1u << 24)
+#define SLUI_CAP_PANEL_INPUT      (1u << 25)
 
 #define SLUI_MOD_SHIFT (1u << 0)
 #define SLUI_MOD_CTRL  (1u << 1)
@@ -67,6 +70,7 @@ typedef struct {
     slui_event_type_t type;
     uint32_t id;
     uint32_t value;
+    uint32_t value2;
     uint16_t keycode;
     uint16_t mods;
     char text[SLUI_EVENT_TEXT_MAX];
@@ -290,6 +294,9 @@ void slui_scroll_v(uint32_t id,
 void slui_scroll_v_state(uint32_t id,
                          uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                          uint32_t content_h, uint32_t offset, uint8_t enabled);
+void slui_panel_input(uint32_t id,
+                      uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                      uint8_t enabled);
 
 void slui_clip_push(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void slui_clip_pop(void);
@@ -297,6 +304,11 @@ void slui_clip_pop(void);
 void slui_separator(uint32_t x, uint32_t y, uint32_t w);
 void slui_rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                uint8_t r, uint8_t g, uint8_t b);
+void slui_gradient_fill_2d(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                           uint8_t r00, uint8_t g00, uint8_t b00, uint8_t a00,
+                           uint8_t r10, uint8_t g10, uint8_t b10, uint8_t a10,
+                           uint8_t r01, uint8_t g01, uint8_t b01, uint8_t a01,
+                           uint8_t r11, uint8_t g11, uint8_t b11, uint8_t a11);
 void slui_rect_a(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                  uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_rect_theme(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_color_token_t token);
@@ -595,27 +607,27 @@ static inline void slui_color_picker_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b,
 static inline void slui_color_picker_prepare(slui_color_picker_t *p,
                                              uint32_t viewport_w, uint32_t viewport_h) {
     if (!p) return;
-    p->w = 260u;
-    p->h = 248u;
+    p->w = 320u;
+    p->h = 298u;
     p->x = (viewport_w > p->w) ? ((viewport_w - p->w) / 2u) : 0u;
     p->y = (viewport_h > p->h) ? ((viewport_h - p->h) / 2u) : 0u;
 
     p->spectrum_x = p->x + 10u;
     p->spectrum_y = p->y + 30u;
-    p->spectrum_w = 146u;
-    p->spectrum_h = 44u;
-    p->preview_x = p->x + 166u;
+    p->spectrum_w = 156u;
+    p->spectrum_h = 156u;
+    p->preview_x = p->x + 176u;
     p->preview_y = p->y + 50u;
-    p->preview_w = 84u;
-    p->preview_h = 22u;
-    p->slider_x = p->x + 58u;
-    p->slider_w = 192u;
-    p->hue_y = p->y + 104u;
-    p->sat_y = p->y + 128u;
-    p->val_y = p->y + 152u;
-    p->btn_y = p->y + 206u;
-    p->ok_x = p->x + 180u;
-    p->cancel_x = p->x + 104u;
+    p->preview_w = 134u;
+    p->preview_h = 32u;
+    p->slider_x = p->x + 64u;
+    p->slider_w = 246u;
+    p->hue_y = p->y + 194u;
+    p->sat_y = p->y + 218u;
+    p->val_y = p->y + 242u;
+    p->btn_y = p->y + 268u;
+    p->ok_x = p->x + 240u;
+    p->cancel_x = p->x + 164u;
 }
 
 static inline void slui_color_picker_draw(const slui_color_picker_t *p,
@@ -626,35 +638,44 @@ static inline void slui_color_picker_draw(const slui_color_picker_t *p,
                                           uint8_t show_alpha,
                                           const char *title) {
     uint8_t pr = 0u, pg = 0u, pb = 0u;
+    uint32_t selector_x = 0u;
+    uint32_t selector_y = 0u;
     if (!p) return;
     if (!title) title = "Color picker";
+    (void)id_slider_v;
     slui_rect_a_theme(0u, 0u, viewport_w, viewport_h, SLUI_COLOR_BG_CANVAS, 160u);
     slui_rect_theme(p->x, p->y, p->w, p->h, SLUI_COLOR_BG_PANEL);
     slui_label_theme(p->x + 10u, p->y + 10u, SLUI_COLOR_TEXT_PRIMARY, title);
 
-    slui_rect_theme(p->spectrum_x, p->spectrum_y, p->spectrum_w, p->spectrum_h, SLUI_COLOR_BG_CANVAS);
-    for (uint32_t i = 0u; i < 12u; i++) {
-        uint32_t hh = (i * 359u) / 11u;
-        uint8_t rr = 0u, gg = 0u, bb = 0u;
-        slui_color_picker_hsv_to_rgb(hh, 255u, 255u, &rr, &gg, &bb);
-        slui_rect(p->spectrum_x + 2u + (i * 11u), p->spectrum_y + 2u, 9u, 12u, rr, gg, bb);
-    }
-    slui_label_theme(p->spectrum_x + 4u, p->spectrum_y + 20u, SLUI_COLOR_TEXT_SECONDARY, "Anteprima spettro");
+    slui_color_picker_hsv_to_rgb(h, 255u, 255u, &pr, &pg, &pb);
+    slui_gradient_fill_2d(p->spectrum_x, p->spectrum_y, p->spectrum_w, p->spectrum_h,
+                          0u, 0u, 0u, 255u,
+                          255u, 255u, 255u, 255u,
+                          0u, 0u, 0u, 255u,
+                          pr, pg, pb, 255u);
+    slui_panel_input(id_slider_s, p->spectrum_x, p->spectrum_y, p->spectrum_w, p->spectrum_h, 1u);
+    selector_x = p->spectrum_x + ((v * (p->spectrum_w - 1u)) / 255u);
+    selector_y = p->spectrum_y + ((s * (p->spectrum_h - 1u)) / 255u);
+    if (selector_x > p->spectrum_x) slui_rect_theme(selector_x - 1u, selector_y, 3u, 1u, SLUI_COLOR_TEXT_PRIMARY);
+    if (selector_y > p->spectrum_y) slui_rect_theme(selector_x, selector_y - 1u, 1u, 3u, SLUI_COLOR_TEXT_PRIMARY);
+    slui_label_theme(p->spectrum_x, p->spectrum_y + p->spectrum_h + 4u, SLUI_COLOR_TEXT_SECONDARY, "X = Brightness, Y = Saturazione");
 
     slui_color_picker_hsv_to_rgb(h, s, v, &pr, &pg, &pb);
     slui_label_theme(p->preview_x, p->y + 34u, SLUI_COLOR_TEXT_SECONDARY, "Preview");
     slui_rect(p->preview_x, p->preview_y, p->preview_w, p->preview_h, pr, pg, pb);
+    if (show_alpha && a < 255u) {
+        slui_rect_a(p->preview_x, p->preview_y, p->preview_w, p->preview_h, 255u, 255u, 255u, (uint8_t)(255u - a));
+    }
 
     slui_label_theme(p->x + 10u, p->hue_y, SLUI_COLOR_TEXT_SECONDARY, "Hue");
     slui_slider_u32(id_slider_h, p->slider_x, p->hue_y, p->slider_w, 0u, 359u, h);
-    slui_label_theme(p->x + 10u, p->sat_y, SLUI_COLOR_TEXT_SECONDARY, "Saturazione");
-    slui_slider_u32(id_slider_s, p->slider_x, p->sat_y, p->slider_w, 0u, 255u, s);
-    slui_label_theme(p->x + 10u, p->val_y, SLUI_COLOR_TEXT_SECONDARY, "Brightness");
-    slui_slider_u32(id_slider_v, p->slider_x, p->val_y, p->slider_w, 0u, 255u, v);
     if (show_alpha) {
-        uint32_t ay = p->val_y + 24u;
+        uint32_t ay = p->sat_y;
         slui_label_theme(p->x + 10u, ay, SLUI_COLOR_TEXT_SECONDARY, "Alpha");
         slui_slider_u32(id_slider_a, p->slider_x, ay, p->slider_w, 0u, 255u, a);
+        slui_button(id_ok, p->ok_x, p->btn_y, 70u, 24u, "Conferma");
+        slui_button(id_cancel, p->cancel_x, p->btn_y, 70u, 24u, "Annulla");
+        return;
     }
     slui_button(id_ok, p->ok_x, p->btn_y, 70u, 24u, "Conferma");
     slui_button(id_cancel, p->cancel_x, p->btn_y, 70u, 24u, "Annulla");
@@ -671,6 +692,7 @@ static inline slui_color_picker_result_t slui_color_picker_handle_event(const sl
                                                                         uint32_t *s,
                                                                         uint32_t *v,
                                                                         uint32_t *a) {
+    (void)id_slider_v;
     if (!ev || !h || !s || !v) return SLUI_COLOR_PICKER_NONE;
     if (ev->type == SLUI_EVENT_BUTTON && ev->id == id_cancel) return SLUI_COLOR_PICKER_CANCEL;
     if (ev->type == SLUI_EVENT_BUTTON && ev->id == id_ok) return SLUI_COLOR_PICKER_CONFIRM;
@@ -678,12 +700,9 @@ static inline slui_color_picker_result_t slui_color_picker_handle_event(const sl
         *h = (ev->value > 359u) ? 359u : ev->value;
         return SLUI_COLOR_PICKER_CHANGED;
     }
-    if (ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_s) {
-        *s = (ev->value > 255u) ? 255u : ev->value;
-        return SLUI_COLOR_PICKER_CHANGED;
-    }
-    if (ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_v) {
+    if (ev->type == SLUI_EVENT_PANEL_INPUT && ev->id == id_slider_s) {
         *v = (ev->value > 255u) ? 255u : ev->value;
+        *s = (ev->value2 > 255u) ? 255u : ev->value2;
         return SLUI_COLOR_PICKER_CHANGED;
     }
     if (a && ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_a) {
