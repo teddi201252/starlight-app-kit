@@ -24,7 +24,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 3u
-#define SLUI_SDK_VERSION_PATCH 0u
+#define SLUI_SDK_VERSION_PATCH 1u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -502,6 +502,202 @@ typedef struct {
     uint32_t y;
     uint32_t w;
     uint32_t h;
+    uint32_t spectrum_x;
+    uint32_t spectrum_y;
+    uint32_t spectrum_w;
+    uint32_t spectrum_h;
+    uint32_t preview_x;
+    uint32_t preview_y;
+    uint32_t preview_w;
+    uint32_t preview_h;
+    uint32_t slider_x;
+    uint32_t slider_w;
+    uint32_t hue_y;
+    uint32_t sat_y;
+    uint32_t val_y;
+    uint32_t btn_y;
+    uint32_t cancel_x;
+    uint32_t ok_x;
+} slui_color_picker_t;
+
+typedef enum {
+    SLUI_COLOR_PICKER_NONE = 0,
+    SLUI_COLOR_PICKER_CHANGED = 1,
+    SLUI_COLOR_PICKER_CANCEL = 2,
+    SLUI_COLOR_PICKER_CONFIRM = 3,
+} slui_color_picker_result_t;
+
+static inline void slui_color_picker_hsv_to_rgb(uint32_t h, uint32_t s, uint32_t v,
+                                                uint8_t *r, uint8_t *g, uint8_t *b) {
+    uint32_t hi = 0u, f = 0u, p = 0u, q = 0u, t = 0u;
+    if (!r || !g || !b) return;
+    if (s > 255u) s = 255u;
+    if (v > 255u) v = 255u;
+    h %= 360u;
+    if (s == 0u) {
+        *r = (uint8_t)v; *g = (uint8_t)v; *b = (uint8_t)v;
+        return;
+    }
+    hi = h / 60u;
+    f = ((h % 60u) * 255u) / 60u;
+    p = (v * (255u - s)) / 255u;
+    q = (v * (255u - ((s * f) / 255u))) / 255u;
+    t = (v * (255u - ((s * (255u - f)) / 255u))) / 255u;
+    switch (hi) {
+        case 0u: *r = (uint8_t)v; *g = (uint8_t)t; *b = (uint8_t)p; break;
+        case 1u: *r = (uint8_t)q; *g = (uint8_t)v; *b = (uint8_t)p; break;
+        case 2u: *r = (uint8_t)p; *g = (uint8_t)v; *b = (uint8_t)t; break;
+        case 3u: *r = (uint8_t)p; *g = (uint8_t)q; *b = (uint8_t)v; break;
+        case 4u: *r = (uint8_t)t; *g = (uint8_t)p; *b = (uint8_t)v; break;
+        default: *r = (uint8_t)v; *g = (uint8_t)p; *b = (uint8_t)q; break;
+    }
+}
+
+static inline void slui_color_picker_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b,
+                                                uint32_t *h, uint32_t *s, uint32_t *v) {
+    uint8_t maxc = r;
+    uint8_t minc = r;
+    uint32_t delta = 0u;
+    int32_t ri = (int32_t)r;
+    int32_t gi = (int32_t)g;
+    int32_t bi = (int32_t)b;
+    if (!h || !s || !v) return;
+    if (g > maxc) maxc = g;
+    if (b > maxc) maxc = b;
+    if (g < minc) minc = g;
+    if (b < minc) minc = b;
+
+    *v = (uint32_t)maxc;
+    delta = (uint32_t)maxc - (uint32_t)minc;
+    if (maxc == 0u) {
+        *s = 0u;
+        *h = 0u;
+        return;
+    }
+    *s = (delta * 255u) / (uint32_t)maxc;
+    if (delta == 0u) {
+        *h = 0u;
+        return;
+    }
+
+    if (maxc == r) {
+        int32_t base = (60 * (gi - bi)) / (int32_t)delta;
+        if (base < 0) base += 360;
+        *h = (uint32_t)base;
+    } else if (maxc == g) {
+        *h = (uint32_t)(120 + ((60 * (bi - ri)) / (int32_t)delta));
+    } else {
+        *h = (uint32_t)(240 + ((60 * (ri - gi)) / (int32_t)delta));
+    }
+    *h %= 360u;
+}
+
+static inline void slui_color_picker_prepare(slui_color_picker_t *p,
+                                             uint32_t viewport_w, uint32_t viewport_h) {
+    if (!p) return;
+    p->w = 260u;
+    p->h = 248u;
+    p->x = (viewport_w > p->w) ? ((viewport_w - p->w) / 2u) : 0u;
+    p->y = (viewport_h > p->h) ? ((viewport_h - p->h) / 2u) : 0u;
+
+    p->spectrum_x = p->x + 10u;
+    p->spectrum_y = p->y + 30u;
+    p->spectrum_w = 146u;
+    p->spectrum_h = 44u;
+    p->preview_x = p->x + 166u;
+    p->preview_y = p->y + 50u;
+    p->preview_w = 84u;
+    p->preview_h = 22u;
+    p->slider_x = p->x + 58u;
+    p->slider_w = 192u;
+    p->hue_y = p->y + 104u;
+    p->sat_y = p->y + 128u;
+    p->val_y = p->y + 152u;
+    p->btn_y = p->y + 206u;
+    p->ok_x = p->x + 180u;
+    p->cancel_x = p->x + 104u;
+}
+
+static inline void slui_color_picker_draw(const slui_color_picker_t *p,
+                                          uint32_t viewport_w, uint32_t viewport_h,
+                                          uint32_t id_slider_h, uint32_t id_slider_s, uint32_t id_slider_v, uint32_t id_slider_a,
+                                          uint32_t id_cancel, uint32_t id_ok,
+                                          uint32_t h, uint32_t s, uint32_t v, uint32_t a,
+                                          uint8_t show_alpha,
+                                          const char *title) {
+    uint8_t pr = 0u, pg = 0u, pb = 0u;
+    if (!p) return;
+    if (!title) title = "Color picker";
+    slui_rect_a_theme(0u, 0u, viewport_w, viewport_h, SLUI_COLOR_BG_CANVAS, 160u);
+    slui_rect_theme(p->x, p->y, p->w, p->h, SLUI_COLOR_BG_PANEL);
+    slui_label_theme(p->x + 10u, p->y + 10u, SLUI_COLOR_TEXT_PRIMARY, title);
+
+    slui_rect_theme(p->spectrum_x, p->spectrum_y, p->spectrum_w, p->spectrum_h, SLUI_COLOR_BG_CANVAS);
+    for (uint32_t i = 0u; i < 12u; i++) {
+        uint32_t hh = (i * 359u) / 11u;
+        uint8_t rr = 0u, gg = 0u, bb = 0u;
+        slui_color_picker_hsv_to_rgb(hh, 255u, 255u, &rr, &gg, &bb);
+        slui_rect(p->spectrum_x + 2u + (i * 11u), p->spectrum_y + 2u, 9u, 12u, rr, gg, bb);
+    }
+    slui_label_theme(p->spectrum_x + 4u, p->spectrum_y + 20u, SLUI_COLOR_TEXT_SECONDARY, "Anteprima spettro");
+
+    slui_color_picker_hsv_to_rgb(h, s, v, &pr, &pg, &pb);
+    slui_label_theme(p->preview_x, p->y + 34u, SLUI_COLOR_TEXT_SECONDARY, "Preview");
+    slui_rect(p->preview_x, p->preview_y, p->preview_w, p->preview_h, pr, pg, pb);
+
+    slui_label_theme(p->x + 10u, p->hue_y, SLUI_COLOR_TEXT_SECONDARY, "Hue");
+    slui_slider_u32(id_slider_h, p->slider_x, p->hue_y, p->slider_w, 0u, 359u, h);
+    slui_label_theme(p->x + 10u, p->sat_y, SLUI_COLOR_TEXT_SECONDARY, "Saturazione");
+    slui_slider_u32(id_slider_s, p->slider_x, p->sat_y, p->slider_w, 0u, 255u, s);
+    slui_label_theme(p->x + 10u, p->val_y, SLUI_COLOR_TEXT_SECONDARY, "Brightness");
+    slui_slider_u32(id_slider_v, p->slider_x, p->val_y, p->slider_w, 0u, 255u, v);
+    if (show_alpha) {
+        uint32_t ay = p->val_y + 24u;
+        slui_label_theme(p->x + 10u, ay, SLUI_COLOR_TEXT_SECONDARY, "Alpha");
+        slui_slider_u32(id_slider_a, p->slider_x, ay, p->slider_w, 0u, 255u, a);
+    }
+    slui_button(id_ok, p->ok_x, p->btn_y, 70u, 24u, "Conferma");
+    slui_button(id_cancel, p->cancel_x, p->btn_y, 70u, 24u, "Annulla");
+}
+
+static inline slui_color_picker_result_t slui_color_picker_handle_event(const slui_event_t *ev,
+                                                                        uint32_t id_slider_h,
+                                                                        uint32_t id_slider_s,
+                                                                        uint32_t id_slider_v,
+                                                                        uint32_t id_slider_a,
+                                                                        uint32_t id_cancel,
+                                                                        uint32_t id_ok,
+                                                                        uint32_t *h,
+                                                                        uint32_t *s,
+                                                                        uint32_t *v,
+                                                                        uint32_t *a) {
+    if (!ev || !h || !s || !v) return SLUI_COLOR_PICKER_NONE;
+    if (ev->type == SLUI_EVENT_BUTTON && ev->id == id_cancel) return SLUI_COLOR_PICKER_CANCEL;
+    if (ev->type == SLUI_EVENT_BUTTON && ev->id == id_ok) return SLUI_COLOR_PICKER_CONFIRM;
+    if (ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_h) {
+        *h = (ev->value > 359u) ? 359u : ev->value;
+        return SLUI_COLOR_PICKER_CHANGED;
+    }
+    if (ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_s) {
+        *s = (ev->value > 255u) ? 255u : ev->value;
+        return SLUI_COLOR_PICKER_CHANGED;
+    }
+    if (ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_v) {
+        *v = (ev->value > 255u) ? 255u : ev->value;
+        return SLUI_COLOR_PICKER_CHANGED;
+    }
+    if (a && ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_a) {
+        *a = (ev->value > 255u) ? 255u : ev->value;
+        return SLUI_COLOR_PICKER_CHANGED;
+    }
+    return SLUI_COLOR_PICKER_NONE;
+}
+
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t w;
+    uint32_t h;
     uint32_t content_h;
     uint32_t offset;
     uint32_t cursor_y;
@@ -583,8 +779,10 @@ const char *slui_last_host_error(void);
 void slui_reload_display(void);
 void slui_reload_theme(void);
 void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
+void slui_set_accent_a(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_theme_reset_override(void);
 int slui_theme_query(slui_color_token_t token, uint8_t *r, uint8_t *g, uint8_t *b);
+int slui_theme_query_a(slui_color_token_t token, uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *a);
 
 #ifdef __cplusplus
 }

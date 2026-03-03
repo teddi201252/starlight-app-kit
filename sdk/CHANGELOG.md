@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.3.1] - 2026-03-03
+- RGBA theme APIs and color picker alpha slider
+
 ## [1.3.0] - 2026-03-03
 - Add SLUI themed primitives, theme query, and per-app accent override APIs
 
