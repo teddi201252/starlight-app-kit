@@ -135,6 +135,7 @@ int64_t peos_tcp_send(int64_t sock, const void *buf, size_t len);
 int64_t peos_tcp_recv(int64_t sock, void *buf, size_t len);
 int64_t peos_tcp_close(int64_t sock);
 int64_t peos_icmp_echo(const uint8_t dst_ip[4], uint16_t id, uint16_t seq);
+int64_t peos_audio_set_log_level(uint32_t level);
 
 size_t peos_strlen(const char *s);
 void *peos_memset(void *dst, int c, size_t n);
