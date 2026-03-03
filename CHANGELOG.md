@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.3.2] - 2026-03-03
+- Sync SDK headers for picker panel interactions
+
 ## [0.3.1] - 2026-03-03
 - Expose updated SDK headers for RGBA theming
 
