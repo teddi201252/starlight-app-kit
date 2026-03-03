@@ -101,6 +101,7 @@ uint64_t peos_time(void);
 uint64_t peos_time_ns(void);
 uint64_t peos_hwinfo(uint64_t *ram_total, uint64_t *ram_free,
                      uint64_t *disk_total, uint64_t *disk_free);
+int64_t peos_hwinfo_report(char *buf, size_t len);
 uint64_t peos_brk(uint64_t addr);
 uint64_t peos_mmap(uint64_t addr, uint64_t len, uint64_t prot, uint64_t flags);
 uint64_t peos_munmap(uint64_t addr, uint64_t len);

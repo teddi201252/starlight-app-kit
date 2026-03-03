@@ -72,6 +72,7 @@ enum {
     PEOS_SYS_mount = 66, // rdi=dev_ptr, rsi=dev_len, rdx=mount_ptr, rcx=mount_len, r8=fs_ptr, r9=fs_len
     PEOS_SYS_umount = 67, // rdi=mount_ptr, rsi=mount_len
     PEOS_SYS_mounts = 68, // rdi=out_ptr, rsi=out_len
+    PEOS_SYS_hwinfo_report = 70, // rdi=buf_ptr (0=only size), rsi=buf_len
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED
