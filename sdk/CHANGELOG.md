@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.4.0] - 2026-03-03
+- Add nonblocking fread/fwrite wrappers for pipe-safe UI polling
+
 ## [1.3.4] - 2026-03-03
 - Maintenance update.
 

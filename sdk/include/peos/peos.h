@@ -78,6 +78,8 @@ int64_t peos_spawnv(const char *path, size_t len, const char *arg_str,
 uint64_t peos_fopen(const char *path, size_t len, uint64_t flags);
 uint64_t peos_fread(uint64_t fd, void *buf, size_t len);
 uint64_t peos_fwrite(uint64_t fd, const void *buf, size_t len);
+uint64_t peos_fread_nb(uint64_t fd, void *buf, size_t len);
+uint64_t peos_fwrite_nb(uint64_t fd, const void *buf, size_t len);
 uint64_t peos_fseek(uint64_t fd, size_t pos);
 uint64_t peos_fsize(uint64_t fd);
 uint64_t peos_fclose(uint64_t fd);
@@ -142,9 +144,11 @@ void *peos_memset(void *dst, int c, size_t n);
 void *peos_memcpy(void *dst, const void *src, size_t n);
 
 // Open flags (userland)
+#define PEOS_O_READ  0x0u
 #define PEOS_O_CREAT 0x1u
 #define PEOS_O_TRUNC 0x2u
 #define PEOS_O_WRITE 0x4u
+#define PEOS_FD_NONBLOCK_BIT (1ull << 63)
 
 #define PEOS_RMDIR_RECURSIVE 0x1u
 
