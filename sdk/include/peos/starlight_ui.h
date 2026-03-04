@@ -58,6 +58,7 @@ typedef enum {
 #define SLUI_CAP_THEME_TOKENS     (1u << 23)
 #define SLUI_CAP_GRADIENT_2D      (1u << 24)
 #define SLUI_CAP_PANEL_INPUT      (1u << 25)
+#define SLUI_CAP_FONT_SIZE        (1u << 26)
 
 #define SLUI_MOD_SHIFT (1u << 0)
 #define SLUI_MOD_CTRL  (1u << 1)
@@ -239,6 +240,7 @@ static inline int slui_grid_next(slui_grid_t *grid,
 
 void slui_begin_frame(void);
 void slui_end_frame(void);
+void slui_set_font_px(uint32_t font_px);
 
 void slui_label(uint32_t x, uint32_t y, const char *text,
                 uint8_t r, uint8_t g, uint8_t b);
