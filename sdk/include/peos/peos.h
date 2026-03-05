@@ -33,6 +33,12 @@ typedef struct {
     uint8_t _pad[7];
 } peos_stat_t;
 
+typedef struct {
+    const char *buf;
+    size_t len;
+    size_t pos;
+} peos_dir_iter_t;
+
 #ifndef PEOS_INPUT_EVENT_T_DEFINED
 #define PEOS_INPUT_EVENT_T_DEFINED 1
 typedef struct peos_input_event {
@@ -86,11 +92,23 @@ uint64_t peos_fclose(uint64_t fd);
 uint64_t peos_chdir(const char *path, size_t len);
 uint64_t peos_getcwd(char *buf, size_t len);
 uint64_t peos_readdir(const char *path, size_t path_len, char *out, size_t out_len);
+int64_t peos_readdir_begin(const char *path, size_t path_len,
+                           char *buf, size_t buf_len, peos_dir_iter_t *it);
+int64_t peos_readdir_next(peos_dir_iter_t *it, char *name, size_t name_len);
 uint64_t peos_stat(const char *path, size_t path_len, peos_stat_t *out, size_t out_len);
 uint64_t peos_mkdir(const char *path, size_t len);
 uint64_t peos_unlink(const char *path, size_t len);
 uint64_t peos_rename(const char *oldpath, size_t old_len, const char *newpath, size_t new_len);
 uint64_t peos_rmdir(const char *path, size_t len, uint64_t flags);
+int64_t peos_exists(const char *path, size_t path_len);
+int64_t peos_is_dir(const char *path, size_t path_len);
+int64_t peos_is_file(const char *path, size_t path_len);
+int64_t peos_mkdir_p(const char *path, size_t path_len);
+int64_t peos_read_file(const char *path, size_t path_len, void *out, size_t out_cap, size_t *out_size);
+int64_t peos_write_file(const char *path, size_t path_len, const void *data, size_t data_len, uint64_t open_flags);
+int64_t peos_path_join(const char *base, const char *name, char *out, size_t out_len);
+int64_t peos_path_basename(const char *path, char *out, size_t out_len);
+int64_t peos_path_parent(const char *path, char *out, size_t out_len);
 uint64_t peos_mount(const char *dev, size_t dev_len, const char *mount_path, size_t mount_len,
                     const char *fs_name, size_t fs_len);
 uint64_t peos_umount(const char *mount_path, size_t mount_len);
@@ -151,6 +169,7 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_FD_NONBLOCK_BIT (1ull << 63)
 
 #define PEOS_RMDIR_RECURSIVE 0x1u
+#define PEOS_PATH_MAX 1024u
 
 // mmap prot flags
 #define PEOS_PROT_READ   (1u << 0)
