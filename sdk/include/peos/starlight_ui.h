@@ -21,11 +21,12 @@ typedef enum {
     SLUI_EVENT_KEY_UP = 10,
     SLUI_EVENT_KEY_REPEAT = 11,
     SLUI_EVENT_PANEL_INPUT = 12,
+    SLUI_EVENT_DOUBLE_CLICK = 13,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 4u
-#define SLUI_SDK_VERSION_PATCH 0u
+#define SLUI_SDK_VERSION_PATCH 1u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -59,6 +60,7 @@ typedef enum {
 #define SLUI_CAP_GRADIENT_2D      (1u << 24)
 #define SLUI_CAP_PANEL_INPUT      (1u << 25)
 #define SLUI_CAP_FONT_SIZE        (1u << 26)
+#define SLUI_CAP_EVENT_DOUBLE_CLICK (1u << 27)
 
 #define SLUI_MOD_SHIFT (1u << 0)
 #define SLUI_MOD_CTRL  (1u << 1)

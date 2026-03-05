@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.4.1] - 2026-03-05
+- SDK/header sync for UI behavior
+
 ## [0.4.0] - 2026-03-03
 - Sync SDK headers for nonblocking file descriptor IO bit
 
