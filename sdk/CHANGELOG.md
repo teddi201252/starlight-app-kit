@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.4.2] - 2026-03-05
+- SDK context-menu API/header updates
+
 ## [1.4.1] - 2026-03-05
 - SDK/header sync for UI behavior
 
