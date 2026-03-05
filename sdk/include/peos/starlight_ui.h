@@ -811,6 +811,7 @@ uint32_t slui_host_capabilities(void);
 const char *slui_last_host_error(void);
 void slui_reload_display(void);
 void slui_reload_theme(void);
+void slui_open_app_bundle(const char *bundle_path);
 void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
 void slui_set_accent_a(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_theme_reset_override(void);
