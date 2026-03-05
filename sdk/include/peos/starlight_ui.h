@@ -22,11 +22,12 @@ typedef enum {
     SLUI_EVENT_KEY_REPEAT = 11,
     SLUI_EVENT_PANEL_INPUT = 12,
     SLUI_EVENT_DOUBLE_CLICK = 13,
+    SLUI_EVENT_CONTEXT_MENU = 14,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 4u
-#define SLUI_SDK_VERSION_PATCH 1u
+#define SLUI_SDK_VERSION_PATCH 2u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -61,6 +62,8 @@ typedef enum {
 #define SLUI_CAP_PANEL_INPUT      (1u << 25)
 #define SLUI_CAP_FONT_SIZE        (1u << 26)
 #define SLUI_CAP_EVENT_DOUBLE_CLICK (1u << 27)
+#define SLUI_CAP_CONTEXT_MENU       (1u << 28)
+#define SLUI_CAP_EVENT_CONTEXT_MENU (1u << 29)
 
 #define SLUI_MOD_SHIFT (1u << 0)
 #define SLUI_MOD_CTRL  (1u << 1)
@@ -278,6 +281,13 @@ void slui_select_state(uint32_t id,
                        uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                        uint32_t option_count, uint32_t selected,
                        uint8_t enabled, const char *options_pipe);
+void slui_context_menu(uint32_t id,
+                       uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                       uint32_t option_count, const char *options_pipe);
+void slui_context_menu_state(uint32_t id,
+                             uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                             uint32_t option_count, uint8_t enabled,
+                             const char *options_pipe);
 
 void slui_text_input(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w, uint32_t h,
