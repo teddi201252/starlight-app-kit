@@ -26,8 +26,8 @@ typedef enum {
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
-#define SLUI_SDK_VERSION_MINOR 4u
-#define SLUI_SDK_VERSION_PATCH 2u
+#define SLUI_SDK_VERSION_MINOR 5u
+#define SLUI_SDK_VERSION_PATCH 0u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -70,8 +70,6 @@ typedef enum {
 #define SLUI_MOD_ALT   (1u << 2)
 #define SLUI_MOD_SUPER (1u << 3)
 
-#define SLUI_EVENT_TEXT_MAX 4096u
-
 typedef struct {
     slui_event_type_t type;
     uint32_t id;
@@ -79,7 +77,8 @@ typedef struct {
     uint32_t value2;
     uint16_t keycode;
     uint16_t mods;
-    char text[SLUI_EVENT_TEXT_MAX];
+    const char *text;
+    uint32_t text_len;
 } slui_event_t;
 
 typedef enum {

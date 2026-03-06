@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.5.0] - 2026-03-06
+- Expose SLUI event text as pointer plus length
+- Align SDK text event structures with dynamic host buffers
+
 ## [1.4.2] - 2026-03-05
 - SDK context-menu API/header updates
 
