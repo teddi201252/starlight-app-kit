@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.5.0] - 2026-03-06
+- Sync App Kit release with SDK text event structure update
+
 ## [0.4.2] - 2026-03-05
 - SDK context-menu API/header updates
 
