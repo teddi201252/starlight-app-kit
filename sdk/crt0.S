@@ -26,3 +26,5 @@ _start:
 
     hlt
     jmp .
+
+.section .note.GNU-stack,"",@progbits

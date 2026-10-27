@@ -1,0 +1,4 @@
+# Where sdk/ comes from (written by scripts/sync_sdk.py)
+peos_commit=1ff0151
+synced=2026-10-27
+slui_sdk=1.0.5

@@ -3,6 +3,12 @@
 #include <stddef.h>
 #include "peos/alloc.h"
 #include "peos/wifi.h"
+#include "peos/capability.h"
+#include "peos/metrics_abi.h"
+#include "peos/sysinfo_abi.h"
+#include "peos/proc_abi.h"
+#include "peos/path_scope_abi.h"
+#include "peos/event_abi.h"
 
 typedef struct {
     uint32_t width;
@@ -19,11 +25,44 @@ typedef struct {
 } peos_fb_map_t;
 
 typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t width;
+    uint32_t height;
+} peos_fb_rect_t;
+
+typedef struct {
+    uint64_t addr;
+    uint64_t len;
+} peos_shm_map_t;
+
+typedef struct {
     uint8_t ip[4];
     uint8_t netmask[4];
     uint8_t gateway[4];
     uint8_t dns[4];
+    uint8_t mac[6];        // filled by netcfg_get (all zero when there is no NIC)
+    uint8_t reserved[2];
 } peos_netcfg_t;
+
+typedef struct {
+    char name[32];
+    uint8_t type;
+    uint8_t reserved[3];
+    uint32_t sector_size;
+    uint64_t sector_count;
+} peos_install_disk_t;
+
+typedef struct {
+    uint32_t status;
+    uint32_t phase;
+    uint32_t percent;
+    int32_t result;
+    uint64_t bytes_done;
+    uint64_t bytes_total;
+    char target[32];
+    char message[64];
+} peos_install_progress_t;
 
 typedef struct {
     uint64_t size;
@@ -76,6 +115,53 @@ void peos_clear(void);
 uint64_t peos_exec(const char *path, size_t len);
 uint64_t peos_execv(const char *path, size_t len, const char *arg_str);
 uint64_t peos_getpid(void);
+/* Fills *out with kernel counters and latency histograms (needs PEOS_CAP_DEBUG). */
+int64_t peos_metrics(peos_metrics_t *out);
+// CPU time counters, volume, uptime, memory and disk, for any task (SYS_SYSINFO).
+int64_t peos_sysinfo(peos_sysinfo_t *out);
+// The processes running (SYS_PROC_LIST): count written to out, or -1.
+int64_t peos_proc_list(peos_proc_info_t *out, size_t max);
+// End a process (SYS_PROC_KILL, needs PEOS_CAP_MANAGE): 0 or -1.
+int64_t peos_proc_kill(uint64_t pid);
+/* Path scope: narrow what this task (and its children) may touch. Never widens. */
+int64_t peos_path_scope_set(const peos_path_grant_t *grants, size_t count);
+/* Path scope for the next peos_spawnv() child: (own scope narrowed by grants). One-shot. */
+int64_t peos_path_set_spawn_scope(const peos_path_grant_t *grants, size_t count);
+int64_t peos_path_scope_query(peos_path_scope_t *out);
+/* Event model. Every descriptor has rights (PEOS_FD_*) that can only shrink. */
+int64_t peos_fd_restrict(uint64_t fd, uint32_t keep_rights);
+int64_t peos_fd_rights(uint64_t fd);
+/* Spawned children get only 0/1/2; list extra descriptors for the next spawnv here. */
+int64_t peos_spawn_set_fds(const peos_spawn_fd_t *fds, size_t count);
+/* Wait until one item is ready or timeout_ns passes (PEOS_WAIT_FOREVER, 0 = poll).
+ * Returns the number of ready items (their revents are set), 0 on timeout, -1 on error. */
+int64_t peos_wait(peos_wait_item_t *items, size_t count, uint64_t timeout_ns);
+/* Timer descriptor: read() returns a uint64_t count of expirations. */
+int64_t peos_timer_create(void);
+int64_t peos_timer_set(uint64_t fd, uint64_t initial_ns, uint64_t interval_ns);
+/* Process descriptor for a direct child: readable when it exits; read() returns
+ * its int32_t exit code and reaps it. */
+int64_t peos_proc_open(uint64_t pid);
+/* Input endpoint: read() returns peos_input_record_t; wait on it with PEOS_WAIT_READ. */
+int64_t peos_input_open(void);
+/* Playback stream: write 48 kHz s16le stereo PCM. A write waits for room
+ * (peos_fwrite_nb does not); wait with PEOS_WAIT_WRITE for space for a period. */
+int64_t peos_audio_open(void);
+/* The network card as a descriptor of whole Ethernet frames (needs "nic"):
+ * read one frame per call into a PEOS_NIC_FRAME_MAX buffer, write one frame
+ * per call. Exclusive: netd holds it. The network itself is peos/net.h. */
+int64_t peos_nic_open(uint32_t index);
+int64_t peos_nic_info(int64_t fd, peos_nic_info_t *out);
+/* Service registry: register a name (needs "service") to get a listening
+ * channel; connect to a name to get a channel to its service. */
+int64_t peos_svc_register(const char *name);
+int64_t peos_svc_connect(const char *name);
+/* Channels (see event_abi.h). send/recv return 0 / byte count, PEOS_CHANNEL_AGAIN,
+ * PEOS_CHANNEL_CLOSED or -1. */
+int64_t peos_channel_create(int64_t out_pair[2]);
+int64_t peos_channel_send(int64_t fd, const peos_channel_msg_t *msg, uint64_t flags);
+int64_t peos_channel_recv(int64_t fd, peos_channel_msg_t *msg, uint64_t flags);
+int64_t peos_thread_spawn(void (*entry)(void *), void *arg, void *stack_top);
 uint64_t peos_waitpid(uint64_t pid, int *status);
 uint64_t peos_waitpid_flags(uint64_t pid, int *status, uint64_t flags);
 uint64_t peos_pipe(uint64_t out_pair[2]);
@@ -125,8 +211,20 @@ int64_t peos_hwinfo_report(char *buf, size_t len);
 uint64_t peos_brk(uint64_t addr);
 uint64_t peos_mmap(uint64_t addr, uint64_t len, uint64_t prot, uint64_t flags);
 uint64_t peos_munmap(uint64_t addr, uint64_t len);
+int64_t peos_shm_create(size_t len);
+int64_t peos_shm_map(uint64_t id, peos_shm_map_t *out);
+int64_t peos_shm_destroy(uint64_t id);
+/* Shared memory as a descriptor: freed when the last descriptor closes and it
+ * was never mapped. Mapping is read-only when the descriptor lacks PEOS_FD_WR. */
+int64_t peos_shm_create_fd(size_t len);
+int64_t peos_shm_map_fd(int64_t fd, peos_shm_map_t *out);
+/* Let `pid` and its descendants map an id-based object (creator only). */
+int64_t peos_shm_allow(uint64_t id, uint64_t pid);
 uint64_t peos_fbinfo(peos_fb_info_t *out);
 uint64_t peos_fbpresent(const void *buf, size_t len, uint64_t flags);
+int64_t peos_fbpresent_damage(const void *frame, size_t frame_len,
+                              const peos_fb_rect_t *rects, size_t rect_count,
+                              uint64_t flags);
 int64_t peos_fbmap(peos_fb_map_t *out, uint64_t flags);
 int64_t peos_fb_set_mode(uint32_t width, uint32_t height);
 int64_t peos_cursor_set_visible(uint64_t visible);
@@ -137,25 +235,13 @@ int64_t peos_bootlog_snapshot(void *buf, size_t len);
 uint64_t peos_input_mode(uint64_t mode);
 uint64_t peos_input_poll(peos_input_event_t *out, size_t max_events);
 int64_t peos_input_mouse(peos_mouse_event_t *out);
-int64_t peos_udp_socket(void);
-int64_t peos_udp_bind(int64_t sock, uint16_t local_port);
-int64_t peos_udp_sendto(int64_t sock, const void *buf, size_t len,
-                        const uint8_t dst_ip[4], uint16_t dst_port);
-int64_t peos_udp_recvfrom(int64_t sock, void *buf, size_t len,
-                          uint8_t out_src_ip[4], uint16_t *out_src_port);
-int64_t peos_udp_close(int64_t sock);
-int64_t peos_netcfg_get(peos_netcfg_t *cfg);
-int64_t peos_netcfg_set(const peos_netcfg_t *cfg);
 int peos_net_parse_ipv4(const char *s, uint8_t out[4]);
 int peos_net_dns_resolve_a(const char *host, uint8_t out_ip[4], uint32_t timeout_ticks);
 int peos_net_resolve_ipv4(const char *host_or_ip, uint8_t out_ip[4], uint32_t timeout_ticks);
-int64_t peos_tcp_socket(void);
-int64_t peos_tcp_connect(int64_t sock, const uint8_t dst_ip[4], uint16_t dst_port);
-int64_t peos_tcp_send(int64_t sock, const void *buf, size_t len);
-int64_t peos_tcp_recv(int64_t sock, void *buf, size_t len);
-int64_t peos_tcp_close(int64_t sock);
-int64_t peos_icmp_echo(const uint8_t dst_ip[4], uint16_t id, uint16_t seq);
 int64_t peos_audio_set_log_level(uint32_t level);
+int64_t peos_install_list_disks(peos_install_disk_t *out, size_t max_entries);
+int64_t peos_install_get_progress(peos_install_progress_t *out);
+int64_t peos_install_run(const char *target, size_t len);
 
 size_t peos_strlen(const char *s);
 void *peos_memset(void *dst, int c, size_t n);
@@ -187,8 +273,21 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 
 #define PEOS_WAIT_NOHANG 0x1u
 
+#define PEOS_INSTALL_STATUS_IDLE 0u
+#define PEOS_INSTALL_STATUS_BUSY 1u
+#define PEOS_INSTALL_STATUS_DONE 2u
+#define PEOS_INSTALL_STATUS_ERROR 3u
+
+#define PEOS_INSTALL_PHASE_NONE 0u
+#define PEOS_INSTALL_PHASE_PREPARE 1u
+#define PEOS_INSTALL_PHASE_PARTITION 2u
+#define PEOS_INSTALL_PHASE_WRITE_ESP 3u
+#define PEOS_INSTALL_PHASE_WRITE_ROOT 4u
+#define PEOS_INSTALL_PHASE_FINALIZE 5u
+
 // fbpresent flags
 #define PEOS_FBPRESENT_EXCLUSIVE (1u << 0)
+#define PEOS_FBPRESENT_DAMAGE_MAX_RECTS 256u
 // fbmap flags
 #define PEOS_FBMAP_EXCLUSIVE     (1u << 0)
 
@@ -221,11 +320,33 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_KEY_N      0x0031u
 #define PEOS_KEY_M      0x0032u
 #define PEOS_KEY_SPACE  0x0039u
+#define PEOS_KEY_CAPSLOCK 0x003Au
+#define PEOS_KEY_BACKSPACE 0x000Eu
+#define PEOS_KEY_TAB    0x000Fu
 #define PEOS_KEY_ENTER  0x001Cu
 #define PEOS_KEY_LCTRL  0x001Du
 #define PEOS_KEY_LSHIFT 0x002Au
 #define PEOS_KEY_RSHIFT 0x0036u
+#define PEOS_KEY_LALT   0x0038u
 #define PEOS_KEY_UP     0xE048u
 #define PEOS_KEY_LEFT   0xE04Bu
 #define PEOS_KEY_RIGHT  0xE04Du
 #define PEOS_KEY_DOWN   0xE050u
+#define PEOS_KEY_HOME   0xE047u
+#define PEOS_KEY_END    0xE04Fu
+#define PEOS_KEY_RCTRL  0xE01Du
+#define PEOS_KEY_RALT   0xE038u
+#define PEOS_KEY_LSUPER 0xE05Bu
+#define PEOS_KEY_RSUPER 0xE05Cu
+
+// Normalized extended keycodes (when E0 prefix is stripped).
+#define PEOS_KEY_UP_NORM      0x0048u
+#define PEOS_KEY_LEFT_NORM    0x004Bu
+#define PEOS_KEY_RIGHT_NORM   0x004Du
+#define PEOS_KEY_DOWN_NORM    0x0050u
+#define PEOS_KEY_HOME_NORM    0x0047u
+#define PEOS_KEY_END_NORM     0x004Fu
+#define PEOS_KEY_RCTRL_NORM   0x001Du
+#define PEOS_KEY_RALT_NORM    0x0038u
+#define PEOS_KEY_LSUPER_NORM  0x005Bu
+#define PEOS_KEY_RSUPER_NORM  0x005Cu
