@@ -23,11 +23,14 @@ typedef enum {
     SLUI_EVENT_PANEL_INPUT = 12,
     SLUI_EVENT_DOUBLE_CLICK = 13,
     SLUI_EVENT_CONTEXT_MENU = 14,
+    // The body (where the app draws) is value x value2 now: lay out again.
+    // It comes once the app has said hello, and on every resize.
+    SLUI_EVENT_RESIZE = 15,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
-#define SLUI_SDK_VERSION_MINOR 5u
-#define SLUI_SDK_VERSION_PATCH 0u
+#define SLUI_SDK_VERSION_MINOR 0u
+#define SLUI_SDK_VERSION_PATCH 5u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -64,6 +67,10 @@ typedef enum {
 #define SLUI_CAP_EVENT_DOUBLE_CLICK (1u << 27)
 #define SLUI_CAP_CONTEXT_MENU       (1u << 28)
 #define SLUI_CAP_EVENT_CONTEXT_MENU (1u << 29)
+#define SLUI_CAP_FOCUS              (1u << 30)
+// BUTTONP, SEGMENT and SWATCH: the primary button, the segmented control
+// and the colour swatch.
+#define SLUI_CAP_SOFT_CONTROLS      (1u << 31)
 
 #define SLUI_MOD_SHIFT (1u << 0)
 #define SLUI_MOD_CTRL  (1u << 1)
@@ -98,6 +105,10 @@ typedef enum {
     SLUI_COLOR_DANGER,
     SLUI_COLOR_SUCCESS,
     SLUI_COLOR_WARNING,
+    // Soft UI (Starlight's shadows and the neon accent).
+    SLUI_COLOR_SHADOW_DARK,
+    SLUI_COLOR_SHADOW_LIGHT,
+    SLUI_COLOR_NEON,
     SLUI_COLOR_COUNT
 } slui_color_token_t;
 
@@ -245,6 +256,7 @@ static inline int slui_grid_next(slui_grid_t *grid,
 void slui_begin_frame(void);
 void slui_end_frame(void);
 void slui_set_font_px(uint32_t font_px);
+void slui_focus(uint32_t id);
 
 void slui_label(uint32_t x, uint32_t y, const char *text,
                 uint8_t r, uint8_t g, uint8_t b);
@@ -256,6 +268,24 @@ void slui_button(uint32_t id,
 void slui_button_state(uint32_t id,
                        uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                        uint8_t enabled, const char *text);
+
+// The primary button of a group (Conferma, Salva): night, its label in the
+// neon accent. Answered with SLUI_EVENT_BUTTON like any button.
+void slui_button_primary(uint32_t id,
+                         uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                         uint8_t enabled, const char *text);
+// A colour to choose (an accent): a round raised button of size x size with
+// a dot of r,g,b, larger and glowing when chosen. Answered with
+// SLUI_EVENT_BUTTON.
+void slui_swatch(uint32_t id, uint32_t x, uint32_t y, uint32_t size,
+                 uint8_t r, uint8_t g, uint8_t b, uint8_t chosen, uint8_t enabled);
+// A segmented control: options "A|B|C" side by side, one chosen. A click on
+// another one, or left/right with the keyboard focus on it, sends
+// SLUI_EVENT_SELECT with its index.
+void slui_segment(uint32_t id,
+                  uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                  uint32_t option_count, uint32_t selected,
+                  uint8_t enabled, const char *options_pipe);
 
 void slui_slider_u32(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w,
@@ -326,6 +356,45 @@ void slui_rect_a(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                  uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_rect_theme(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_color_token_t token);
 void slui_rect_a_theme(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_color_token_t token, uint8_t a);
+// Drawing beyond the controls (Starlight, Soft UI plan phase 13).
+typedef enum {
+    SLUI_SURF_RAISED = 0,     // cards and controls at rest
+    SLUI_SURF_RAISED_HI = 1,  // under the mouse, a chosen row
+    SLUI_SURF_INSET = 2,      // fields, tracks, wells
+    SLUI_SURF_FLAT = 3,
+    SLUI_SURF_NIGHT = 4,      // the night cards (CPU, network, today)
+    SLUI_SURF_NIGHT_GLOW = 5,
+    SLUI_SURF_NEON = 6,       // a lit dot or bar
+    SLUI_SURF_NIGHT_FLAT = 7, // night with no shadow
+} slui_surface_kind_t;
+
+typedef enum {
+    SLUI_ALIGN_LEFT = 0,      // the text starts at x
+    SLUI_ALIGN_CENTER = 1,    // centred on x
+    SLUI_ALIGN_RIGHT = 2,     // ends at x
+} slui_align_t;
+
+// A soft surface of any size, its corners rounded by radius.
+void slui_surface(slui_surface_kind_t kind, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t radius);
+// The labels after this use that font of Starlight's skin ("ui-30-light",
+// "mono-16", "mono-64"...); NULL or "" back to the font size's. Each frame
+// starts with the default.
+void slui_face(const char *name);
+void slui_label_align(uint32_t x, uint32_t y, slui_align_t align, const char *text,
+                      uint8_t r, uint8_t g, uint8_t b);
+void slui_label_align_theme(uint32_t x, uint32_t y, slui_align_t align, slui_color_token_t token,
+                            const char *text);
+// A ring of outer diameter size and width thick: the track, then the fill
+// clockwise from the top to permille (0..1000), with round ends.
+void slui_ring(uint32_t x, uint32_t y, uint32_t size, uint32_t thick, uint32_t permille,
+               uint8_t tr, uint8_t tg, uint8_t tb, uint8_t fr, uint8_t fg, uint8_t fb);
+// A modal dialog's veil: night at alpha over the whole window, its title bar
+// and frame included; what is drawn after it is on top.
+void slui_veil(uint8_t alpha);
+// A graph of up to 256 values 0..1000 across w: the area under them in the
+// fill colour (alpha fa), the line on top.
+void slui_graph(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint16_t *values, uint32_t count,
+                uint8_t lr, uint8_t lg, uint8_t lb, uint8_t fr, uint8_t fg, uint8_t fb, uint8_t fa);
 void slui_list_item(uint32_t id,
                     uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                     uint8_t enabled,
@@ -510,7 +579,7 @@ static inline void slui_dialog_draw(const slui_dialog_t *dlg,
     }
 
     slui_button(id_cancel, dlg->cancel_x, dlg->btn_y, dlg->cancel_w, 24u, cancel_label);
-    slui_button(id_ok, dlg->ok_x, dlg->btn_y, dlg->ok_w, 24u, ok_label);
+    slui_button_primary(id_ok, dlg->ok_x, dlg->btn_y, dlg->ok_w, 24u, 1u, ok_label);
 }
 
 static inline slui_dialog_result_t slui_dialog_map_event(const slui_event_t *ev,
@@ -686,11 +755,11 @@ static inline void slui_color_picker_draw(const slui_color_picker_t *p,
         uint32_t ay = p->sat_y;
         slui_label_theme(p->x + 10u, ay, SLUI_COLOR_TEXT_SECONDARY, "Alpha");
         slui_slider_u32(id_slider_a, p->slider_x, ay, p->slider_w, 0u, 255u, a);
-        slui_button(id_ok, p->ok_x, p->btn_y, 70u, 24u, "Conferma");
+        slui_button_primary(id_ok, p->ok_x, p->btn_y, 70u, 24u, 1u, "Conferma");
         slui_button(id_cancel, p->cancel_x, p->btn_y, 70u, 24u, "Annulla");
         return;
     }
-    slui_button(id_ok, p->ok_x, p->btn_y, 70u, 24u, "Conferma");
+    slui_button_primary(id_ok, p->ok_x, p->btn_y, 70u, 24u, 1u, "Conferma");
     slui_button(id_cancel, p->cancel_x, p->btn_y, 70u, 24u, "Annulla");
 }
 
@@ -807,6 +876,8 @@ uint32_t slui_sdk_version_u32(void);
 uint32_t slui_protocol_version(void);
 uint32_t slui_host_protocol_version(void);
 uint32_t slui_host_capabilities(void);
+// The body's size from the last SLUI_EVENT_RESIZE: 0 until the first one.
+void slui_viewport(uint32_t *w, uint32_t *h);
 const char *slui_last_host_error(void);
 void slui_reload_display(void);
 void slui_reload_theme(void);

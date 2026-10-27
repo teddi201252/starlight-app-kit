@@ -40,19 +40,19 @@ enum {
     PEOS_SYS_audio_write = 34, // rdi=buf, rsi=len -> bytes written or -1
     PEOS_SYS_audio_stream_write = 35, // rdi=buf, rsi=len -> bytes written or -1
     PEOS_SYS_audio_stream_avail = 36, // rax=available bytes for writing
-    PEOS_SYS_udp_socket = 37, // rax=sockfd
-    PEOS_SYS_udp_bind = 38, // rdi=sockfd, rsi=port
-    PEOS_SYS_udp_sendto = 39, // rdi=sockfd, rsi=buf, rdx=len, rcx=ip, r8=port
-    PEOS_SYS_udp_recvfrom = 40, // rdi=sockfd, rsi=buf, rdx=len, rcx=ip, r8=port
-    PEOS_SYS_udp_close = 41, // rdi=sockfd
-    PEOS_SYS_netcfg_get = 42, // rdi=cfg_ptr, rsi=cfg_len
-    PEOS_SYS_netcfg_set = 43, // rdi=cfg_ptr, rsi=cfg_len
-    PEOS_SYS_tcp_socket = 44, // rax=sockfd
-    PEOS_SYS_tcp_connect = 45, // rdi=sockfd, rcx=dst_ip_ptr, r8=dst_port
-    PEOS_SYS_tcp_send = 46, // rdi=sockfd, rsi=buf, rdx=len
-    PEOS_SYS_tcp_recv = 47, // rdi=sockfd, rsi=buf, rdx=len
-    PEOS_SYS_tcp_close = 48, // rdi=sockfd
-    PEOS_SYS_icmp_echo = 49, // rdi=dst_ip_ptr, rsi=id, rdx=seq
+    /* 37: udp_socket, retired in milestone 4 (the network is netd's) */
+    /* 38: udp_bind, retired in milestone 4 (the network is netd's) */
+    /* 39: udp_sendto, retired in milestone 4 (the network is netd's) */
+    /* 40: udp_recvfrom, retired in milestone 4 (the network is netd's) */
+    /* 41: udp_close, retired in milestone 4 (the network is netd's) */
+    /* 42: netcfg_get, retired in milestone 4 (the network is netd's) */
+    /* 43: netcfg_set, retired in milestone 4 (the network is netd's) */
+    /* 44: tcp_socket, retired in milestone 4 (the network is netd's) */
+    /* 45: tcp_connect, retired in milestone 4 (the network is netd's) */
+    /* 46: tcp_send, retired in milestone 4 (the network is netd's) */
+    /* 47: tcp_recv, retired in milestone 4 (the network is netd's) */
+    /* 48: tcp_close, retired in milestone 4 (the network is netd's) */
+    /* 49: icmp_echo, retired in milestone 4 (the network is netd's) */
     PEOS_SYS_wifi_scan = 50, // rdi=scan_req_ptr, rsi=scan_req_len
     PEOS_SYS_wifi_connect = 51, // rdi=conn_ptr, rsi=conn_len
     PEOS_SYS_wifi_status = 52, // rdi=status_ptr, rsi=status_len
@@ -72,8 +72,49 @@ enum {
     PEOS_SYS_mount = 66, // rdi=dev_ptr, rsi=dev_len, rdx=mount_ptr, rcx=mount_len, r8=fs_ptr, r9=fs_len
     PEOS_SYS_umount = 67, // rdi=mount_ptr, rsi=mount_len
     PEOS_SYS_mounts = 68, // rdi=out_ptr, rsi=out_len
+    PEOS_SYS_thread_spawn = 69, // rdi=entry, rsi=arg, rdx=stack_top
     PEOS_SYS_hwinfo_report = 70, // rdi=buf_ptr (0=only size), rsi=buf_len
     PEOS_SYS_audio_set_log_level = 71, // rdi=level (0=error..3=debug)
+    PEOS_SYS_shm_create = 72, // rdi=len -> shm id or -1
+    PEOS_SYS_shm_map = 73, // rdi=id, rsi=out_ptr, rdx=out_len -> 0/-1
+    PEOS_SYS_shm_destroy = 74, // rdi=id -> 0/-1
+    PEOS_SYS_install_list_disks = 75, // rdi=out_ptr (0=only count), rsi=max_entries -> count or -1
+    PEOS_SYS_install_get_progress = 76, // rdi=out_ptr, rsi=out_len -> 0/-1
+    PEOS_SYS_install_run = 77, // rdi=target_ptr, rsi=target_len -> 0/-1
+    PEOS_SYS_cap_query = 78, // rdi=target_pid (0=self) -> capability mask or -1
+    PEOS_SYS_cap_grant = 79, // rdi=target_pid, rsi=mask -> 0/-1
+    PEOS_SYS_cap_revoke = 80, // rdi=target_pid, rsi=mask -> 0/-1
+    PEOS_SYS_fbpresent_damage = 81, // rdi=frame, rsi=len, rdx=rects, rcx=count, r8=flags
+    PEOS_SYS_cap_set_spawn_mask = 82, // rdi=mask -> 0/-1; ceiling for the next spawnv child (one-shot)
+    PEOS_SYS_metrics = 83, // rdi=out_ptr, rsi=len (>= sizeof(peos_metrics_t)) -> bytes written or -1
+    PEOS_SYS_path_scope_set = 84, // rdi=grants_ptr, rsi=count -> 0/-1; narrows this task's path scope
+    PEOS_SYS_path_set_spawn_scope = 85, // rdi=grants_ptr, rsi=count -> 0/-1; path scope for the next spawnv child (one-shot)
+    PEOS_SYS_path_scope_query = 86, // rdi=out_ptr (peos_path_scope_t) -> 0/-1
+    PEOS_SYS_fd_restrict = 87,     // rdi=fd, rsi=rights to keep -> 0/-1
+    PEOS_SYS_fd_rights = 88,       // rdi=fd -> rights or -1
+    PEOS_SYS_spawn_set_fds = 89,   // rdi=peos_spawn_fd_t[], rsi=count -> 0/-1; for the next spawnv (one-shot)
+    PEOS_SYS_wait = 90,            // rdi=peos_wait_item_t[], rsi=count, rdx=timeout_ns -> ready count, 0 on timeout, -1
+    PEOS_SYS_timer_create = 91,    // -> fd or -1
+    PEOS_SYS_timer_set = 92,       // rdi=fd, rsi=initial_ns (0 = disarm), rdx=interval_ns (0 = one-shot) -> 0/-1
+    PEOS_SYS_proc_open = 93,       // rdi=pid of a direct child -> fd or -1
+    PEOS_SYS_channel_create = 94,  // rdi=int64_t[2] out -> 0/-1
+    PEOS_SYS_channel_send = 95,    // rdi=fd, rsi=peos_channel_msg_t*, rdx=flags -> 0/AGAIN/CLOSED/-1
+    PEOS_SYS_channel_recv = 96,    // rdi=fd, rsi=peos_channel_msg_t*, rdx=flags -> len/AGAIN/CLOSED/-1
+    PEOS_SYS_shm_create_fd = 97,   // rdi=len -> fd or -1
+    PEOS_SYS_shm_map_fd = 98,      // rdi=fd, rsi=out_ptr, rdx=out_len -> 0/-1 (read-only without WR)
+    PEOS_SYS_shm_allow = 99,       // rdi=id, rsi=pid -> 0/-1; creator only
+    PEOS_SYS_input_open = 100,     // -> fd of peos_input_record_t, or -1
+    PEOS_SYS_audio_open = 101,     // -> fd for PCM playback (write, wait WRITE), or -1
+    /* 102: net_socket, retired in milestone 4 (the network is netd's) */
+    /* 103: net_bind, retired in milestone 4 (the network is netd's) */
+    /* 104: net_connect, retired in milestone 4 (the network is netd's) */
+    PEOS_SYS_nic_open = 105,       // rdi=index -> fd of whole Ethernet frames (exclusive), or -1
+    PEOS_SYS_nic_info = 106,       // rdi=fd, rsi=peos_nic_info_t*, rdx=len -> 0/-1
+    PEOS_SYS_svc_register = 107,   // rdi=name, rsi=len -> listening channel fd, or -1
+    PEOS_SYS_svc_connect = 108,    // rdi=name, rsi=len -> channel fd to the service, -1, or PEOS_CHANNEL_AGAIN
+    PEOS_SYS_sysinfo = 109,       // rdi=peos_sysinfo_t*, rsi=len -> bytes written or -1 (no capability)
+    PEOS_SYS_proc_list = 110,     // rdi=peos_proc_info_t[], rsi=max -> count or -1 (no capability)
+    PEOS_SYS_proc_kill = 111,     // rdi=pid -> 0/-1 (PEOS_CAP_MANAGE)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED
