@@ -2,6 +2,18 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.6.0] - 2026-10-27
+- Synced from PeOS 1ff0151 (SLUI SDK 1.0.5) with `scripts/sync_sdk.py`
+- The whole `userland/include`: the libc headers (`stdio.h`, `string.h`...),
+  SDL, and every `peos/` header (notify, net, capability, path scope, event,
+  sysinfo, proc, calendar_file...)
+- SLUI: Soft UI controls (`slui_button_primary`, `slui_segment`,
+  `slui_swatch`), `SLUI_EVENT_RESIZE`, drawing beyond the controls
+  (`slui_surface`, `slui_face`, `slui_label_align`, `slui_ring`,
+  `slui_graph`, `slui_veil`)
+- `peos_sysinfo` (uptime, memory, disk), `peos_proc_list`, `peos_proc_kill`
+- New `libpeos.a` and `crt0.S`
+
 ## [1.5.0] - 2026-03-06
 - Expose SLUI event text as pointer plus length
 - Align SDK text event structures with dynamic host buffers

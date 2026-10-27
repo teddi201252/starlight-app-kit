@@ -8,7 +8,11 @@ APP_SRC_ROOT := examples/$(APP_ID)/src
 APP_RES_ROOT := examples/$(APP_ID)/resources
 
 CC := x86_64-elf-gcc
-CFLAGS ?= -std=gnu11 -O2 -Wall -Wextra -ffreestanding -fno-stack-protector -fno-pie -mno-red-zone -mcmodel=kernel
+# The flags PeOS builds its own apps with (but -Werror).
+CFLAGS ?= -std=gnu11 -O2 -Wall -Wextra -ffreestanding -fno-stack-protector -fno-pie -Wa,--noexecstack -mno-red-zone -mcmodel=kernel
+# A PeOS source tree, for sync-sdk and peos-add: the one the kit sits in, or
+# a sibling checkout.
+PEOS ?= $(if $(wildcard ../userland/apps),..,../peos-starlight)
 
 APP_SRC_C := $(shell find $(APP_SRC_ROOT) -type f -name '*.c' 2>/dev/null)
 APP_SRC_S := $(shell find $(APP_SRC_ROOT) -type f -name '*.S' 2>/dev/null)
@@ -30,13 +34,15 @@ DIST_MANIFEST := $(DIST_DIR)/app.ini
 APP_RES_FILES := $(shell find $(APP_RES_ROOT) -type f ! -name '.DS_Store' 2>/dev/null)
 DIST_RES_FILES := $(patsubst $(APP_RES_ROOT)/%,$(DIST_DIR)/resources/%,$(APP_RES_FILES))
 
-.PHONY: help check-env scaffold check-sources build package clean
+.PHONY: help check-env scaffold check-sources build package clean sync-sdk peos-add
 
 help:
 	@echo "Starlight App Kit (standalone-first)"
 	@echo "  make scaffold APP_NAME='My App' APP_ID=myapp"
 	@echo "  make build APP_ID=myapp                     # standalone: dist/myapp.app"
 	@echo "  make package APP_ID=myapp                   # alias of build"
+	@echo "  make sync-sdk PEOS=../peos-starlight         # refresh sdk/ from a PeOS tree"
+	@echo "  make peos-add APP_ID=myapp PEOS=../peos-starlight  # add the app to a PeOS tree's image"
 
 check-env:
 	python3 scripts/check_env.py --sdk-dir "$(SDK_DIR)"
@@ -66,7 +72,7 @@ $(BUILD_DIR)/%.o: $(APP_SRC_ROOT)/%.s
 $(DIST_BIN): check-sources $(APP_OBJS) $(BUILD_CRT0) $(SDK_LIB) $(SDK_LINKER)
 	@mkdir -p "$(DIST_DIR)"
 	$(CC) $(CFLAGS) -I"$(SDK_INCLUDE)" -nostdlib -ffreestanding -fno-pie \
-	    -Wl,-T,"$(SDK_LINKER)" -Wl,-z,max-page-size=0x1000 \
+	    -Wl,-T,"$(SDK_LINKER)" -Wl,-z,max-page-size=0x1000 -Wl,-z,noexecstack \
 	    "$(BUILD_CRT0)" $(APP_OBJS) "$(SDK_LIB)" -o "$@"
 
 $(DIST_MANIFEST): $(APP_MANIFEST)
@@ -81,6 +87,19 @@ build: $(DIST_BIN) $(DIST_MANIFEST) $(DIST_RES_FILES)
 	@echo "Standalone bundle ready: $(DIST_DIR)"
 
 package: build
+
+sync-sdk:
+	python3 scripts/sync_sdk.py --peos "$(PEOS)"
+
+# The app's project goes into PeOS's userland/apps/, where the image build
+# compiles it like the system apps (make -C $(PEOS) run-hdd to try it).
+peos-add: check-sources
+	@test -d "$(PEOS)/userland/apps" || (echo "Not a PeOS tree: $(PEOS)" && exit 1)
+	rm -rf "$(PEOS)/userland/apps/$(APP_ID)"
+	mkdir -p "$(PEOS)/userland/apps/$(APP_ID)"
+	cp -R "examples/$(APP_ID)/src" "examples/$(APP_ID)/bundle" "$(PEOS)/userland/apps/$(APP_ID)/"
+	if [ -d "$(APP_RES_ROOT)" ]; then cp -R "$(APP_RES_ROOT)" "$(PEOS)/userland/apps/$(APP_ID)/"; fi
+	@echo "Added to $(PEOS)/userland/apps/$(APP_ID)"
 
 clean:
 	rm -rf "$(BUILD_DIR)" "$(DIST_DIR)"

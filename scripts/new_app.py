@@ -41,8 +41,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Create a Starlight app project in this kit")
     parser.add_argument("--name", required=True, help="Display name (e.g. Calcolatrice)")
     parser.add_argument("--id", help="App id (default: sanitized name)")
+    parser.add_argument("--category", choices=["sistema", "strumenti", "svago"], default="strumenti",
+                        help="App manager filter (default: strumenti)")
+    parser.add_argument("--width", type=int, default=560, help="Body width when the window opens")
+    parser.add_argument("--height", type=int, default=400, help="Body height when the window opens")
+    parser.add_argument("--min-width", type=int, help="Smallest body width (default: --width)")
+    parser.add_argument("--min-height", type=int, help="Smallest body height (default: --height)")
+    parser.add_argument("--fixed-size", action="store_true", help="The window cannot be resized")
     parser.add_argument("--force", action="store_true", help="Overwrite if project exists")
     args = parser.parse_args()
+    if args.width < 200 or args.height < 150:
+        raise SystemExit("--width/--height: at least 200 x 150")
 
     app_name = sanitize_name(args.name)
     app_id = sanitize_id(args.id if args.id else app_name)
@@ -59,9 +68,22 @@ def main() -> int:
     bundle_dir.mkdir(parents=True, exist_ok=True)
     resources_dir.mkdir(parents=True, exist_ok=True)
 
+    if args.fixed_size:
+        limits = "resizable=0"
+    else:
+        limits = "\n".join([
+            f"min_width={args.min_width}" if args.min_width else f"# min_width={args.width}",
+            f"min_height={args.min_height}" if args.min_height else f"# min_height={args.height}",
+            "# max_width=",
+            "# max_height=",
+        ])
     mapping = {
         "APP_NAME": app_name,
         "APP_ID": app_id,
+        "CATEGORY": args.category,
+        "WIDTH": str(args.width),
+        "HEIGHT": str(args.height),
+        "SIZE_LIMITS": limits,
     }
 
     (src_dir / "main.c").write_text(

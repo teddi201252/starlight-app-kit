@@ -36,6 +36,11 @@ def main() -> int:
         print("  Populate sdk/ with include/, lib/libpeos.a, crt0.S, linker.ld")
 
     ok = ok and sdk_ok
+    source = sdk_dir / "SOURCE"
+    if source.exists():
+        info = dict(l.split("=", 1) for l in source.read_text().splitlines() if "=" in l and not l.startswith("#"))
+        print(f"sdk source: PeOS {info.get('peos_commit', '?')}, synced {info.get('synced', '?')}, "
+              f"SLUI SDK {info.get('slui_sdk', '?')}")
 
     return 0 if ok else 1
 
