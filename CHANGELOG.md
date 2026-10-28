@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.8.1] - 2026-10-28
+- String.lang: a text between double quotes keeps its spaces; check_strings.py reads them so
+- SDK 1.7.1
+
 ## [0.8.0] - 2026-10-28
 - Languages (Technical Alpha plan, phase 4): `slui_text`, `slui_text_n`,
   `slui_resource`, `slui_language`, `SLUI_EVENT_LANGUAGE`; an app's words in

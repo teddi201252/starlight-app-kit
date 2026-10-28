@@ -33,8 +33,11 @@ def parse(path: pathlib.Path) -> dict[str, str]:
             continue
         key, value = line.split("=", 1)
         key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+            value = value[1:-1]   # quoted: the spaces inside are the text's
         if key:
-            out[key] = value.strip()
+            out[key] = value
     return out
 
 

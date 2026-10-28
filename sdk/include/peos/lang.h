@@ -11,8 +11,9 @@
 //   about.body=First line\nsecond line
 //
 // UTF-8, one sentence per line, the key up to the first '='. Spaces around
-// the key and the text are dropped. In the text, \n is a new line, \t a tab
-// and \\ a backslash. A key given twice keeps the last text.
+// the key and the text are dropped; a text between double quotes keeps its
+// own (chars="Chars: "). In the text, \n is a new line, \t a tab and \\ a
+// backslash. A key given twice keeps the last text.
 //
 // The system's sentences: /system/lang/<code>/String.lang. An app's:
 // <bundle>/resources/<code>/String.lang, beside its translated images and
@@ -83,6 +84,10 @@ static inline uint32_t peos_lang_parse(char *buf, size_t len, peos_lang_entry_t 
         buf[key_end] = '\0';
         size_t text = eq + 1u;
         while (text < end && peos_lang_is_space(buf[text])) text++;
+        if (end - text >= 2u && buf[text] == '"' && buf[end - 1u] == '"') {
+            text++;   // "  quoted  ": the spaces inside are the text's
+            end--;
+        }
 
         // the escapes, in place (the text only gets shorter)
         size_t w = text;

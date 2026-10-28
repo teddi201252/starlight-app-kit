@@ -371,7 +371,8 @@ myapp.app/
 ```
 
 `String.lang` is UTF-8 text, one sentence per line, `key=text` as in
-`app.ini`; `#` starts a comment, `\n` is a new line, `\t` a tab, `\\` a
+`app.ini`. Spaces around the text are dropped; put it between double quotes
+to keep them (`chars="Chars: "`). `#` starts a comment, `\n` is a new line, `\t` a tab, `\\` a
 backslash. Values go in as `%s` and `%u`, in the order the code passes them.
 For singular and plural give two keys, `key.one` and `key.other`.
 
