@@ -1,0 +1,65 @@
+# Soft UI (English)
+# key=text, see peos/lang.h for the format.
+
+# add
+add=+  New value
+
+# ask_name
+ask_name=What is your name?
+
+# cancel
+cancel=Cancel
+
+# day
+day=DAY
+
+# dialog
+dialog=Dialog
+
+# drag
+drag=Drag the bar:
+
+# hello
+hello=Hello, %s!
+
+# level
+level=LEVEL
+
+# no_desktop
+no_desktop=No desktop for the notification
+
+# notified
+notified=Notification sent
+
+# notify
+notify=Notify
+
+# notify_text
+notify_text=A notification from the example app
+
+# now
+now=now
+
+# off
+off=Off
+
+# on
+on=On
+
+# ready
+ready=Ready
+
+# state
+state=STATE
+
+# stranger
+stranger=stranger
+
+# title
+title=Soft UI
+
+# views
+views=Day|Week
+
+# week
+week=WEEK

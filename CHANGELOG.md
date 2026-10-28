@@ -2,6 +2,17 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.8.0] - 2026-10-28
+- Languages (Technical Alpha plan, phase 4): `slui_text`, `slui_text_n`,
+  `slui_resource`, `slui_language`, `SLUI_EVENT_LANGUAGE`; an app's words in
+  `resources/<language>/String.lang`, its name in the dock from `title=`
+- The template and `new_app.py` create `resources/en/` and `resources/it/`;
+  the examples `soft_ui` and `demo_kit` speak English and Italian
+- `scripts/check_strings.py` and `make check-strings`: every language has
+  English's keys and %-values, and the code's keys exist
+- Guide: Languages in `docs/api-reference.md`, how to add one
+- SDK 1.7.0
+
 ## [0.7.0] - 2026-10-28
 - `make pack` (`dist/<id>.app.tar`) and `make serve`: install an app in a
   running PeOS VM with `appget <url>` in Terminale, no rebuild of PeOS

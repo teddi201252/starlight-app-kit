@@ -1,0 +1,26 @@
+# Demo Kit (English)
+# key=text, see peos/lang.h for the format.
+
+# click
+click=Click
+
+# ctx
+ctx.area=Right-click inside this area
+ctx.demo=Context menu demo
+ctx.menu=New file|Open file|Rename|Delete|Properties
+ctx.0=New file
+ctx.1=Open file
+ctx.2=Rename
+ctx.3=Delete
+ctx.4=Properties
+ctx.none=Context menu: none
+ctx.invalid=Context menu: invalid index
+
+# heading
+heading=Demo Kit - Extended Widgets
+
+# title
+title=Demo Kit
+
+# wifi
+wifi=Wi-Fi

@@ -36,7 +36,7 @@ DIST_MANIFEST := $(DIST_DIR)/app.ini
 APP_RES_FILES := $(shell find $(APP_RES_ROOT) -type f ! -name '.DS_Store' 2>/dev/null)
 DIST_RES_FILES := $(patsubst $(APP_RES_ROOT)/%,$(DIST_DIR)/resources/%,$(APP_RES_FILES))
 
-.PHONY: help check-env scaffold check-sources build package pack serve clean sync-sdk peos-add
+.PHONY: help check-env scaffold check-sources check-strings build package pack serve clean sync-sdk peos-add
 
 help:
 	@echo "Starlight App Kit (standalone-first)"
@@ -45,6 +45,7 @@ help:
 	@echo "  make package APP_ID=myapp                   # alias of build"
 	@echo "  make serve APP_ID=myapp [PORT=8000]          # serve it: in PeOS, appget <url> installs it"
 	@echo "  make pack APP_ID=myapp                      # dist/myapp.app.tar, what serve serves"
+	@echo "  make check-strings APP_ID=myapp             # every language has every sentence"
 	@echo "  make sync-sdk PEOS=../peos-starlight         # refresh sdk/ from a PeOS tree"
 	@echo "  make peos-add APP_ID=myapp PEOS=../peos-starlight  # add the app to a PeOS tree's image"
 
@@ -53,6 +54,11 @@ check-env:
 
 scaffold:
 	python3 scripts/new_app.py --name "$(APP_NAME)" --id "$(APP_ID)"
+
+# Every resources/<language>/String.lang has the keys and %-values of the
+# English one, and the keys the code asks for exist.
+check-strings:
+	python3 scripts/check_strings.py "$(APP_RES_ROOT)" --src "$(APP_SRC_ROOT)"
 
 check-sources:
 	@test -n "$(APP_SRCS)" || (echo "No sources found under $(APP_SRC_ROOT)" && exit 1)

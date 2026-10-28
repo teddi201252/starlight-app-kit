@@ -1,7 +1,9 @@
 // {{APP_NAME}}: a Starlight app. It sends what its window's body shows as
 // SLUI commands (Starlight draws them, in the Soft UI style), lays it out
 // for the size it is given (the window can be resized: SLUI_EVENT_RESIZE)
-// and redraws only when something changed.
+// and redraws only when something changed. Its words are in
+// resources/<language>/String.lang: slui_text("key") gives them in the
+// language the user chose (SLUI_EVENT_LANGUAGE when it changes).
 
 #include "peos/peos.h"
 #include "peos/starlight_ui.h"
@@ -28,8 +30,8 @@ static void render(const app_state_t *s) {
     slui_begin_frame();
     // A title in a font of Starlight's skin, a segmented control on the right.
     slui_face("ui-28-light");
-    slui_label_theme(0u, 10u, SLUI_COLOR_TEXT_PRIMARY, "{{APP_NAME}}");
-    slui_segment(ID_MODE, W - 240u, 0u, 240u, 44u, 2u, s->mode, 1u, "Uno|Due");
+    slui_label_theme(0u, 10u, SLUI_COLOR_TEXT_PRIMARY, slui_text("title"));
+    slui_segment(ID_MODE, W - 240u, 0u, 240u, 44u, 2u, s->mode, 1u, slui_text("mode.options"));
 
     // A raised card filling the rest, a night panel inside it with a number.
     slui_surface(SLUI_SURF_RAISED, 0u, 64u, W, H - 64u, 26u);
@@ -41,11 +43,11 @@ static void render(const app_state_t *s) {
     slui_label_align(24u + pw / 2u, 88u + ph / 2u - 32u, SLUI_ALIGN_CENTER, count, 0x59u, 0xD0u, 0xFFu);
     slui_face("ui-14");
     slui_label_align(24u + pw / 2u, 88u + ph / 2u + 44u, SLUI_ALIGN_CENTER,
-                     s->mode ? "modo Due" : "modo Uno", 0x9Fu, 0xB4u, 0xD8u);
+                     slui_text(s->mode ? "mode.two" : "mode.one"), 0x9Fu, 0xB4u, 0xD8u);
 
     // The buttons: the group's main one is night (primary).
-    slui_button(ID_RESET, W - 24u - 260u, H - 68u, 120u, 44u, "Azzera");
-    slui_button_primary(ID_COUNT, W - 24u - 128u, H - 68u, 128u, 44u, 1u, "Conta");
+    slui_button(ID_RESET, W - 24u - 260u, H - 68u, 120u, 44u, slui_text("reset"));
+    slui_button_primary(ID_COUNT, W - 24u - 128u, H - 68u, 128u, 44u, 1u, slui_text("count"));
     slui_end_frame();
 }
 
@@ -69,7 +71,7 @@ int main(int argc, char **argv) {
             if (ev.type == SLUI_EVENT_BUTTON && ev.id == ID_COUNT) state.clicks++;
             else if (ev.type == SLUI_EVENT_BUTTON && ev.id == ID_RESET) state.clicks = 0u;
             else if (ev.type == SLUI_EVENT_SELECT && ev.id == ID_MODE) state.mode = ev.value;
-            dirty = 1u;   // SLUI_EVENT_RESIZE included: lay out again
+            dirty = 1u;   // SLUI_EVENT_RESIZE and _LANGUAGE included: draw again
         }
         if (!got) peos_sleep(10u);
     }
