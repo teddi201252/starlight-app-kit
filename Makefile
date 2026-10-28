@@ -4,6 +4,8 @@ APP_NAME ?= Demo Kit
 SDK_DIR ?= sdk
 BUILD_DIR ?= build/$(APP_ID)
 DIST_DIR ?= dist/$(APP_ID).app
+DIST_TAR ?= dist/$(APP_ID).app.tar
+PORT ?= 8000
 APP_SRC_ROOT := examples/$(APP_ID)/src
 APP_RES_ROOT := examples/$(APP_ID)/resources
 
@@ -34,13 +36,15 @@ DIST_MANIFEST := $(DIST_DIR)/app.ini
 APP_RES_FILES := $(shell find $(APP_RES_ROOT) -type f ! -name '.DS_Store' 2>/dev/null)
 DIST_RES_FILES := $(patsubst $(APP_RES_ROOT)/%,$(DIST_DIR)/resources/%,$(APP_RES_FILES))
 
-.PHONY: help check-env scaffold check-sources build package clean sync-sdk peos-add
+.PHONY: help check-env scaffold check-sources build package pack serve clean sync-sdk peos-add
 
 help:
 	@echo "Starlight App Kit (standalone-first)"
 	@echo "  make scaffold APP_NAME='My App' APP_ID=myapp"
 	@echo "  make build APP_ID=myapp                     # standalone: dist/myapp.app"
 	@echo "  make package APP_ID=myapp                   # alias of build"
+	@echo "  make serve APP_ID=myapp [PORT=8000]          # serve it: in PeOS, appget <url> installs it"
+	@echo "  make pack APP_ID=myapp                      # dist/myapp.app.tar, what serve serves"
 	@echo "  make sync-sdk PEOS=../peos-starlight         # refresh sdk/ from a PeOS tree"
 	@echo "  make peos-add APP_ID=myapp PEOS=../peos-starlight  # add the app to a PeOS tree's image"
 
@@ -88,6 +92,14 @@ build: $(DIST_BIN) $(DIST_MANIFEST) $(DIST_RES_FILES)
 
 package: build
 
+# The bundle as one tar, for PeOS's appget: no rebuild of PeOS needed.
+pack: build
+	python3 scripts/pack_app.py "$(DIST_DIR)" "$(DIST_TAR)"
+
+# Serves the tar on PORT and prints the appget command to type in the VM.
+serve: pack
+	python3 scripts/serve_app.py "$(DIST_TAR)" --port "$(PORT)"
+
 sync-sdk:
 	python3 scripts/sync_sdk.py --peos "$(PEOS)"
 
@@ -102,6 +114,6 @@ peos-add: check-sources
 	@echo "Added to $(PEOS)/userland/apps/$(APP_ID)"
 
 clean:
-	rm -rf "$(BUILD_DIR)" "$(DIST_DIR)"
+	rm -rf "$(BUILD_DIR)" "$(DIST_DIR)" "$(DIST_TAR)"
 
 -include $(APP_DEPS)
