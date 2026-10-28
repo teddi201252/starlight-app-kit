@@ -1,0 +1,26 @@
+# Demo Kit (Italiano)
+# key=text, see peos/lang.h for the format.
+
+# click
+click=Clic
+
+# ctx
+ctx.area=Clic destro in quest'area
+ctx.demo=Prova del menu contestuale
+ctx.menu=Nuovo file|Apri file|Rinomina|Elimina|Proprietà
+ctx.0=Nuovo file
+ctx.1=Apri file
+ctx.2=Rinomina
+ctx.3=Elimina
+ctx.4=Proprietà
+ctx.none=Menu contestuale: nessuno
+ctx.invalid=Menu contestuale: indice non valido
+
+# heading
+heading=Demo Kit - Controlli estesi
+
+# title
+title=Demo Kit
+
+# wifi
+wifi=Wi-Fi

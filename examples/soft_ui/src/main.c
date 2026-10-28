@@ -6,6 +6,7 @@
 // - slui_segment, slui_button_primary, slui_toggle: the Soft UI controls;
 // - slui_veil: a modal dialog over the whole window;
 // - peos_notify: a notification on the desktop;
+// - slui_text: its words in the user's language (resources/<language>/);
 // - SLUI_EVENT_RESIZE: three cards in a row on a wide window, in a column
 //   on a narrow one.
 
@@ -57,8 +58,8 @@ static void render(const tour_t *t) {
     slui_begin_frame();
 
     slui_face("ui-28-light");
-    slui_label_theme(0u, 10u, SLUI_COLOR_TEXT_PRIMARY, "Soft UI");
-    slui_segment(ID_VIEW, W - 260u, 0u, 260u, 44u, 2u, t->view, 1u, "Giorno|Settimana");
+    slui_label_theme(0u, 10u, SLUI_COLOR_TEXT_PRIMARY, slui_text("title"));
+    slui_segment(ID_VIEW, W - 260u, 0u, 260u, 44u, 2u, t->view, 1u, slui_text("views"));
 
     // Three cards: in a row when there is room, else one under the other.
     uint8_t row = W >= 720u;
@@ -73,7 +74,7 @@ static void render(const tour_t *t) {
 
     // 1. A raised card with a ring and a big number.
     slui_surface(SLUI_SURF_RAISED, x[0], y[0], cw, ch, 26u);
-    card_title(x[0] + 22u, y[0] + 22u, "LIVELLO", 0u);
+    card_title(x[0] + 22u, y[0] + 22u, slui_text("level"), 0u);
     uint32_t ring = ch > 160u ? 110u : (ch > 90u ? ch - 50u : 40u);
     slui_ring(x[0] + 22u, y[0] + 44u, ring, ring / 10u, t->level * 10u, 0xF4u, 0xF5u, 0xF8u, 0x11u, 0x16u, 0x26u);
     char pct[8];
@@ -83,33 +84,33 @@ static void render(const tour_t *t) {
                            SLUI_COLOR_TEXT_PRIMARY, pct);
     if (cw > ring + 140u) {
         slui_face("ui-15");
-        slui_label_theme(x[0] + ring + 44u, y[0] + 50u, SLUI_COLOR_TEXT_SECONDARY, "Trascina la barra:");
+        slui_label_theme(x[0] + ring + 44u, y[0] + 50u, SLUI_COLOR_TEXT_SECONDARY, slui_text("drag"));
         slui_slider_u32(ID_LEVEL, x[0] + ring + 44u, y[0] + 76u, cw - ring - 66u, 0u, 100u, t->level);
     }
 
     // 2. A night panel with a graph of the last values.
     slui_surface(SLUI_SURF_NIGHT, x[1], y[1], cw, ch, 26u);
-    card_title(x[1] + 22u, y[1] + 22u, t->view ? "SETTIMANA" : "GIORNO", 1u);
+    card_title(x[1] + 22u, y[1] + 22u, t->view ? slui_text("week") : slui_text("day"), 1u);
     slui_graph(x[1] + 22u, y[1] + 48u, cw - 44u, ch > 110u ? ch - 70u : 40u, t->history, HISTORY,
                NEON, 0x1Cu, 0x2Au, 0x4Au, 255u);
     slui_face("mono-12");
-    slui_label_align(x[1] + cw - 22u, y[1] + 22u, SLUI_ALIGN_RIGHT, "ora", NIGHT_DIM);
+    slui_label_align(x[1] + cw - 22u, y[1] + 22u, SLUI_ALIGN_RIGHT, slui_text("now"), NIGHT_DIM);
 
     // 3. An inset well with a toggle, a neon dot and what happened last.
     slui_surface(SLUI_SURF_INSET, x[2], y[2], cw, ch, 26u);
-    card_title(x[2] + 22u, y[2] + 22u, "STATO", 0u);
+    card_title(x[2] + 22u, y[2] + 22u, slui_text("state"), 0u);
     slui_surface(t->glow ? SLUI_SURF_NEON : SLUI_SURF_FLAT, x[2] + 22u, y[2] + 52u, 12u, 12u, 6u);
     slui_face("ui-15");
-    slui_label_theme(x[2] + 44u, y[2] + 50u, SLUI_COLOR_TEXT_PRIMARY, t->glow ? "Acceso" : "Spento");
+    slui_label_theme(x[2] + 44u, y[2] + 50u, SLUI_COLOR_TEXT_PRIMARY, t->glow ? slui_text("on") : slui_text("off"));
     slui_toggle(ID_GLOW, x[2] + cw - 22u - 62u, y[2] + 42u, 62u, 32u, t->glow, "");
     slui_face("ui-14");
     slui_label_theme(x[2] + 22u, y[2] + 90u, SLUI_COLOR_TEXT_SECONDARY, t->status);
 
     // The buttons: the main one is night.
     uint8_t live = !t->dialog;
-    slui_button_state(ID_NOTIFY, 0u, H - 54u, 130u, 44u, live, "Notifica");
-    slui_button_state(ID_DIALOG, 142u, H - 54u, 130u, 44u, live, "Dialogo");
-    slui_button_primary(ID_ADD, W - 150u, H - 54u, 150u, 44u, live, "+  Nuovo valore");
+    slui_button_state(ID_NOTIFY, 0u, H - 54u, 130u, 44u, live, slui_text("notify"));
+    slui_button_state(ID_DIALOG, 142u, H - 54u, 130u, 44u, live, slui_text("dialog"));
+    slui_button_primary(ID_ADD, W - 150u, H - 54u, 150u, 44u, live, slui_text("add"));
 
     // A modal dialog: the veil over all of the window, the dialog on top.
     if (t->dialog) {
@@ -118,9 +119,9 @@ static void render(const tour_t *t) {
         slui_veil(87u);
         slui_surface(SLUI_SURF_RAISED, dx, dy, dw, dh, 30u);
         slui_face("ui-22-mid");
-        slui_label_theme(dx + 28u, dy + 26u, SLUI_COLOR_TEXT_PRIMARY, "Come ti chiami?");
+        slui_label_theme(dx + 28u, dy + 26u, SLUI_COLOR_TEXT_PRIMARY, slui_text("ask_name"));
         slui_text_input(ID_D_NAME, dx + 28u, dy + 72u, dw - 56u, 46u, 31u, t->name);
-        slui_button(ID_D_CANCEL, dx + dw - 28u - 100u - 14u - 110u, dy + dh - 72u, 110u, 44u, "Annulla");
+        slui_button(ID_D_CANCEL, dx + dw - 28u - 100u - 14u - 110u, dy + dh - 72u, 110u, 44u, slui_text("cancel"));
         slui_button_primary(ID_D_OK, dx + dw - 28u - 100u, dy + dh - 72u, 100u, 44u, 1u, "OK");
     }
     slui_end_frame();
@@ -140,7 +141,7 @@ static void on_event(tour_t *t, const slui_event_t *ev) {
         else if (ev->type == SLUI_EVENT_BUTTON && ev->id == ID_D_CANCEL) t->dialog = 0u;
         else if ((ev->type == SLUI_EVENT_BUTTON && ev->id == ID_D_OK) ||
                  (ev->type == SLUI_EVENT_KEY_DOWN && ev->keycode == PEOS_KEY_ENTER)) {
-            snprintf(t->status, sizeof(t->status), "Ciao, %s!", t->name[0] ? t->name : "sconosciuto");
+            snprintf(t->status, sizeof(t->status), slui_text("hello"), t->name[0] ? t->name : slui_text("stranger"));
             t->dialog = 0u;
         } else if (ev->type == SLUI_EVENT_KEY_DOWN && ev->keycode == PEOS_KEY_ESC) t->dialog = 0u;
         return;
@@ -153,8 +154,8 @@ static void on_event(tour_t *t, const slui_event_t *ev) {
         t->dialog = 1u;
         slui_focus(ID_D_NAME);
     } else if (ev->type == SLUI_EVENT_BUTTON && ev->id == ID_NOTIFY) {
-        int ok = peos_notify("Soft UI", "Una notifica dall'app di esempio") == 0;
-        snprintf(t->status, sizeof(t->status), ok ? "Notifica inviata" : "Nessun desktop per la notifica");
+        int ok = peos_notify(slui_text("title"), slui_text("notify_text")) == 0;
+        snprintf(t->status, sizeof(t->status), "%s", slui_text(ok ? "notified" : "no_desktop"));
     }
 }
 
@@ -167,7 +168,7 @@ int main(void) {
         700, 640, 600, 680, 720, 690, 640, 700, 760, 730, 690, 740,
     };
     memcpy(t.history, start, sizeof(start));
-    snprintf(t.status, sizeof(t.status), "Pronto");
+    snprintf(t.status, sizeof(t.status), slui_text("ready"));
     uint8_t dirty = 1u;
     for (;;) {
         if (dirty) {
