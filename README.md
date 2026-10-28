@@ -12,7 +12,9 @@ bundle in `dist/`.
 - source + manifest templates (`templates/`)
 - examples: `soft_ui` (the Soft UI drawing, a resizable window, a dialog, a
   notification) and `demo_kit` (the classic controls at a fixed size)
-- quickstart and troubleshooting guides (`docs/`)
+- quickstart, API reference and troubleshooting guides (`docs/`)
+- `make serve`: install an app in a running PeOS VM over the network, no
+  rebuild of PeOS
 
 ## Requirements
 - Python 3.9+
@@ -39,8 +41,18 @@ Output:
 - `dist/calculator.app/app.ini`
 - `dist/calculator.app/resources/*` (if present in project)
 
-3) Try it in PeOS: add it to a PeOS tree, which builds it into its image
-like its own apps, then boot that image:
+3) Try it in PeOS. In a running PeOS VM (the live ISO is enough), serve it
+from your machine:
+
+```bash
+make APP_ID=calculator serve
+```
+
+and type the command it prints in PeOS's Terminale, e.g.
+`appget http://10.0.2.2:8000/calculator.app.tar`: the app shows up in the
+dock. Run both again after every change.
+
+Or add it to a PeOS tree, which builds it into its image like its own apps:
 
 ```bash
 make APP_ID=calculator peos-add PEOS=../peos-starlight
@@ -74,6 +86,10 @@ The template (`templates/main.c.tpl`) shows the pattern:
 `app.ini` keys: `title`, `category` (sistema, strumenti, svago), `exec`,
 `args`, `capabilities`, `paths`, `icon`, `width`, `height`, `min_width`,
 `min_height`, `max_width`, `max_height`, `resizable`, and `[resources]`.
+
+Every SLUI call and event, the manifest, the capabilities and libpeos (files,
+time, notifications, network) are in [docs/api-reference.md](docs/api-reference.md),
+with an example per topic.
 
 ## Keeping the SDK in step with PeOS
 When PeOS changes its SDK (a new header, new SLUI commands), refresh the kit:

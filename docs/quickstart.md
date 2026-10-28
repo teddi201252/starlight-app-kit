@@ -30,6 +30,21 @@ If your project has `examples/myapp/resources/`, files are copied to
 
 ## 4) Try it in PeOS
 
+Start PeOS in a VM (`make -C ../peos-starlight run-live`, or the ISO in
+VirtualBox, VMware, UTM), then serve the app from your machine:
+
+```bash
+make APP_ID=myapp serve
+```
+
+In PeOS, open Terminale and type the command it prints, e.g.
+
+```
+appget http://10.0.2.2:8000/myapp.app.tar
+```
+
+To build it into a PeOS image instead:
+
 ```bash
 make APP_ID=myapp peos-add PEOS=../peos-starlight
 make -C ../peos-starlight run-hdd
@@ -47,4 +62,7 @@ make APP_ID=soft_ui build
 `examples/soft_ui` uses every Soft UI primitive; `examples/demo_kit` the
 classic controls.
 
-Done: you can now distribute `dist/myapp.app/` directly.
+Done: you can now distribute `dist/myapp.app/` directly (or
+`dist/myapp.app.tar`, from `make pack`, for `appget`).
+
+Next: [docs/api-reference.md](api-reference.md), every call with an example.
