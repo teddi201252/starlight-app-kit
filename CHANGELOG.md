@@ -2,6 +2,15 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.7.0] - 2026-10-28
+- `make pack` (`dist/<id>.app.tar`) and `make serve`: install an app in a
+  running PeOS VM with `appget <url>` in Terminale, no rebuild of PeOS
+  (Technical Alpha plan, phase 3)
+- `docs/api-reference.md`: the manifest, capabilities and paths, every SLUI
+  call and event, libpeos (files, time, notifications, network, system
+  information), with an example per topic
+- SDK 1.6.1
+
 ## [0.6.0] - 2026-10-27
 - Realigned with PeOS's Soft UI (Starlight plan, phases 1-13): SDK 1.6.0
 - `scripts/sync_sdk.py` and `make sync-sdk`: refresh `sdk/` from a PeOS tree

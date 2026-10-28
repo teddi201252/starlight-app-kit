@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.6.1] - 2026-10-28
+- `event_abi.h`: mouse records carry `PEOS_INPUT_MOUSE_RELATIVE` or
+  `PEOS_INPUT_MOUSE_ABSOLUTE` in `code` (a tablet's position)
+
 ## [1.6.0] - 2026-10-27
 - Synced from PeOS 1ff0151 (SLUI SDK 1.0.5) with `scripts/sync_sdk.py`
 - The whole `userland/include`: the libc headers (`stdio.h`, `string.h`...),
