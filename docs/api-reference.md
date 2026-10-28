@@ -1,6 +1,6 @@
 # API reference
 
-Everything a Starlight app can use, as of SDK 1.6.1 (SLUI SDK 1.0.5). The
+Everything a Starlight app can use, as of SDK 1.7.0 (SLUI SDK 1.0.6). The
 headers in `sdk/include/peos/` are the source of truth; this page says what
 each part is for and shows it in use.
 
@@ -14,6 +14,7 @@ each part is for and shows it in use.
 - [SLUI: theme colours](#slui-theme-colours)
 - [SLUI: events](#slui-events)
 - [SLUI: helpers](#slui-helpers)
+- [Languages](#languages)
 - [libpeos: files and folders](#libpeos-files-and-folders)
 - [libpeos: time](#libpeos-time)
 - [libpeos: notifications](#libpeos-notifications)
@@ -352,6 +353,76 @@ Header-only helpers in `starlight_ui.h`, built on the calls above:
 
 Others: `slui_open_app_bundle(path)` asks Starlight to open another app;
 `slui_host_capabilities()` says which `SLUI_CAP_*` the running Starlight has.
+
+## Languages
+
+The user chooses PeOS's language in Settings (General > Language). An app
+carries its own words, one folder per language in its bundle:
+
+```
+myapp.app/
+  app.ini
+  app.bin
+  resources/
+    en/String.lang      English: the fallback for every other language
+    it/String.lang
+    it/welcome.png      a picture with Italian text in it
+    icon.png            the same in every language
+```
+
+`String.lang` is UTF-8 text, one sentence per line, `key=text` as in
+`app.ini`; `#` starts a comment, `\n` is a new line, `\t` a tab, `\\` a
+backslash. Values go in as `%s` and `%u`, in the order the code passes them.
+For singular and plural give two keys, `key.one` and `key.other`.
+
+```ini
+# resources/en/String.lang
+title=Notes
+greeting=Hello, %s!
+notes.one=%u note
+notes.other=%u notes
+```
+
+```ini
+# resources/it/String.lang
+title=Note
+greeting=Ciao, %s!
+notes.one=%u nota
+notes.other=%u note
+```
+
+| Call | |
+|---|---|
+| `slui_text("key")` | The sentence in the chosen language, else in English, else the key itself. |
+| `slui_text_n("key", n)` | `key.one` when `n` is 1, else `key.other`. |
+| `slui_resource("name")` | The path of `resources/<language>/name`, else `resources/en/name`, else `resources/name`. |
+| `slui_language()` | The chosen language's code (`"it"`, `"en"`). |
+
+`title=` in an app's `String.lang` is its name in the dock, the app manager
+and the title bar, instead of `app.ini`'s `title`. When the user picks
+another language, the app gets `SLUI_EVENT_LANGUAGE`: `slui_text` already
+answers in the new one, so drawing again is enough. Strings kept from before
+(a status line) stay as they were: keep keys, not texts, if that matters.
+
+```c
+char line[64];
+snprintf(line, sizeof line, slui_text_n("notes", count), (unsigned)count);
+slui_label_theme(20, 20, SLUI_COLOR_TEXT_PRIMARY, slui_text("title"));
+slui_label_theme(20, 50, SLUI_COLOR_TEXT_SECONDARY, line);
+slui_image_file(20, 80, 200, 120, slui_resource("welcome.png"));
+```
+
+An app always reads its own bundle, whatever its `paths` say: its languages
+need no grant.
+
+**Adding a language** to an app: copy `resources/en/` to
+`resources/<code>/` (`fr`, `de`, `pt-BR`...), translate the texts (not the
+keys), and run `make check-strings APP_ID=myapp`: it says which keys a
+language misses or has in excess, which texts have different `%`-values than
+English, and which keys the code asks for that English lacks. The system's
+own languages are folders of `/system/lang/` in PeOS (with `language.name`,
+the name the Settings list shows); an app may have more or fewer languages
+than the system.
 
 ## libpeos: files and folders
 

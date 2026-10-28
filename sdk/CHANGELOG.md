@@ -2,6 +2,12 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.7.0] - 2026-10-28
+- SLUI SDK 1.0.6: `slui_text`, `slui_text_n`, `slui_resource`,
+  `slui_language`, `SLUI_EVENT_LANGUAGE` (Starlight's `@SLUI HOST LANG`)
+- `peos/lang.h`: the String.lang format and parser, `peos_lang_load`/`_get`
+- New `libpeos.a`
+
 ## [1.6.1] - 2026-10-28
 - `event_abi.h`: mouse records carry `PEOS_INPUT_MOUSE_RELATIVE` or
   `PEOS_INPUT_MOUSE_ABSOLUTE` in `code` (a tablet's position)

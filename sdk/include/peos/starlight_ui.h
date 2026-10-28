@@ -26,11 +26,14 @@ typedef enum {
     // The body (where the app draws) is value x value2 now: lay out again.
     // It comes once the app has said hello, and on every resize.
     SLUI_EVENT_RESIZE = 15,
+    // The user chose another language: text is its code ("it", "en").
+    // slui_text and slui_resource already answer in it: draw again.
+    SLUI_EVENT_LANGUAGE = 16,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 5u
+#define SLUI_SDK_VERSION_PATCH 6u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -872,6 +875,18 @@ void slui_image_file(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                      const char *path);
 
 int slui_poll_event(slui_event_t *out);
+
+// Languages (SLUI SDK 1.0.6): the app's sentences in the language the user
+// chose, from its bundle's resources/<language>/String.lang (peos/lang.h for
+// the format), then from resources/en/, then the key itself.
+const char *slui_text(const char *key);
+// The singular or plural: key.one when n is 1, else key.other.
+const char *slui_text_n(const char *key, uint32_t n);
+// A file of the bundle in the chosen language: resources/<language>/name,
+// else resources/en/name, else resources/name.
+const char *slui_resource(const char *name);
+// The chosen language's code ("en" until Starlight says one).
+const char *slui_language(void);
 uint32_t slui_sdk_version_u32(void);
 uint32_t slui_protocol_version(void);
 uint32_t slui_host_protocol_version(void);

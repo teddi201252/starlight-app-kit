@@ -91,6 +91,13 @@ Every SLUI call and event, the manifest, the capabilities and libpeos (files,
 time, notifications, network) are in [docs/api-reference.md](docs/api-reference.md),
 with an example per topic.
 
+## Languages
+An app's words are in `resources/<language>/String.lang` (`key=text`), read
+with `slui_text("key")`; images and files in a language sit beside them
+(`slui_resource("name")`). `new_app.py` creates `en` and `it`; English is the
+fallback. `make check-strings APP_ID=myapp` checks that every language has
+every sentence. See [Languages](docs/api-reference.md#languages).
+
 ## Keeping the SDK in step with PeOS
 When PeOS changes its SDK (a new header, new SLUI commands), refresh the kit:
 
