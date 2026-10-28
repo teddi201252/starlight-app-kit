@@ -71,14 +71,21 @@ typedef struct {
 #define PEOS_INPUT_KEY   1u
 #define PEOS_INPUT_MOUSE 2u
 
+/* Mouse record codes. A tablet (VirtualBox, VMware, UTM, QEMU's usb-tablet)
+ * knows where the pointer is, not how far it went: its records carry the
+ * position, so the cursor stays under the host's even when motion was lost. */
+#define PEOS_INPUT_MOUSE_RELATIVE 0u   /* dx, dy: motion */
+#define PEOS_INPUT_MOUSE_ABSOLUTE 1u   /* dx, dy: position in screen pixels */
+
 typedef struct {
     uint16_t type;       /* PEOS_INPUT_KEY or PEOS_INPUT_MOUSE */
-    uint16_t code;       /* key: keycode, same codes as peos_input_event_t */
+    uint16_t code;       /* key: keycode, same codes as peos_input_event_t;
+                            mouse: PEOS_INPUT_MOUSE_RELATIVE or _ABSOLUTE */
     uint8_t pressed;     /* key: 1 down, 0 up */
     uint8_t buttons;     /* mouse: buttons held after this event */
     int8_t wheel_x;      /* mouse */
     int8_t wheel_y;
-    int32_t dx;          /* mouse: relative motion */
+    int32_t dx;          /* mouse: motion, or position (see code) */
     int32_t dy;
     uint64_t time_ns;    /* when the driver saw it (same clock as peos_input_event_t) */
 } peos_input_record_t;
