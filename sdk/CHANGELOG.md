@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.7.1] - 2026-10-28
+- peos/lang.h and libpeos: quoted texts keep their spaces
+
 ## [1.7.0] - 2026-10-28
 - SLUI SDK 1.0.6: `slui_text`, `slui_text_n`, `slui_resource`,
   `slui_language`, `SLUI_EVENT_LANGUAGE` (Starlight's `@SLUI HOST LANG`)
