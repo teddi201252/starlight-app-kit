@@ -85,7 +85,7 @@ The template (`templates/main.c.tpl`) shows the pattern:
 
 `app.ini` keys: `title`, `category` (sistema, strumenti, svago), `exec`,
 `args`, `capabilities`, `paths`, `icon`, `width`, `height`, `min_width`,
-`min_height`, `max_width`, `max_height`, `resizable`, and `[resources]`.
+`min_height`, `max_width`, `max_height`, `resizable`, `dock`, and `[resources]`.
 
 Every SLUI call and event, the manifest, the capabilities and libpeos (files,
 time, notifications, network) are in [docs/api-reference.md](docs/api-reference.md),
