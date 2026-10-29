@@ -93,6 +93,7 @@ The bundle's manifest, `<id>.app/app.ini`. `#` and `;` start comments.
 | `min_width`, `min_height` | How small the user can make it. | `min_width=400` |
 | `max_width`, `max_height` | How large. | `max_width=1200` |
 | `resizable` | `0` or `no`: a fixed size. | `resizable=0` |
+| `dock` | `0` or `no`: not in the dock until the user pins it (the app manager lists it). | `dock=no` |
 
 The `[resources]` section names files of the bundle, `key=./path`:
 
