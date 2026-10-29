@@ -259,6 +259,42 @@ slui_ring(20, 30, 110, 11, 720, 0x1C, 0x2A, 0x4A, 0x59, 0xD0, 0xFF);
 slui_graph(150, 30, 130, 120, history, 24, 0x59, 0xD0, 0xFF, 0x1C, 0x2A, 0x4A, 255);
 ```
 
+### Pixels of your own
+
+Since SLUI SDK 1.0.7 (PeOS 0.11) an app can draw its own pixels in part of
+its window, beside the SLUI controls: a page, a picture being made, a game
+board. It needs the `shm` capability.
+
+```c
+void slui_pixels_open(uint32_t w, uint32_t h);
+uint32_t *slui_pixels_buffer(uint32_t *w, uint32_t *h, uint32_t *pitch);
+void slui_pixels(x, y, w, h, uint32_t sx, uint32_t sy);
+void slui_pixels_damage(x, y, w, h);
+```
+
+- `slui_pixels_open` asks Starlight for a surface of `w` x `h` pixels; it is
+  ready when `SLUI_EVENT_PIXELS` comes (`value` x `value2`, 0 x 0 if there
+  was no room). Ask again, larger, when the window grows.
+- `slui_pixels_buffer`: its rows, `pitch` bytes apart, each pixel
+  `0x00RRGGBB`; `NULL` until the event came.
+- `slui_pixels`, in a frame: the part from `sx`,`sy` shown at `x`,`y` of the
+  body, `w` x `h`; what is drawn after it goes on top.
+- `slui_pixels_damage`: the pixels changed there; Starlight shows them
+  without a new frame (a page arriving, an animation).
+
+```c
+slui_pixels_open(400, 300);                        // once
+// ... SLUI_EVENT_PIXELS came:
+uint32_t w, h, pitch;
+uint32_t *px = slui_pixels_buffer(&w, &h, &pitch);
+for (uint32_t y = 0; y < h; y++)
+    for (uint32_t x = 0; x < w; x++)
+        ((uint32_t *)((uint8_t *)px + y * pitch))[x] = (x ^ y) & 0xFF;
+slui_pixels_damage(0, 0, w, h);
+// in every frame:
+slui_pixels(20, 60, 400, 300, 0, 0);
+```
+
 ## SLUI: text and fonts
 
 ```c
@@ -327,6 +363,8 @@ int slui_poll_event(slui_event_t *out);   // 1: one event in *out, 0: none left
 | `SLUI_EVENT_KEY_DOWN`, `KEY_UP`, `KEY_REPEAT` | | `keycode` (`PEOS_KEY_*`), `mods` (`SLUI_MOD_SHIFT`, `CTRL`, `ALT`, `SUPER`) |
 | `SLUI_EVENT_RESIZE` | | `value`, `value2`: the body's new width and height |
 | `SLUI_EVENT_HOST_ERROR` | | `text`: what Starlight could not do (`slui_last_host_error()` too) |
+| `SLUI_EVENT_LANGUAGE` | | `text`: the new language's code |
+| `SLUI_EVENT_PIXELS` | | `value`, `value2`: the surface of `slui_pixels_open` (0 x 0: none) |
 
 `text` points into SLUI's buffer: copy it before the next `slui_poll_event`.
 Keys reach the app when its window has the focus and no text field takes them.
@@ -525,7 +563,49 @@ while ((n = net_tcp_read(&r, buf, sizeof buf, 5000000000ull)) > 0) handle(buf, (
 peos_fclose((uint64_t)c);
 ```
 
-There is no TLS: plain HTTP and your own protocols only.
+For the web, use HTTP below rather than TCP by hand.
+
+## libpeos: HTTP and HTTPS
+
+`peos/http.h`, needs `network` (PeOS 0.11). HTTP/1.1 over `http://` and
+`https://` (TLS 1.3 and 1.2, the server's certificate checked against the
+root certificates in `/system/certs`), redirects followed, gzip and chunked
+bodies decoded, the connection kept for the next request to the same
+server, cookies in a jar if you give one. The body comes in pieces, as it
+arrives.
+
+```c
+#include "peos/http.h"
+
+static int got(void *user, const uint8_t *data, size_t len) {
+    (void)user;
+    peos_write(data, len);
+    return 0;                         // not 0: stop
+}
+
+static http_result_t res;             // large: keep it off the stack
+http_request_t req = { .url = "https://example.org/" };
+if (http_fetch(&req, &res, got, NULL) != 0) printf("%s\n", res.error);
+else printf("%d, %s\n", res.resp.status, res.tls);
+```
+
+| `http_request_t` | |
+|---|---|
+| `url` | The address. |
+| `method`, `body`, `body_len`, `content_type` | `NULL` method: GET; POST with a body. |
+| `headers` | More request headers, `"Name: value\r\n"` each. |
+| `cookies` | An `http_cookies_t` jar kept between requests, or `NULL`. |
+| `timeout_ns` | Each wait (0: 15 s). |
+| `no_redirects`, `max_redirects` | A 3xx as it is; how many to follow (0: 10). |
+
+`res.resp` has the status, `content_type`, `location` and the headers
+(`http_header(&res.resp, "Name", buf, cap)`); `res.url` where it came from
+after the redirects. `http_url_parse` and `http_url_resolve` read and join
+addresses as a browser does.
+
+`peos/tls.h` is TLS over a TCP connection of your own (`tls_open`,
+`tls_read`, `tls_write`, `tls_close`), and `peos_random(buf, len)`
+(`peos/peos.h`, no capability) gives random bytes for keys and tokens.
 
 ## libpeos: system information
 
