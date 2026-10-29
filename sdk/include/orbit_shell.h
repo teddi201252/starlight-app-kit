@@ -5,10 +5,13 @@
 
 typedef void (*orbit_shell_write_fn)(const char *text, size_t len, void *ctx);
 typedef uint64_t (*orbit_shell_execv_fn)(const char *path, const char *arg_str, void *ctx);
+// `history` lists the commands, `history -c` forgets them (the editor keeps them).
+typedef void (*orbit_shell_history_fn)(int clear, void *ctx);
 
 typedef struct {
     orbit_shell_write_fn write;
     orbit_shell_execv_fn execv;
+    orbit_shell_history_fn history;
     void *ctx;
 } orbit_shell_io_t;
 

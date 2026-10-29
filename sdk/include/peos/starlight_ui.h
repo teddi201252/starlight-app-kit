@@ -29,11 +29,14 @@ typedef enum {
     // The user chose another language: text is its code ("it", "en").
     // slui_text and slui_resource already answer in it: draw again.
     SLUI_EVENT_LANGUAGE = 16,
+    // The surface asked with slui_pixels_open is ready: value x value2
+    // pixels (0 x 0: Starlight had no room for it).
+    SLUI_EVENT_PIXELS = 17,
 } slui_event_type_t;
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 6u
+#define SLUI_SDK_VERSION_PATCH 7u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -873,6 +876,21 @@ static inline void slui_scroll_view_end(const slui_scroll_view_t *view) {
 
 void slui_image_file(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                      const char *path);
+
+// Pixels of the app's own beside the controls (SLUI SDK 1.0.7, release
+// 0.11.0 phase 3: the browser's page). The app needs the "shm" capability.
+//   slui_pixels_open(w, h): ask Starlight for a surface of w x h; it comes
+//     with SLUI_EVENT_PIXELS (ask again, larger, when the window grows).
+//   slui_pixels_buffer(): its rows, XRGB8888 (0x00RRGGBB), pitch bytes apart;
+//     NULL until it came.
+//   slui_pixels(x, y, w, h, sx, sy): in a frame, the part from sx,sy shown at
+//     x,y of the body, under what is drawn after it.
+//   slui_pixels_damage(x, y, w, h): the pixels changed there between frames
+//     (a page arriving, a scroll): Starlight shows them, no new frame needed.
+void slui_pixels_open(uint32_t w, uint32_t h);
+uint32_t *slui_pixels_buffer(uint32_t *w, uint32_t *h, uint32_t *pitch);
+void slui_pixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t sx, uint32_t sy);
+void slui_pixels_damage(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
 int slui_poll_event(slui_event_t *out);
 

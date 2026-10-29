@@ -123,6 +123,8 @@ int64_t peos_sysinfo(peos_sysinfo_t *out);
 int64_t peos_proc_list(peos_proc_info_t *out, size_t max);
 // End a process (SYS_PROC_KILL, needs PEOS_CAP_MANAGE): 0 or -1.
 int64_t peos_proc_kill(uint64_t pid);
+// Cryptographic random bytes from the kernel (SYS_RANDOM, any task): len or -1.
+int64_t peos_random(void *buf, size_t len);
 /* Path scope: narrow what this task (and its children) may touch. Never widens. */
 int64_t peos_path_scope_set(const peos_path_grant_t *grants, size_t count);
 /* Path scope for the next peos_spawnv() child: (own scope narrowed by grants). One-shot. */
