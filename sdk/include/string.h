@@ -1,6 +1,7 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
+#include <strings.h>
 
 void *memcpy(void *restrict dest, const void *restrict src, size_t n);
 void *memmove(void *dest, const void *src, size_t n);
@@ -18,6 +19,13 @@ void *memchr(const void *s, int c, size_t n);
 size_t strcspn(const char *s, const char *reject);
 size_t strspn(const char *s, const char *accept);
 char *strerror(int error);
+char *strcat(char *dest, const char *src);
+char *strncat(char *dest, const char *src, size_t n);
+char *strpbrk(const char *s, const char *accept);
+char *strtok(char *s, const char *delim);
+char *strndup(const char *s, size_t n);
+size_t strnlen(const char *s, size_t max);
+
 int u32_to_str(uint32_t v, char *out, uint32_t cap);
 int append_str(char *dst, uint32_t cap, uint32_t *off, const char *src);
 int append_u32(char *dst, uint32_t cap, uint32_t *off, uint32_t value);
