@@ -295,6 +295,30 @@ slui_pixels_damage(0, 0, w, h);
 slui_pixels(20, 60, 400, 300, 0, 0);
 ```
 
+**The mouse and the keys on your pixels** (SDK 1.0.8). While the pointer is
+over them, `SLUI_EVENT_POINTER` comes: `id` is what happened
+(`SLUI_POINTER_MOVE`, `_DOWN`, `_UP`, `_WHEEL`), `value`, `value2` where,
+from the top left of the pixels shown; `keycode` the buttons held (bit 0
+left, 1 right), `mods` the modifiers, `wheel` the notches (up positive). A
+press on them gives them the keyboard: the typed characters then come as
+`SLUI_EVENT_CHAR` (`text` in UTF-8, `value` the code point), the keys as
+`SLUI_EVENT_KEY_DOWN` as always.
+
+**The pointer's shape and the clipboard** (SDK 1.0.9, 1.0.10):
+
+```c
+void slui_pixels_cursor(slui_cursor_t c);      // SLUI_CURSOR_ARROW, _HAND, _TEXT, over your pixels
+void slui_clipboard_copy(const char *text, size_t len);   // up to 64 KB, with PeOS's copy feedback
+void slui_clipboard_request(void);             // the text comes as SLUI_EVENT_CLIPBOARD
+```
+
+In PeOS one copies with **Caps+A** and pastes with **Caps+S** (Caps held
+like one more modifier). SLUI's own text fields do it by themselves; on
+your pixels the keys come as `SLUI_EVENT_CLIPCMD`, `value` `SLUI_CLIP_COPY`
+or `SLUI_CLIP_PASTE`: copy what is selected with `slui_clipboard_copy`, or
+ask with `slui_clipboard_request` and paste what `SLUI_EVENT_CLIPBOARD`
+brings. Do not bind Ctrl+C and Ctrl+V: they are not PeOS's.
+
 ## SLUI: text and fonts
 
 ```c
