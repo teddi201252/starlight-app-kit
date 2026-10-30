@@ -32,11 +32,37 @@ typedef enum {
     // The surface asked with slui_pixels_open is ready: value x value2
     // pixels (0 x 0: Starlight had no room for it).
     SLUI_EVENT_PIXELS = 17,
+    // The mouse over the pixels shown with slui_pixels (SLUI SDK 1.0.8, the
+    // browser's page): id is what happened (SLUI_POINTER_*), value x value2
+    // where, from the top left of that part of the body; keycode the buttons
+    // held (bit 0 left, 1 right, 2 middle), mods the modifiers, wheel the
+    // notches (up positive). A press there gives the pixels the keyboard
+    // (SLUI_EVENT_CHAR) and is followed until it is let go, also outside.
+    SLUI_EVENT_POINTER = 18,
+    // A character typed while the pixels have the keyboard: text (UTF-8),
+    // value its code point. The keys come as KEY_DOWN as always.
+    SLUI_EVENT_CHAR = 19,
+    // The clipboard's text (UTF-8), asked with slui_clipboard_request()
+    // (SLUI SDK 1.0.9).
+    SLUI_EVENT_CLIPBOARD = 20,
+    // Caps+A (copy) or Caps+S (paste), PeOS's clipboard keys, while the
+    // pixels have the keyboard: value SLUI_CLIP_COPY or SLUI_CLIP_PASTE
+    // (SLUI SDK 1.0.10). The app copies its selection with
+    // slui_clipboard_copy, or pastes after slui_clipboard_request.
+    SLUI_EVENT_CLIPCMD = 21,
 } slui_event_type_t;
+
+#define SLUI_CLIP_COPY 1u
+#define SLUI_CLIP_PASTE 2u
+
+#define SLUI_POINTER_MOVE 1u
+#define SLUI_POINTER_DOWN 2u
+#define SLUI_POINTER_UP 3u
+#define SLUI_POINTER_WHEEL 4u
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 7u
+#define SLUI_SDK_VERSION_PATCH 10u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -92,6 +118,7 @@ typedef struct {
     uint16_t mods;
     const char *text;
     uint32_t text_len;
+    int32_t wheel;      // SLUI_EVENT_POINTER, SLUI_POINTER_WHEEL
 } slui_event_t;
 
 typedef enum {
@@ -891,6 +918,17 @@ void slui_pixels_open(uint32_t w, uint32_t h);
 uint32_t *slui_pixels_buffer(uint32_t *w, uint32_t *h, uint32_t *pitch);
 void slui_pixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t sx, uint32_t sy);
 void slui_pixels_damage(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+
+// The pointer Starlight shows over the app's pixels (SLUI SDK 1.0.9), until
+// asked again: an arrow, a hand (a link), an I-beam (text).
+typedef enum { SLUI_CURSOR_ARROW = 0, SLUI_CURSOR_HAND = 1, SLUI_CURSOR_TEXT = 2 } slui_cursor_t;
+void slui_pixels_cursor(slui_cursor_t cursor);
+
+// The system clipboard (SLUI SDK 1.0.9), the one of Caps and of the text
+// fields: copy text into it (at most 64 KiB), or ask for what it holds,
+// which comes as SLUI_EVENT_CLIPBOARD.
+void slui_clipboard_copy(const char *text, size_t len);
+void slui_clipboard_request(void);
 
 int slui_poll_event(slui_event_t *out);
 

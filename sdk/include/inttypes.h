@@ -1,2 +1,33 @@
 #pragma once
 #include <stdint.h>
+
+// printf and scanf formats of the fixed-size integers (x86-64: long is 64 bits).
+#define PRId8 "d"
+#define PRId16 "d"
+#define PRId32 "d"
+#define PRId64 "ld"
+#define PRIi32 "i"
+#define PRIi64 "li"
+#define PRIu8 "u"
+#define PRIu16 "u"
+#define PRIu32 "u"
+#define PRIu64 "lu"
+#define PRIx8 "x"
+#define PRIx16 "x"
+#define PRIx32 "x"
+#define PRIx64 "lx"
+#define PRIX8 "X"
+#define PRIX16 "X"
+#define PRIX32 "X"
+#define PRIX64 "lX"
+#define PRIdPTR "ld"
+#define PRIuPTR "lu"
+#define PRIxPTR "lx"
+#define SCNd32 "d"
+#define SCNi32 "i"
+#define SCNu32 "u"
+#define SCNx32 "x"
+#define SCNd64 "ld"
+#define SCNu64 "lu"
+#define SCNx64 "lx"
+

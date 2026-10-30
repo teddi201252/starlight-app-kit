@@ -42,3 +42,16 @@ int rename(const char *oldpath, const char *newpath);
 int mkdir(const char *path, int mode);
 int fflush(FILE *stream);
 int fileno(FILE *stream);
+int ferror(FILE *stream);
+void clearerr(FILE *stream);
+void rewind(FILE *stream);
+int ungetc(int c, FILE *stream);
+int getc(FILE *stream);
+int putc(int c, FILE *stream);
+int vprintf(const char *fmt, va_list ap);
+int vsprintf(char *buf, const char *fmt, va_list ap);
+int vsscanf(const char *str, const char *fmt, va_list ap);
+int fscanf(FILE *stream, const char *fmt, ...);
+void perror(const char *s);
+#define BUFSIZ 4096
+#define FILENAME_MAX 256
