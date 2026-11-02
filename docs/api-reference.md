@@ -243,7 +243,10 @@ void slui_image_file(x, y, w, h, const char *path);
   `SLUI_SURF_RAISED` (cards, controls at rest), `RAISED_HI` (hovered,
   chosen), `INSET` (wells, fields), `FLAT`, `NIGHT` (the dark cards),
   `NIGHT_GLOW`, `NIGHT_FLAT`, `NEON` (a lit dot or bar). `radius` rounds the
-  corners.
+  corners. The shadows reach past the surface (about 13 px at rest, 20 under
+  the mouse); the window draws them up to 12 px outside the app's body, so
+  leave 8 px or more between a raised surface and the edge of the body and
+  its shadow stays whole.
 - `slui_ring`: a ring of outer diameter `size`, filled clockwise from the top
   to `permille` (0..1000).
 - `slui_graph`: up to 256 values of 0..1000 spread over `w`, an area under a
