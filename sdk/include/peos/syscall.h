@@ -116,6 +116,7 @@ enum {
     PEOS_SYS_proc_list = 110,     // rdi=peos_proc_info_t[], rsi=max -> count or -1 (no capability)
     PEOS_SYS_proc_kill = 111,     // rdi=pid -> 0/-1 (PEOS_CAP_MANAGE)
     PEOS_SYS_random = 112,        // rdi=buf, rsi=len (<= 65536) -> len or -1 (no capability)
+    PEOS_SYS_mrelease = 113,      // rdi=addr, rsi=len, rdx=0 out / 1 back in -> 0 or -1 (no capability)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED

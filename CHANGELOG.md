@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.10.0] - 2026-11-03
+- SDK 1.9.0, from PeOS 0.12.0: peos_mrelease, a libpeos that gives memory back to the system
+- Guide: 8 px or more between a raised surface and the edge of the body keep its shadow whole
+
 ## [0.9.0] - 2026-10-30
 - SDK 1.8.0, from PeOS 0.11.0 (SLUI SDK 1.0.10): HTTP and HTTPS (`peos/http.h`, `peos/tls.h`), `peos/charset.h`, a fuller C library (`math.h`, `time.h`, `scanf`)
 - Pixels of an app's own (`slui_pixels_*`), with the mouse and the keys on them (`SLUI_EVENT_POINTER`, `SLUI_EVENT_CHAR`), the pointer's shape (`slui_pixels_cursor`), the clipboard (`slui_clipboard_*`) and PeOS's Caps+A / Caps+S (`SLUI_EVENT_CLIPCMD`)

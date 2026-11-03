@@ -213,6 +213,12 @@ int64_t peos_hwinfo_report(char *buf, size_t len);
 uint64_t peos_brk(uint64_t addr);
 uint64_t peos_mmap(uint64_t addr, uint64_t len, uint64_t prot, uint64_t flags);
 uint64_t peos_munmap(uint64_t addr, uint64_t len);
+// Pages of an anonymous mapping (SYS_MRELEASE): PEOS_MRELEASE_OUT gives their
+// memory back but keeps the range reserved (touching it then is a fault);
+// PEOS_MRELEASE_IN maps zeroed pages there again. 0 or -1.
+#define PEOS_MRELEASE_OUT 0u
+#define PEOS_MRELEASE_IN 1u
+int64_t peos_mrelease(uint64_t addr, uint64_t len, uint32_t op);
 int64_t peos_shm_create(size_t len);
 int64_t peos_shm_map(uint64_t id, peos_shm_map_t *out);
 int64_t peos_shm_destroy(uint64_t id);

@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.9.0] - 2026-11-03
+- From PeOS 0.12.0 (SLUI SDK 1.0.10): SYS_MRELEASE and peos_mrelease (peos/syscall.h, peos/peos.h)
+- New libpeos.a: memory goes back to the system; SLUI waits up to 2 s for the language and the bundle
+
 ## [1.8.0] - 2026-10-30
 - From PeOS 0.11.0 (SLUI SDK 1.0.10): `peos/http.h` (HTTP and HTTPS), `peos/tls.h`, `peos/charset.h`; `math.h`, `time.h`, `scanf`, `inttypes.h` formats and more of the C library
 - SLUI: pixels of an app's own (`slui_pixels_*`, 1.0.7), the mouse and typed text on them (`SLUI_EVENT_POINTER`, `SLUI_EVENT_CHAR`, 1.0.8), the pointer's shape and the clipboard (`slui_pixels_cursor`, `slui_clipboard_*`, 1.0.9), Caps+A and Caps+S on them (`SLUI_EVENT_CLIPCMD`, 1.0.10)
