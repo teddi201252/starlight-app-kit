@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [Unreleased]
+- app.ini: `dock=yes` puts an app in the dock from the start (Starlight after 0.15.0); without it the app is only in the app manager until pinned. The template writes it
+
 ## [0.10.0] - 2026-11-03
 - SDK 1.9.0, from PeOS 0.12.0: peos_mrelease, a libpeos that gives memory back to the system
 - Guide: 8 px or more between a raised surface and the edge of the body keep its shadow whole

@@ -93,7 +93,7 @@ The bundle's manifest, `<id>.app/app.ini`. `#` and `;` start comments.
 | `min_width`, `min_height` | How small the user can make it. | `min_width=400` |
 | `max_width`, `max_height` | How large. | `max_width=1200` |
 | `resizable` | `0` or `no`: a fixed size. | `resizable=0` |
-| `dock` | `0` or `no`: not in the dock until the user pins it (the app manager lists it). | `dock=no` |
+| `dock` | `1` or `yes`: in the dock from the start. Without it the app is only in the app manager, until the user pins it to the dock. | `dock=yes` |
 
 The `[resources]` section names files of the bundle, `key=./path`:
 
@@ -662,7 +662,8 @@ appget http://10.0.2.2:8000/myapp.app.tar
 
 `10.0.2.2` is your machine as QEMU and VirtualBox (NAT) see it; for UTM's
 shared network or a bridged VM, use the other address it prints. The app goes
-into `/apps/myapp.app` and shows up in the dock within a second; running
+into `/apps/myapp.app` and shows up within a second, in the app manager and,
+with `dock=yes` (the template has it), in the dock; running
 `appget` again replaces it with the new build. On the live ISO `/apps` is in
 RAM: install again after a restart.
 

@@ -2,6 +2,9 @@
 title={{APP_NAME}}
 # The app manager's filter: sistema, strumenti or svago.
 category={{CATEGORY}}
+# In the dock from the start; without it the app is only in the app manager,
+# until the user pins it.
+dock=yes
 exec=./app.bin
 args=
 # Rights the app may use (fs.read, fs.write, process, display, input, audio,
