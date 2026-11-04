@@ -50,7 +50,8 @@ make APP_ID=myapp peos-add PEOS=../peos-starlight
 make -C ../peos-starlight run-hdd
 ```
 
-The app shows in the dock and in the app manager. Drag a window corner to
+The app shows in the app manager, and in the dock (`dock=yes` in its
+`app.ini`, as the template writes). Drag a window corner to
 check that your layout follows the size.
 
 ## 5) Look at the examples

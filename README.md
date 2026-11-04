@@ -50,7 +50,7 @@ make APP_ID=calculator serve
 
 and type the command it prints in PeOS's Terminale, e.g.
 `appget http://10.0.2.2:8000/calculator.app.tar`: the app shows up in the
-dock. Run both again after every change.
+dock (`dock=yes` in its `app.ini`). Run both again after every change.
 
 Or add it to a PeOS tree, which builds it into its image like its own apps:
 
