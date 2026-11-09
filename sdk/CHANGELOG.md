@@ -2,6 +2,12 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.10.0] - 2026-11-09
+- From PeOS 0.13.0 (SLUI SDK 1.0.12): `slui_open_file_with` and `SLUI_EVENT_OPEN_FILE` (1.0.12), `SLUI_EVENT_CHAR` also in apps without pixels (1.0.11)
+- `peos/music.h` (WAV, FLAC and MP3 decoders, tags, covers) and `peos/musicd.h` (the music service and its queue)
+- `peos/http.h`: HttpOnly cookies and the cookies of a page's scripts; `peos/peos.h`: Page Up and Page Down
+- New libpeos.a: the decoders, the music client
+
 ## [1.9.0] - 2026-11-03
 - From PeOS 0.12.0 (SLUI SDK 1.0.10): SYS_MRELEASE and peos_mrelease (peos/syscall.h, peos/peos.h)
 - New libpeos.a: memory goes back to the system; SLUI waits up to 2 s for the language and the bundle

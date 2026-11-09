@@ -305,7 +305,8 @@ from the top left of the pixels shown; `keycode` the buttons held (bit 0
 left, 1 right), `mods` the modifiers, `wheel` the notches (up positive). A
 press on them gives them the keyboard: the typed characters then come as
 `SLUI_EVENT_CHAR` (`text` in UTF-8, `value` the code point), the keys as
-`SLUI_EVENT_KEY_DOWN` as always.
+`SLUI_EVENT_KEY_DOWN` as always. An app without pixels gets the characters
+too while none of its controls has the keyboard (SDK 1.0.11).
 
 **The pointer's shape and the clipboard** (SDK 1.0.9, 1.0.10):
 
@@ -418,7 +419,17 @@ Header-only helpers in `starlight_ui.h`, built on the calls above:
   `_handle_event`, and `slui_color_picker_hsv_to_rgb` / `_rgb_to_hsv`.
 
 Others: `slui_open_app_bundle(path)` asks Starlight to open another app;
-`slui_host_capabilities()` says which `SLUI_CAP_*` the running Starlight has.
+`slui_open_file_with(path, file)` opens it and hands it a file, which comes
+to that app as `SLUI_EVENT_OPEN_FILE` (`text` the path; once the app said
+hello, also when it was started for it: SDK 1.0.12, as Curiosity opens a
+picture in Orion); `slui_host_capabilities()` says which `SLUI_CAP_*` the
+running Starlight has.
+
+The music service (`peos/musicd.h`, with the "audio" capability) plays a
+queue in the background, as Orfeus does: `music_queue_write` the tracks,
+`music_call(MUSIC_OP_LOAD, ...)`, then play, pause, next, seek and volume;
+`music_watch` gives a connection on which every change comes. The
+decoders behind it (WAV, FLAC, MP3, their tags) are in `peos/music.h`.
 
 ## Languages
 
