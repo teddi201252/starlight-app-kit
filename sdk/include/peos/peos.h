@@ -354,6 +354,8 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_KEY_DOWN_NORM    0x0050u
 #define PEOS_KEY_HOME_NORM    0x0047u
 #define PEOS_KEY_END_NORM     0x004Fu
+#define PEOS_KEY_PGUP_NORM    0x0049u
+#define PEOS_KEY_PGDN_NORM    0x0051u
 #define PEOS_KEY_RCTRL_NORM   0x001Du
 #define PEOS_KEY_RALT_NORM    0x0038u
 #define PEOS_KEY_LSUPER_NORM  0x005Bu

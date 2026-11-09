@@ -74,6 +74,7 @@ typedef struct {
     char path[128];
     uint8_t secure;
     uint8_t host_only;          /* no Domain=: only that host */
+    uint8_t http_only;          /* HttpOnly: not for the page's scripts */
     int64_t expires;            /* Unix seconds, 0: for the session */
 } http_cookie_t;
 
@@ -87,6 +88,10 @@ typedef struct {
 void http_cookies_set(http_cookies_t *jar, const http_url_t *from, const char *set_cookie, int64_t now);
 /* The Cookie header's value for a request to url ("a=1; b=2"). -> length. */
 int http_cookies_header(const http_cookies_t *jar, const http_url_t *url, int64_t now, char *out, size_t cap);
+/* The same for a page's scripts (document.cookie): without the HttpOnly ones.
+   A script's own cookie neither is HttpOnly nor replaces one that is. */
+int http_cookies_script(const http_cookies_t *jar, const http_url_t *url, int64_t now, char *out, size_t cap);
+void http_cookies_set_script(http_cookies_t *jar, const http_url_t *from, const char *set_cookie, int64_t now);
 
 /* ------------------------------------------------------------------ fetch */
 

@@ -2,8 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
-## [Unreleased]
-- app.ini: `dock=yes` puts an app in the dock from the start (Starlight after 0.15.0); without it the app is only in the app manager until pinned. The template writes it
+## [0.11.0] - 2026-11-09
+- SDK 1.10.0, from PeOS 0.13.0 (SLUI SDK 1.0.12): `slui_open_file_with` and `SLUI_EVENT_OPEN_FILE`, typed characters for apps without pixels, the music (`peos/music.h`, `peos/musicd.h`)
+- app.ini: `dock=yes` puts an app in the dock from the start (Starlight 0.16.0); without it the app is only in the app manager until pinned. The template writes it
+- Guide: opening a file in another app, the music service
 
 ## [0.10.0] - 2026-11-03
 - SDK 1.9.0, from PeOS 0.12.0: peos_mrelease, a libpeos that gives memory back to the system

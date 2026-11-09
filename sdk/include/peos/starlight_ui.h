@@ -39,8 +39,9 @@ typedef enum {
     // notches (up positive). A press there gives the pixels the keyboard
     // (SLUI_EVENT_CHAR) and is followed until it is let go, also outside.
     SLUI_EVENT_POINTER = 18,
-    // A character typed while the pixels have the keyboard: text (UTF-8),
-    // value its code point. The keys come as KEY_DOWN as always.
+    // A character typed while the pixels have the keyboard (or, in an app
+    // without pixels, while no control has it: SLUI SDK 1.0.11): text
+    // (UTF-8), value its code point. The keys come as KEY_DOWN as always.
     SLUI_EVENT_CHAR = 19,
     // The clipboard's text (UTF-8), asked with slui_clipboard_request()
     // (SLUI SDK 1.0.9).
@@ -50,6 +51,10 @@ typedef enum {
     // (SLUI SDK 1.0.10). The app copies its selection with
     // slui_clipboard_copy, or pastes after slui_clipboard_request.
     SLUI_EVENT_CLIPCMD = 21,
+    // A file to open, from another app (slui_open_file_with) or Orbit
+    // (SLUI SDK 1.0.12): text is its path. It comes once the app said
+    // hello, also when the app was started to open it.
+    SLUI_EVENT_OPEN_FILE = 22,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
@@ -62,7 +67,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 10u
+#define SLUI_SDK_VERSION_PATCH 12u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -953,6 +958,9 @@ const char *slui_last_host_error(void);
 void slui_reload_display(void);
 void slui_reload_theme(void);
 void slui_open_app_bundle(const char *bundle_path);
+// Opens the app of bundle_path (started if it is not) and gives it file to
+// open, as SLUI_EVENT_OPEN_FILE (SLUI SDK 1.0.12).
+void slui_open_file_with(const char *bundle_path, const char *file);
 void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
 void slui_set_accent_a(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_theme_reset_override(void);
