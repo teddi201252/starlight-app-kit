@@ -20,6 +20,7 @@ each part is for and shows it in use.
 - [libpeos: notifications](#libpeos-notifications)
 - [libpeos: network](#libpeos-network)
 - [libpeos: system information](#libpeos-system-information)
+- [Publishing to PeStore](#publishing-to-pestore)
 - [Installing an app in a VM](#installing-an-app-in-a-vm)
 
 ## The shape of an app
@@ -94,6 +95,10 @@ The bundle's manifest, `<id>.app/app.ini`. `#` and `;` start comments.
 | `max_width`, `max_height` | How large. | `max_width=1200` |
 | `resizable` | `0` or `no`: a fixed size. | `resizable=0` |
 | `dock` | `1` or `yes`: in the dock from the start. Without it the app is only in the app manager, until the user pins it to the dock. | `dock=yes` |
+| `version` | The app's version, for PeStore: an installed app is updated when the catalog has a newer one. | `version=1.0.0` |
+| `author` | Who made it, shown in PeStore. | `author=Ada` |
+| `store_category` | Its shelf in PeStore: `strumenti`, `giochi`, `media`, `sviluppo` or `internet`. | `store_category=strumenti` |
+| `min_peos` | The oldest PeOS it runs on (PeStore; default `0.14.0`). | `min_peos=0.14.0` |
 
 The `[resources]` section names files of the bundle, `key=./path`:
 
@@ -203,6 +208,8 @@ out and ignores clicks). Text is UTF-8.
 | `slui_slider_u32(id, x, y, w, min, max, value)` | A slider. | `SLIDER` (value) |
 | `slui_select(id, x, y, w, h, count, selected, "A\|B\|C")` | A drop-down list. | `SELECT` (index) |
 | `slui_text_input(id, x, y, w, h, max_chars, text)` | A one-line field. | `TEXT_INPUT` (text) |
+| `slui_text_hint(id, "Search")` | Before the field, each frame: what it shows while empty and not focused, in the secondary colour (SDK 1.0.14). | |
+| `slui_text_menu(id, "Paste and go\|~Other")` | Before the field, each frame: the app's options after Starlight's own in the field's right-click menu (SDK 1.0.14). | `TEXT_MENU` (index) |
 | `slui_text_area(id, x, y, w, h, max_chars, text)` | A multi-line field. | `TEXT_AREA` (text) |
 | `slui_scroll_v(id, x, y, w, h, content_h, offset)` | A vertical scroll bar. | `SCROLL_V` (offset) |
 | `slui_list_item(id, x, y, w, h, enabled, title, subtitle)` | A row of a list. | `BUTTON`, `DOUBLE_CLICK` |
@@ -325,6 +332,15 @@ copy what is selected with `slui_clipboard_copy`, or ask with
 `slui_clipboard_request` and paste what `SLUI_EVENT_CLIPBOARD` brings, or
 something of your own. Do not bind Ctrl+C and Ctrl+V: they are not PeOS's.
 
+**Caps+Z** undoes and **Caps+Y** redoes (SDK 1.0.14). SLUI's text fields
+keep their own history and have a right-click menu (undo, redo, cut, copy,
+paste, paste from the clipboard manager, delete, select all), to which
+`slui_text_menu` adds the app's options. On your pixels the keys come as
+`SLUI_EVENT_CLIPCMD` with `SLUI_CLIP_UNDO` or `SLUI_CLIP_REDO`;
+`peos/text_undo.h` keeps a field's history for you, as Starlight's fields
+do. `slui_clipboard_manager()` opens the clipboard manager: the copy chosen
+there comes back as a `SLUI_CLIP_PASTE`.
+
 ## SLUI: text and fonts
 
 ```c
@@ -386,6 +402,8 @@ int slui_poll_event(slui_event_t *out);   // 1: one event in *out, 0: none left
 | `SLUI_EVENT_TOGGLE` | the toggle | `value`: 0 or 1 |
 | `SLUI_EVENT_SELECT` | select or segment | `value`: the chosen index |
 | `SLUI_EVENT_CONTEXT_MENU` | the menu | `value`: the chosen index |
+| `SLUI_EVENT_TEXT_MENU` | the field | `value`: the index of the app's option (`slui_text_menu`) |
+| `SLUI_EVENT_CLIPCMD` | | `value`: `SLUI_CLIP_COPY`, `PASTE`, `UNDO` or `REDO` |
 | `SLUI_EVENT_TEXT_INPUT` | the field | `text`, `text_len`: the whole text now |
 | `SLUI_EVENT_TEXT_AREA` | the field | `text`, `text_len` |
 | `SLUI_EVENT_SCROLL_V` | the bar | `value`: the new offset |
@@ -666,6 +684,24 @@ processes (`peos/proc_abi.h`). Neither needs a capability.
 peos_sysinfo_t si;
 if (peos_sysinfo(&si) == 0) printf("up %u s\n", (unsigned)(si.uptime_ns / 1000000000ull));
 ```
+
+## Publishing to PeStore
+
+PeStore (PeOS 0.14.0) installs apps from a catalog of static files, signed:
+`catalog.json`, `catalog.json.sig` and each app's tar, icon and screenshots.
+
+```sh
+make store-keys                      # once: ~/.peos/keys/store.key and .pub
+make store-init                      # an empty store/ with its catalog signed
+make publish APP_ID=myapp            # the app into store/, the catalog signed again
+```
+
+`make publish` reads `version`, `author`, `store_category` and `min_peos`
+from app.ini, `store.summary` and `store.description` from each
+`String.lang`, the screenshots from `examples/<id>/store/*.png`. Upload the
+whole `store/` folder as it is. The private key never leaves your machine;
+PeOS checks the catalog with the public one in `/system/config/store.pub`,
+so a store of your own needs a PeOS with your key there.
 
 ## Installing an app in a VM
 

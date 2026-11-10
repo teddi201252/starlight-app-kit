@@ -51,16 +51,22 @@ typedef enum {
     // pixels, while no control has it (SLUI SDK 1.0.13): value
     // SLUI_CLIP_COPY or SLUI_CLIP_PASTE. The app copies its selection with
     // slui_clipboard_copy, or pastes after slui_clipboard_request (or
-    // pastes something of its own: Curiosity, a file).
+    // pastes something of its own: Curiosity, a file). Caps+Z and Caps+Y
+    // come as SLUI_CLIP_UNDO and SLUI_CLIP_REDO (SLUI SDK 1.0.14).
     SLUI_EVENT_CLIPCMD = 21,
     // A file to open, from another app (slui_open_file_with) or Orbit
     // (SLUI SDK 1.0.12): text is its path. It comes once the app said
     // hello, also when the app was started to open it.
     SLUI_EVENT_OPEN_FILE = 22,
+    // One of the app's options in a text field's menu (slui_text_menu,
+    // SLUI SDK 1.0.14): id the field, value the option's index.
+    SLUI_EVENT_TEXT_MENU = 23,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
 #define SLUI_CLIP_PASTE 2u
+#define SLUI_CLIP_UNDO 3u
+#define SLUI_CLIP_REDO 4u
 
 #define SLUI_POINTER_MOVE 1u
 #define SLUI_POINTER_DOWN 2u
@@ -69,7 +75,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 13u
+#define SLUI_SDK_VERSION_PATCH 14u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -360,6 +366,17 @@ void slui_context_menu_state(uint32_t id,
                              uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                              uint32_t option_count, uint8_t enabled,
                              const char *options_pipe);
+
+// A text field's menu (the right button on it) is Starlight's: undo, redo,
+// cut, copy, paste, paste from the clipboard manager, delete, select all
+// (SLUI SDK 1.0.14). These options of the app's come after them, for the
+// field with this id, each frame it is drawn: "Incolla e vai|~Altro"
+// ("~" first: shown, cannot be chosen now). The choice comes as
+// SLUI_EVENT_TEXT_MENU with the field's id and the option's index.
+void slui_text_menu(uint32_t field_id, const char *options_pipe);
+// What a one-line field shows while it is empty and not focused, in the
+// secondary colour ("Cerca un'app"), each frame it is drawn (SLUI SDK 1.0.14).
+void slui_text_hint(uint32_t field_id, const char *hint);
 
 void slui_text_input(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w, uint32_t h,
@@ -939,6 +956,10 @@ void slui_pixels_cursor(slui_cursor_t cursor);
 // which comes as SLUI_EVENT_CLIPBOARD.
 void slui_clipboard_copy(const char *text, size_t len);
 void slui_clipboard_request(void);
+// The clipboard manager opens (as when Caps is held); the item chosen there
+// comes back as SLUI_EVENT_CLIPCMD SLUI_CLIP_PASTE, to ask for and paste
+// ("Paste from the clipboard..." in a menu of the app's, SLUI SDK 1.0.14).
+void slui_clipboard_manager(void);
 
 int slui_poll_event(slui_event_t *out);
 
