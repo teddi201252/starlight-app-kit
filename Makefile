@@ -36,7 +36,7 @@ DIST_MANIFEST := $(DIST_DIR)/app.ini
 APP_RES_FILES := $(shell find $(APP_RES_ROOT) -type f ! -name '.DS_Store' 2>/dev/null)
 DIST_RES_FILES := $(patsubst $(APP_RES_ROOT)/%,$(DIST_DIR)/resources/%,$(APP_RES_FILES))
 
-.PHONY: help check-env scaffold check-sources check-strings build package pack serve clean sync-sdk peos-add
+.PHONY: help check-env scaffold check-sources check-strings build package pack serve publish store-init store-keys clean sync-sdk peos-add
 
 help:
 	@echo "Starlight App Kit (standalone-first)"
@@ -45,6 +45,9 @@ help:
 	@echo "  make package APP_ID=myapp                   # alias of build"
 	@echo "  make serve APP_ID=myapp [PORT=8000]          # serve it: in PeOS, appget <url> installs it"
 	@echo "  make pack APP_ID=myapp                      # dist/myapp.app.tar, what serve serves"
+	@echo "  make publish APP_ID=myapp [STORE=store]     # into a PeStore folder, the catalog signed with KEY"
+	@echo "  make store-init [STORE=store]                # an empty store, its catalog signed"
+	@echo "  make store-keys [KEY=~/.peos/keys/store.key] # the store's key pair, once"
 	@echo "  make check-strings APP_ID=myapp             # every language has every sentence"
 	@echo "  make sync-sdk PEOS=../peos-starlight         # refresh sdk/ from a PeOS tree"
 	@echo "  make peos-add APP_ID=myapp PEOS=../peos-starlight  # add the app to a PeOS tree's image"
@@ -101,6 +104,27 @@ package: build
 # The bundle as one tar, for PeOS's appget: no rebuild of PeOS needed.
 pack: build
 	python3 scripts/pack_app.py "$(DIST_DIR)" "$(DIST_TAR)"
+
+# PeStore (PeOS 0.14.0): the app into a store folder, the catalog signed.
+# Upload STORE as it is to the store's address (scripts/publish_app.py).
+STORE ?= store
+KEY ?= $(HOME)/.peos/keys/store.key
+publish: pack
+	python3 scripts/publish_app.py --app-id "$(APP_ID)" --app-dir "examples/$(APP_ID)" --tar "$(DIST_TAR)" \
+		--store "$(STORE)" --key "$(KEY)" $(if $(FEATURED),--featured) $(if $(MIN_PEOS),--min-peos "$(MIN_PEOS)")
+
+# A store's first catalog, empty and signed (or the one in STORE signed again).
+store-init:
+	python3 scripts/publish_app.py --init --store "$(STORE)" --key "$(KEY)"
+
+# The store's key pair, once: the private key in KEY (never in git), the
+# public one beside it as .pub, for PeOS's /system/config/store.pub.
+store-keys:
+	@if [ -f "$(KEY)" ]; then echo "store-keys: $(KEY) is there already"; exit 1; fi
+	@mkdir -p "$(dir $(KEY))" && chmod 700 "$(dir $(KEY))"
+	@openssl ecparam -name prime256v1 -genkey -noout -out "$(KEY)" && chmod 600 "$(KEY)"
+	@openssl ec -in "$(KEY)" -pubout -out "$(KEY:.key=.pub)" 2>/dev/null
+	@echo "store-keys: private $(KEY) (keep it, never share it); public $(KEY:.key=.pub)"
 
 # Serves the tar on PORT and prints the appget command to type in the VM.
 serve: pack

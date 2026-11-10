@@ -2,6 +2,11 @@
 title={{APP_NAME}}
 # The app manager's filter: sistema, strumenti or svago.
 category={{CATEGORY}}
+# For PeStore (make publish): the version, who made it, and its shelf there:
+# strumenti, giochi, media, sviluppo or internet.
+version=1.0.0
+author=
+store_category=strumenti
 # In the dock from the start; without it the app is only in the app manager,
 # until the user pins it.
 dock=yes
