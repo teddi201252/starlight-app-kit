@@ -2,6 +2,12 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.11.0] - 2026-11-10
+- From PeOS 0.13.1 (SLUI SDK 1.0.13): `SLUI_EVENT_CLIPCMD` (Caps+A, Caps+S) also in apps without pixels while no field has the keyboard; context menu options starting with `~` are shown grey and cannot be chosen
+- `peos/fileop.h`: copying and moving files and folders a piece at a time, never over a name already there
+- `peos/peos.h`: `PEOS_READDIR_MAX` (a listing answers up to 64 KiB)
+- New libpeos.a: fileop
+
 ## [1.10.0] - 2026-11-09
 - From PeOS 0.13.0 (SLUI SDK 1.0.12): `slui_open_file_with` and `SLUI_EVENT_OPEN_FILE` (1.0.12), `SLUI_EVENT_CHAR` also in apps without pixels (1.0.11)
 - `peos/music.h` (WAV, FLAC and MP3 decoders, tags, covers) and `peos/musicd.h` (the music service and its queue)

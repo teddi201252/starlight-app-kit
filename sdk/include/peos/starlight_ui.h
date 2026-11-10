@@ -47,9 +47,11 @@ typedef enum {
     // (SLUI SDK 1.0.9).
     SLUI_EVENT_CLIPBOARD = 20,
     // Caps+A (copy) or Caps+S (paste), PeOS's clipboard keys, while the
-    // pixels have the keyboard: value SLUI_CLIP_COPY or SLUI_CLIP_PASTE
-    // (SLUI SDK 1.0.10). The app copies its selection with
-    // slui_clipboard_copy, or pastes after slui_clipboard_request.
+    // pixels have the keyboard (SLUI SDK 1.0.10), or, in an app without
+    // pixels, while no control has it (SLUI SDK 1.0.13): value
+    // SLUI_CLIP_COPY or SLUI_CLIP_PASTE. The app copies its selection with
+    // slui_clipboard_copy, or pastes after slui_clipboard_request (or
+    // pastes something of its own: Curiosity, a file).
     SLUI_EVENT_CLIPCMD = 21,
     // A file to open, from another app (slui_open_file_with) or Orbit
     // (SLUI SDK 1.0.12): text is its path. It comes once the app said
@@ -67,7 +69,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 12u
+#define SLUI_SDK_VERSION_PATCH 13u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -348,6 +350,9 @@ void slui_select_state(uint32_t id,
                        uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                        uint32_t option_count, uint32_t selected,
                        uint8_t enabled, const char *options_pipe);
+// A right-click menu on x, y, w, h: options "A|B|C", answered with
+// SLUI_EVENT_CONTEXT_MENU and the index chosen. An option starting with "~"
+// is shown but cannot be chosen now (SLUI SDK 1.0.13: "Copia|~Incolla").
 void slui_context_menu(uint32_t id,
                        uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                        uint32_t option_count, const char *options_pipe);

@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.12.0] - 2026-11-10
+- SDK 1.11.0, from PeOS 0.13.1 (SLUI SDK 1.0.13): Caps+A and Caps+S for apps without pixels, context menu options that are off (`~`), copying and moving files (`peos/fileop.h`)
+- Guide: the clipboard keys without pixels, the options that are off, copying and moving
+
 ## [0.11.0] - 2026-11-09
 - SDK 1.10.0, from PeOS 0.13.0 (SLUI SDK 1.0.12): `slui_open_file_with` and `SLUI_EVENT_OPEN_FILE`, typed characters for apps without pixels, the music (`peos/music.h`, `peos/musicd.h`)
 - app.ini: `dock=yes` puts an app in the dock from the start (Starlight 0.16.0); without it the app is only in the app manager until pinned. The template writes it
