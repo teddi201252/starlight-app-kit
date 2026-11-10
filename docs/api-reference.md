@@ -206,7 +206,7 @@ out and ignores clicks). Text is UTF-8.
 | `slui_text_area(id, x, y, w, h, max_chars, text)` | A multi-line field. | `TEXT_AREA` (text) |
 | `slui_scroll_v(id, x, y, w, h, content_h, offset)` | A vertical scroll bar. | `SCROLL_V` (offset) |
 | `slui_list_item(id, x, y, w, h, enabled, title, subtitle)` | A row of a list. | `BUTTON`, `DOUBLE_CLICK` |
-| `slui_context_menu(id, x, y, w, h, count, "Copy\|Paste")` | A right-click menu over an area. | `CONTEXT_MENU` (index) |
+| `slui_context_menu(id, x, y, w, h, count, "Copy\|Paste")` | A right-click menu over an area; an option starting with `~` is grey and cannot be chosen (`"Copy\|~Paste"`, SDK 1.0.13). | `CONTEXT_MENU` (index) |
 | `slui_panel_input(id, x, y, w, h, enabled)` | An invisible area that reports where it is pressed. | `PANEL_INPUT` |
 
 Controls show the value you pass: when the user moves a slider, you get the
@@ -319,9 +319,11 @@ void slui_clipboard_request(void);             // the text comes as SLUI_EVENT_C
 In PeOS one copies with **Caps+A** and pastes with **Caps+S** (Caps held
 like one more modifier). SLUI's own text fields do it by themselves; on
 your pixels the keys come as `SLUI_EVENT_CLIPCMD`, `value` `SLUI_CLIP_COPY`
-or `SLUI_CLIP_PASTE`: copy what is selected with `slui_clipboard_copy`, or
-ask with `slui_clipboard_request` and paste what `SLUI_EVENT_CLIPBOARD`
-brings. Do not bind Ctrl+C and Ctrl+V: they are not PeOS's.
+or `SLUI_CLIP_PASTE`, and in an app without pixels too while no field has
+the keyboard (SDK 1.0.13: Curiosity copies and pastes files with them):
+copy what is selected with `slui_clipboard_copy`, or ask with
+`slui_clipboard_request` and paste what `SLUI_EVENT_CLIPBOARD` brings, or
+something of your own. Do not bind Ctrl+C and Ctrl+V: they are not PeOS's.
 
 ## SLUI: text and fonts
 
@@ -424,6 +426,15 @@ to that app as `SLUI_EVENT_OPEN_FILE` (`text` the path; once the app said
 hello, also when it was started for it: SDK 1.0.12, as Curiosity opens a
 picture in Orion); `slui_host_capabilities()` says which `SLUI_CAP_*` the
 running Starlight has.
+
+Copying and moving files and folders (`peos/fileop.h`, as Curiosity's
+Paste and Orbit's `cp` and `mv` do): `peos_fileop_begin(PEOS_FILEOP_COPY or
+PEOS_FILEOP_MOVE, src, dst_dir, "copy", &err)`, then `peos_fileop_step(op,
+budget_ns)` between your frames until it is not `PEOS_FILEOP_RUNNING`,
+`peos_fileop_progress` for a bar, `peos_fileop_result` (where it went: a
+name already there is never overwritten, the copy is "name (copy).ext") and
+`peos_fileop_end`. It writes under a provisional name, so one stopped half
+way leaves nothing behind.
 
 The music service (`peos/musicd.h`, with the "audio" capability) plays a
 queue in the background, as Orfeus does: `music_queue_write` the tracks,

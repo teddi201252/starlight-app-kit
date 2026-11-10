@@ -6,7 +6,7 @@
 #include "peos/path_scope_abi.h"
 
 /* Parsing of the manifest key
- *   paths=/home:rw, /system:r
+ *   paths=/downloads:rw, /system:r
  * Each item is an absolute path, a colon and r, w or rw. Freestanding so
  * hosts and tests can include it. */
 

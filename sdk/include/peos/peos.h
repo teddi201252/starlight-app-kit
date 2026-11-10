@@ -179,6 +179,10 @@ uint64_t peos_fsize(uint64_t fd);
 uint64_t peos_fclose(uint64_t fd);
 uint64_t peos_chdir(const char *path, size_t len);
 uint64_t peos_getcwd(char *buf, size_t len);
+/* The names in a folder, "name\n" (a folder "name/\n"); out_len at most
+ * PEOS_READDIR_MAX (a larger one gets nothing). Filled to out_len - 1 or
+ * more: there may be more names than fit. */
+#define PEOS_READDIR_MAX 65536u
 uint64_t peos_readdir(const char *path, size_t path_len, char *out, size_t out_len);
 int64_t peos_readdir_begin(const char *path, size_t path_len,
                            char *buf, size_t buf_len, peos_dir_iter_t *it);

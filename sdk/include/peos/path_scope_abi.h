@@ -8,7 +8,7 @@
  * (FS_READ / FS_WRITE) still apply. A scope only ever narrows: once restricted
  * a task can shrink it further but never widen it, and children inherit it.
  * A grant covers its prefix and everything below it (component boundaries:
- * "/home" covers "/home/a" but not "/homework"). */
+ * "/downloads" covers "/downloads/a" but not "/downloadsx"). */
 
 #define PEOS_PATH_READ   1u   /* open for reading, list, stat, chdir, execute */
 #define PEOS_PATH_WRITE  2u   /* create, write, truncate, mkdir, unlink, rmdir, rename */
