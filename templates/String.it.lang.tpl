@@ -5,3 +5,6 @@ mode.one=modo Uno
 mode.two=modo Due
 reset=Azzera
 count=Conta
+# PeStore (make publish): una riga, poi il resto (\n per andare a capo).
+store.summary=
+store.description=

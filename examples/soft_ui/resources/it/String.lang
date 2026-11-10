@@ -63,3 +63,6 @@ views=Giorno|Settimana
 
 # week
 week=SETTIMANA
+# PeStore (make publish)
+store.summary=Le superfici Soft UI di Starlight in un'app: rilievi, campi, interruttori.
+store.description=Un esempio del kit: mostra le superfici in rilievo e incavate, i campi e gli interruttori di SLUI.

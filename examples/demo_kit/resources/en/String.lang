@@ -24,3 +24,6 @@ title=Demo Kit
 
 # wifi
 wifi=Wi-Fi
+# PeStore (make publish)
+store.summary=The kit's example: a counter, a selector, the languages.
+store.description=Shows how an app for Starlight is written with the SLUI SDK: controls, events, texts in two languages.

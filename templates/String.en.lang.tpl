@@ -7,3 +7,6 @@ mode.one=mode One
 mode.two=mode Two
 reset=Reset
 count=Count
+# PeStore (make publish): one line, then the rest (\n for a new line).
+store.summary=
+store.description=

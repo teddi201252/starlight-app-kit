@@ -63,3 +63,6 @@ views=Day|Week
 
 # week
 week=WEEK
+# PeStore (make publish)
+store.summary=Starlight's Soft UI surfaces in an app: raised, sunk, switches.
+store.description=A kit example: the raised and sunk surfaces, the fields and switches of SLUI.
