@@ -2,6 +2,13 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.12.0] - 2026-11-10
+- From PeOS 0.14.0 (SLUI SDK 1.0.14): `slui_text_menu` and `SLUI_EVENT_TEXT_MENU`, `slui_text_hint`, `slui_clipboard_manager`, `SLUI_CLIP_UNDO` and `SLUI_CLIP_REDO`
+- `peos/text_undo.h`: a text field's undo history
+- `peos/store.h` (PeStore's catalog and its signature), `peos/appinstall.h` (installing a bundle from a tar stream), `peos/update.h` (PeOS's update: latest.json and the manifest)
+- `peos/net.h`: the TCP receive counters in `net_stats_t`
+- New libpeos.a
+
 ## [1.11.0] - 2026-11-10
 - From PeOS 0.13.1 (SLUI SDK 1.0.13): `SLUI_EVENT_CLIPCMD` (Caps+A, Caps+S) also in apps without pixels while no field has the keyboard; context menu options starting with `~` are shown grey and cannot be chosen
 - `peos/fileop.h`: copying and moving files and folders a piece at a time, never over a name already there

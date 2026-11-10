@@ -2,6 +2,11 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.13.0] - 2026-11-10
+- SDK 1.12.0, from PeOS 0.14.0 (SLUI SDK 1.0.14): a text field's menu with the app's options (`slui_text_menu`), its hint (`slui_text_hint`), undo and redo (`SLUI_CLIP_UNDO`, `SLUI_CLIP_REDO`, `peos/text_undo.h`), the clipboard manager (`slui_clipboard_manager`)
+- PeStore: `make store-keys`, `make store-init`, `make publish`; app.ini gets `version`, `author`, `store_category`; String.lang `store.summary` and `store.description`
+- Guide: the field's menu, undo and redo, publishing to PeStore
+
 ## [0.12.0] - 2026-11-10
 - SDK 1.11.0, from PeOS 0.13.1 (SLUI SDK 1.0.13): Caps+A and Caps+S for apps without pixels, context menu options that are off (`~`), copying and moving files (`peos/fileop.h`)
 - Guide: the clipboard keys without pixels, the options that are off, copying and moving

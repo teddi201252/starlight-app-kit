@@ -65,6 +65,11 @@ typedef struct {
     uint32_t udp_open, tcp_open;
     uint32_t dhcp_leases, restarts;
     uint64_t bytes_rx, bytes_tx;            /* whole Ethernet frames */
+    /* TCP receive side (release 0.14.0, phase 1): segments that did not start
+     * at the next byte expected (ahead: a hole before them; behind: old data
+     * sent again), acknowledgements announcing a closed window, and window
+     * updates sent once the client read enough. */
+    uint64_t tcp_rx_ahead, tcp_rx_behind, tcp_zero_window, tcp_window_updates;
 } net_stats_t;
 
 typedef struct {
