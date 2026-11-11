@@ -36,7 +36,7 @@ DIST_MANIFEST := $(DIST_DIR)/app.ini
 APP_RES_FILES := $(shell find $(APP_RES_ROOT) -type f ! -name '.DS_Store' 2>/dev/null)
 DIST_RES_FILES := $(patsubst $(APP_RES_ROOT)/%,$(DIST_DIR)/resources/%,$(APP_RES_FILES))
 
-.PHONY: help check-env scaffold check-sources check-strings build package pack serve publish store-init store-keys clean sync-sdk peos-add
+.PHONY: help check-env scaffold check-sources check-strings build package pack serve publish publish-bundle store-pull store-init store-keys clean sync-sdk peos-add
 
 help:
 	@echo "Starlight App Kit (standalone-first)"
@@ -46,6 +46,8 @@ help:
 	@echo "  make serve APP_ID=myapp [PORT=8000]          # serve it: in PeOS, appget <url> installs it"
 	@echo "  make pack APP_ID=myapp                      # dist/myapp.app.tar, what serve serves"
 	@echo "  make publish APP_ID=myapp [STORE=store]     # into a PeStore folder, the catalog signed with KEY"
+	@echo "  make publish-bundle APP_ID=id BUNDLE=dir     # an app built elsewhere (a port) into the store"
+	@echo "  make store-pull [STORE=store]                # the online catalog into STORE, to publish into"
 	@echo "  make store-init [STORE=store]                # an empty store, its catalog signed"
 	@echo "  make store-keys [KEY=~/.peos/keys/store.key] # the store's key pair, once"
 	@echo "  make check-strings APP_ID=myapp             # every language has every sentence"
@@ -112,6 +114,24 @@ KEY ?= $(HOME)/.peos/keys/store.key
 publish: pack
 	python3 scripts/publish_app.py --app-id "$(APP_ID)" --app-dir "examples/$(APP_ID)" --tar "$(DIST_TAR)" \
 		--store "$(STORE)" --key "$(KEY)" $(if $(FEATURED),--featured) $(if $(MIN_PEOS),--min-peos "$(MIN_PEOS)")
+
+# An app built elsewhere, as a port (BUNDLE=../peos-d2d/out/d2d.app): its
+# app.ini and resources/ are read from the bundle itself.
+publish-bundle:
+	@test -f "$(BUNDLE)/app.ini" || { echo "publish-bundle: BUNDLE=<the built $(APP_ID).app folder>"; exit 1; }
+	@mkdir -p dist
+	python3 scripts/pack_app.py "$(BUNDLE)" "dist/$(APP_ID).app.tar"
+	python3 scripts/publish_app.py --app-id "$(APP_ID)" --app-dir "$(BUNDLE)" --tar "dist/$(APP_ID).app.tar" \
+		--store "$(STORE)" --key "$(KEY)" $(if $(FEATURED),--featured) $(if $(MIN_PEOS),--min-peos "$(MIN_PEOS)")
+
+# The store as it is online (its catalog and signature) into STORE: publish
+# adds to that catalog, so pull it first on a machine without the folder.
+STORE_URL ?= https://peoverse.com/store
+store-pull:
+	mkdir -p "$(STORE)"
+	curl -sSf "$(STORE_URL)/catalog.json" -o "$(STORE)/catalog.json"
+	curl -sSf "$(STORE_URL)/catalog.json.sig" -o "$(STORE)/catalog.json.sig"
+	@echo "store-pull: $(STORE)/catalog.json from $(STORE_URL)"
 
 # A store's first catalog, empty and signed (or the one in STORE signed again).
 store-init:
