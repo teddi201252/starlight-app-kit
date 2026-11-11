@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdint.h>
 
 #define PEOS_WIFI_SSID_MAX_LEN 32u
@@ -84,3 +87,6 @@ int64_t peos_wifi_status(peos_wifi_status_t *status);
 
 const char *peos_wifi_state_name(uint8_t state);
 const char *peos_wifi_security_name(uint8_t security);
+#ifdef __cplusplus
+}
+#endif

@@ -25,6 +25,9 @@
  * (tests/host/test_store.c); store_verify uses mbedTLS. */
 #ifndef PEOS_STORE_H
 #define PEOS_STORE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -79,4 +82,7 @@ void store_sha256(const void *data, size_t len, uint8_t out[32]);
 /* 64 hex digits into 32 bytes: 0, or -1. */
 int store_hex32(const char *hex, uint8_t out[32]);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

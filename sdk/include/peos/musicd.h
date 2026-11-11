@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* The music service (release 0.13.0, phase 5): musicd plays the queue that
  * Orfeus gives it, so the music goes on when Orfeus's window is closed.
  * It owns an audio stream (capability "audio"), reads the files (fs.read)
@@ -122,3 +125,6 @@ uint64_t music_position_ms(const music_status_t *st, uint64_t now_ns);
 int music_queue_write(const char *path, const music_track_t *tracks, uint32_t count, uint32_t current);
 /* *tracks is malloc'ed (free it). 0, or -1. */
 int music_queue_read(const char *path, music_track_t **tracks, uint32_t *count, uint32_t *current);
+#ifdef __cplusplus
+}
+#endif

@@ -11,6 +11,9 @@
 //   Caps+Z:                  peos_undo_apply(&u, id, text, &len, cap, &caret, 0);
 #ifndef PEOS_TEXT_UNDO_H
 #define PEOS_TEXT_UNDO_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -48,4 +51,7 @@ uint8_t peos_undo_can(const peos_text_undo_t *u, uint32_t id, uint8_t redo);
 void peos_undo_break(peos_text_undo_t *u);
 void peos_undo_clear(peos_text_undo_t *u);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

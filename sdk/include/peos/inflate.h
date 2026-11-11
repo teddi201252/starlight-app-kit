@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* A small inflate (RFC 1951), with the gzip (RFC 1952) and zlib (RFC 1950)
  * wrappers, for HTTP's Content-Encoding (release 0.11.0, phase 3).
  *
@@ -44,3 +47,6 @@ typedef struct {
 
 /* Decompresses the whole stream: INFLATE_OK or an INFLATE_ERR_*. */
 int inflate_run(inflate_t *z, inflate_wrap_t wrap, inflate_read_fn read, inflate_write_fn write, void *user);
+#ifdef __cplusplus
+}
+#endif

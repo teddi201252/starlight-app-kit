@@ -132,7 +132,7 @@ needs one it lacks fails (and the kernel logs `[CAP] denied`).
 | `fs.write` | Creating, writing, renaming and removing them (within `paths` marked `rw`). |
 | `network` | The network: TCP, UDP, DNS, ping (`peos/net.h`). |
 | `audio` | Playing sound (`peos/audio.h`). |
-| `process` | Starting other programs and threads. |
+| `process` | Starting other programs (an app's own threads need nothing: SDK 1.13.0). |
 | `shm` | Shared memory. |
 | `display` | The framebuffer directly (Starlight's own business: apps draw through SLUI). |
 | `input` | Raw keyboard and mouse (likewise: apps get keys as SLUI events). |
@@ -318,7 +318,7 @@ too while none of its controls has the keyboard (SDK 1.0.11).
 **The pointer's shape and the clipboard** (SDK 1.0.9, 1.0.10):
 
 ```c
-void slui_pixels_cursor(slui_cursor_t c);      // SLUI_CURSOR_ARROW, _HAND, _TEXT, over your pixels
+void slui_pixels_cursor(slui_cursor_t c);      // SLUI_CURSOR_ARROW, _HAND, _TEXT, _NONE (1.0.15), over your pixels
 void slui_clipboard_copy(const char *text, size_t len);   // up to 64 KB, with PeOS's copy feedback
 void slui_clipboard_request(void);             // the text comes as SLUI_EVENT_CLIPBOARD
 ```
@@ -581,6 +581,34 @@ uint64_t t0 = peos_time_ns();
 work();
 printf("took %u us\n", (unsigned)((peos_time_ns() - t0) / 1000));
 ```
+
+## libpeos: threads
+
+`peos/thread.h` (SDK 1.13.0): threads of your app, sharing its memory, its
+files and its capabilities (making one needs no capability).
+
+| Call | |
+|---|---|
+| `peos_thread_spawn(entry, arg, stack_top)` | A thread (`peos/peos.h`): `entry(arg)` on the stack you give it. |
+| `peos_thread_exit(code)` | Ends this thread only (`peos_exit` ends the whole app). |
+| `peos_mutex_lock`, `_trylock`, `_unlock` | A mutex (`PEOS_MUTEX_INIT`): one atomic instruction when free. |
+| `peos_wait_word(addr, expect, timeout_ns)`, `peos_wake(addr, n)` | Wait while a 32-bit word holds `expect`; wake up to n waiting on it. |
+| `peos_tls_set(base)` | This thread's `%fs` base (its thread-local storage). |
+| `peos_cpu_count()` | The CPUs PeOS runs on. |
+
+```c
+static peos_mutex_t lock = PEOS_MUTEX_INIT;
+static void worker(void *arg) {
+    peos_mutex_lock(&lock);
+    /* ... */
+    peos_mutex_unlock(&lock);
+    peos_thread_exit(0);   // a thread never returns from its entry
+}
+```
+
+A thread is joined with `peos_waitpid(tid, &code)` (any thread of the app
+may join any other; no capability). `peos_memalign(align, size)` (`peos/alloc.h`) gives aligned
+memory, freed with `free`. Every `peos/*.h` can be included from C++.
 
 ## libpeos: notifications
 

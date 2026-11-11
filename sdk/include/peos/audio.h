@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include <stddef.h>
@@ -53,3 +56,6 @@ size_t audio_write(const void *samples, size_t len);
 size_t audio_stream_write(const void *samples, size_t len);
 size_t audio_stream_avail(void);
 int audio_set_volume(uint32_t volume);
+#ifdef __cplusplus
+}
+#endif

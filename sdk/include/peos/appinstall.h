@@ -12,6 +12,9 @@
  */
 #ifndef PEOS_APPINSTALL_H
 #define PEOS_APPINSTALL_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -41,4 +44,7 @@ void appinstall_free(appinstall_t *ai);
 /* Removes an installed bundle (<apps>/<Name>.app). 0, or -1. */
 int appinstall_remove(const char *apps_dir, const char *bundle);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

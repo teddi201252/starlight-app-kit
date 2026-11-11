@@ -13,6 +13,9 @@
  * then "(<word> 2)"... Moving on the same disk is a rename; across disks a
  * copy, and the original goes only once the copy is whole. */
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -61,3 +64,6 @@ void peos_fileop_end(peos_fileop_t *op);
 /* A name not yet in dir for name: name itself, else "stem (word).ext",
  * "stem (word 2).ext"... (a folder: no extension). 0, or -1 if too long. */
 int peos_fileop_free_name(const char *dir, const char *name, int is_dir, const char *word, char *out, size_t cap);
+#ifdef __cplusplus
+}
+#endif

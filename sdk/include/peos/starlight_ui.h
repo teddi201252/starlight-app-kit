@@ -75,7 +75,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 14u
+#define SLUI_SDK_VERSION_PATCH 15u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -947,8 +947,9 @@ void slui_pixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t sx, ui
 void slui_pixels_damage(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
 // The pointer Starlight shows over the app's pixels (SLUI SDK 1.0.9), until
-// asked again: an arrow, a hand (a link), an I-beam (text).
-typedef enum { SLUI_CURSOR_ARROW = 0, SLUI_CURSOR_HAND = 1, SLUI_CURSOR_TEXT = 2 } slui_cursor_t;
+// asked again: an arrow, a hand (a link), an I-beam (text), or none (SLUI
+// SDK 1.0.15: an app that draws its own, a game).
+typedef enum { SLUI_CURSOR_ARROW = 0, SLUI_CURSOR_HAND = 1, SLUI_CURSOR_TEXT = 2, SLUI_CURSOR_NONE = 3 } slui_cursor_t;
 void slui_pixels_cursor(slui_cursor_t cursor);
 
 // The system clipboard (SLUI SDK 1.0.9), the one of Caps and of the text
