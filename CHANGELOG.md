@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.15.0] - 2026-11-11
+- SDK 1.14.0: `sdk/compat/`, libpeos-compat for ports of C and C++ programs (its headers, `libpeos-compat.a`, `crt0.S`), from PeOS 0.15.0; `scripts/sync_sdk.py` copies it too
+- The SDK's `libpeos.a` from PeOS 0.15.0's release commit
+
 ## [0.14.0] - 2026-11-11
 - SDK 1.13.0, from PeOS 0.15.0 (SLUI SDK 1.0.15): threads (`peos/thread.h`), with no capability needed; `SLUI_CURSOR_NONE` over your pixels; `peos_memalign`; every `peos/*.h` usable from C++
 - Guide: threads, the pointer that is not there, the `process` capability

@@ -7,6 +7,10 @@ bundle in `dist/`.
 ## What it includes
 - the PeOS SDK in `sdk/` (headers, `libpeos.a`, `crt0.S`, `linker.ld`), kept in
   step with PeOS by `scripts/sync_sdk.py` (`sdk/SOURCE` says from which commit)
+- for ports of existing C and C++ programs, `sdk/compat/`: libpeos-compat
+  (files, threads, the C library such programs expect) with its headers and
+  `crt0.S`, used with the `x86_64-peos` cross compiler; the Diablo II port
+  ([peos-d2d](https://github.com/teddi201252/peos-d2d)) is built this way
 - app project generator (`scripts/new_app.py`)
 - standalone-first Makefile (`Makefile`)
 - source + manifest templates (`templates/`)
