@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Character sets (release 0.11.0): text in the encodings a browser meets
  * most, to UTF-8 and back. PeOS's own text is UTF-8; this is for what comes
  * from outside (a page that says charset=windows-1252) and what goes back
@@ -28,3 +31,6 @@ int64_t peos_charset_to_utf8(peos_charset_t cs, const uint8_t *in, size_t len, c
 /* UTF-8 to cs, in *out (malloc'd): what cs cannot hold becomes "&#N;", as a
  * browser sends a form. -> the length, or -1. */
 int64_t peos_charset_from_utf8(peos_charset_t cs, const char *in, size_t len, uint8_t **out);
+#ifdef __cplusplus
+}
+#endif

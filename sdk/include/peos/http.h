@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* An HTTP/1.1 client (release 0.11.0, phase 3), for appget, the browser and
  * the apps: http:// and https:// (peos/tls.h), connections kept open and
  * used again, chunked bodies, gzip and deflate (peos/inflate.h), redirects,
@@ -126,3 +129,6 @@ typedef struct {
 int http_fetch(const http_request_t *req, http_result_t *res, http_body_fn body, void *user);
 /* Closes the connection kept open, if any. */
 void http_close_idle(void);
+#ifdef __cplusplus
+}
+#endif

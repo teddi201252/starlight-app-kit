@@ -117,6 +117,9 @@ enum {
     PEOS_SYS_proc_kill = 111,     // rdi=pid -> 0/-1 (PEOS_CAP_MANAGE)
     PEOS_SYS_random = 112,        // rdi=buf, rsi=len (<= 65536) -> len or -1 (no capability)
     PEOS_SYS_mrelease = 113,      // rdi=addr, rsi=len, rdx=0 out / 1 back in -> 0 or -1 (no capability)
+    PEOS_SYS_thread_exit = 114,   // rdi=code: ends this thread only (exit ends the process) (no capability)
+    PEOS_SYS_tls_set = 115,       // rdi=this thread's %fs base -> 0 or -1 (no capability)
+    PEOS_SYS_wake = 116,          // rdi=addr, rsi=n: wakes up to n waiting on that word -> how many (no capability)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED

@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* TLS over netd (release 0.11.0, phase 3): mbedTLS 3.6 (userland/ports/
  * mbedtls), TLS 1.3 and 1.2, a client only. The server's certificate is
  * checked against the root certificates in /system/certs/ (every *.pem, the
@@ -32,3 +35,6 @@ void tls_close(tls_conn_t *t);
 /* The roots read so far (they are read once per process, at the first
  * tls_open), or -1 if none could be read. */
 int tls_root_count(void);
+#ifdef __cplusplus
+}
+#endif

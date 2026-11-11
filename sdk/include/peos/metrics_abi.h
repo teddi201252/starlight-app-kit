@@ -9,7 +9,7 @@
  * per power of two, ~12% resolution). Convert with tsc_hz; it is 0 when the
  * kernel could not determine the TSC frequency. */
 
-#define PEOS_METRICS_ABI_VERSION 5u
+#define PEOS_METRICS_ABI_VERSION 6u
 #define PEOS_METRICS_SYSCALL_SLOTS 128u
 #define PEOS_METRICS_HIST_BUCKETS 256u
 #define PEOS_METRICS_TASKS 16u
@@ -75,6 +75,9 @@ typedef struct {
     uint64_t net_tx_frames;         /* frames handed to the NIC */
     uint64_t net_tx_ring_full;      /* sends refused because the NIC ring was full */
     uint64_t net_tx_dropped;        /* sends refused for another reason (too long, NIC down) */
+    uint64_t futex_waits;           /* waits on a word of memory that blocked (wait's address items) */
+    uint64_t futex_wakes;           /* wake calls that woke at least one */
+    uint64_t threads_live;          /* threads alive now, besides each process's first task */
 
     uint64_t syscall_by_id[PEOS_METRICS_SYSCALL_SLOTS];
     uint64_t hist[PEOS_MH_COUNT][PEOS_METRICS_HIST_BUCKETS];

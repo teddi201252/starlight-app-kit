@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdint.h>
 #include <stddef.h>
 #include "peos/alloc.h"
@@ -364,3 +367,6 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_KEY_RALT_NORM    0x0038u
 #define PEOS_KEY_LSUPER_NORM  0x005Bu
 #define PEOS_KEY_RSUPER_NORM  0x005Cu
+#ifdef __cplusplus
+}
+#endif

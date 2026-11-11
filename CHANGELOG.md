@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.14.0] - 2026-11-11
+- SDK 1.13.0, from PeOS 0.15.0 (SLUI SDK 1.0.15): threads (`peos/thread.h`), with no capability needed; `SLUI_CURSOR_NONE` over your pixels; `peos_memalign`; every `peos/*.h` usable from C++
+- Guide: threads, the pointer that is not there, the `process` capability
+
 ## [0.13.0] - 2026-11-10
 - SDK 1.12.0, from PeOS 0.14.0 (SLUI SDK 1.0.14): a text field's menu with the app's options (`slui_text_menu`), its hint (`slui_text_hint`), undo and redo (`SLUI_CLIP_UNDO`, `SLUI_CLIP_REDO`, `peos/text_undo.h`), the clipboard manager (`slui_clipboard_manager`)
 - PeStore: `make store-keys`, `make store-init`, `make publish`; app.ini gets `version`, `author`, `store_category`; String.lang `store.summary` and `store.description`

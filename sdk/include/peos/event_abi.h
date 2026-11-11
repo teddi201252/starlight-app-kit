@@ -29,6 +29,21 @@ typedef struct {
     uint16_t revents;    /* filled by the kernel */
 } peos_wait_item_t;
 
+/* Waiting on a word of memory, beside the descriptors (the threads of one
+ * process: mutexes, condition variables, joins). The item is ready when the
+ * 32-bit word at addr is not `expect` when wait looks, or when a thread of
+ * the same process calls wake(addr, n) on it while waiting; a wake can come
+ * with the word unchanged, so look at it again. addr must be 4-aligned.
+ * wait's count with PEOS_WAIT_ADDRS set says that the address items follow
+ * (the 4th and 5th arguments): peos_wait_addrs in libpeos. */
+#define PEOS_WAIT_ADDRS     0x80000000u
+#define PEOS_WAIT_MAX_ADDRS 16u
+typedef struct {
+    uint64_t addr;
+    uint32_t expect;
+    uint32_t revents;    /* filled by the kernel: PEOS_WAIT_READ when ready */
+} peos_wait_addr_t;
+
 /* One descriptor to hand to the next spawned child, besides 0/1/2. */
 #define PEOS_SPAWN_MAX_FDS 8u
 typedef struct {

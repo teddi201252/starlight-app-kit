@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Desktop notifications (Soft UI plan, phase 7): a short message to the
 // "notify" service, which Starlight registers. Starlight shows it in a night
@@ -22,3 +25,6 @@ typedef struct {
 // Send a notification; never blocks. 0 if delivered to the service, -1 if
 // there is none (no desktop running) or it is busy.
 int peos_notify(const char *source, const char *text);
+#ifdef __cplusplus
+}
+#endif

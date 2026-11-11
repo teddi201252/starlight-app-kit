@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* The network as a service (milestone 4): netd implements Ethernet, ARP,
  * IPv4, ICMP, UDP, TCP, DHCP and DNS in userland; programs talk to it over
  * channels, through the service registry name "net" (needs "network").
@@ -118,3 +121,6 @@ int net_stats(net_stats_t *out);
 /* Tests only (needs "debug"): netd faults on purpose; init starts it again. */
 int net_debug_crash(void);
 int net_parse_ipv4(const char *s, uint8_t out[4]);
+#ifdef __cplusplus
+}
+#endif

@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -29,3 +32,6 @@ int64_t peos_cap_revoke(uint64_t target_pid, peos_cap_mask_t mask);
 /* Limits the rights of the next peos_spawnv() child to (own rights & mask).
  * One-shot: it is consumed by that spawn, whether it succeeds or not. */
 int64_t peos_cap_set_spawn_mask(peos_cap_mask_t mask);
+#ifdef __cplusplus
+}
+#endif

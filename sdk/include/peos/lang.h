@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Languages (Technical Alpha plan, phase 4). A language is a folder; its
 // sentences are in String.lang:
@@ -169,4 +172,7 @@ int peos_lang_load(peos_lang_t *lang, const char *path);
 void peos_lang_free(peos_lang_t *lang);
 // The text of key, or NULL.
 const char *peos_lang_get(const peos_lang_t *lang, const char *key);
+#endif
+#ifdef __cplusplus
+}
 #endif

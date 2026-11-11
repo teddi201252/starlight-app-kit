@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Music files (release 0.13.0, phase 5: Orfeus). Our own decoders, no
  * libraries: WAV (on top of peos/audio.h), FLAC and MP3 (MPEG-1/2/2.5
  * Layer III). They work on the whole file in memory and give 16-bit stereo
@@ -116,3 +119,6 @@ void mus_art_for(const char *album, const char *artist, mus_art_t *out);
 void mus_format_time(char *out, size_t cap, uint64_t ms);
 /* A stable 32-bit hash of a string (FNV-1a), for cache names and colours. */
 uint32_t mus_hash(const char *s);
+#ifdef __cplusplus
+}
+#endif

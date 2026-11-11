@@ -2,6 +2,14 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.13.0] - 2026-11-11
+- From PeOS 0.15.0 (SLUI SDK 1.0.15): `SLUI_CURSOR_NONE`, no pointer over the app's pixels (an app that draws its own)
+- `peos/thread.h`: threads of the app (`peos_thread_exit`, `peos_tls_set`), a mutex, waiting on a word of memory and waking (`peos_wait_word`, `peos_wake`, `peos_wait_addrs`); `peos/event_abi.h`: `PEOS_WAIT_ADDRS`, `peos_wait_addr_t`; making a thread needs no capability
+- `peos/alloc.h`: `peos_memalign`
+- `peos/metrics_abi.h`: ABI 6, waits and wakes on words, threads alive
+- Every `peos/*.h` has C linkage under C++
+- New libpeos.a
+
 ## [1.12.0] - 2026-11-10
 - From PeOS 0.14.0 (SLUI SDK 1.0.14): `slui_text_menu` and `SLUI_EVENT_TEXT_MENU`, `slui_text_hint`, `slui_clipboard_manager`, `SLUI_CLIP_UNDO` and `SLUI_CLIP_REDO`
 - `peos/text_undo.h`: a text field's undo history

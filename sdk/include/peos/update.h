@@ -19,6 +19,9 @@
  * /system/config/update.pub). Pure parsing, checked by tests/host/test_update.c. */
 #ifndef PEOS_UPDATE_H
 #define PEOS_UPDATE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -156,4 +159,7 @@ int update_rollback(update_ctx_t *c, const update_manifest_t *new_m, const updat
  * The new text in out (NUL-ended); its length, 0 if nothing to add. */
 size_t update_limine_with_previous(const char *conf, size_t len, char *out, size_t cap);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
