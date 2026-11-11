@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.14.0] - 2026-11-11
+- `compat/`: libpeos-compat, the C library ports of existing C and C++ programs are built with (POSIX-like files and directories, `pthread.h`, `stdio.h` in full, maths), with its headers and its program entry `crt0.S`; for the `x86_64-peos` cross compiler, not for the kit's own apps
+- New libpeos.a (PeOS 0.15.0's release commit)
+
 ## [1.13.0] - 2026-11-11
 - From PeOS 0.15.0 (SLUI SDK 1.0.15): `SLUI_CURSOR_NONE`, no pointer over the app's pixels (an app that draws its own)
 - `peos/thread.h`: threads of the app (`peos_thread_exit`, `peos_tls_set`), a mutex, waiting on a word of memory and waking (`peos_wait_word`, `peos_wake`, `peos_wait_addrs`); `peos/event_abi.h`: `PEOS_WAIT_ADDRS`, `peos_wait_addr_t`; making a thread needs no capability

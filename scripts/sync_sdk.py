@@ -9,6 +9,11 @@ Copies what an app is built against, as PeOS builds its own apps:
   userland/libpeos.a  -> sdk/lib/libpeos.a (build it first: make userland/libpeos.a)
   userland/crt0.S     -> sdk/crt0.S
   userland/linker.ld  -> sdk/linker.ld
+and, for ports of C and C++ programs (libpeos-compat: POSIX-like files,
+threads, the C library they expect; built with the x86_64-peos toolchain):
+  userland/compat/include/   -> sdk/compat/include/
+  userland/libpeos-compat.a  -> sdk/compat/lib/libpeos-compat.a
+  userland/compat/crt0.S     -> sdk/compat/crt0.S
 and writes sdk/SOURCE: the PeOS commit, the date and the SLUI SDK version.
 """
 from __future__ import annotations
@@ -52,11 +57,15 @@ def main() -> int:
         "lib": peos / "userland" / "libpeos.a",
         "crt0": peos / "userland" / "crt0.S",
         "linker": peos / "userland" / "linker.ld",
+        "compat_include": peos / "userland" / "compat" / "include",
+        "compat_lib": peos / "userland" / "libpeos-compat.a",
+        "compat_crt0": peos / "userland" / "compat" / "crt0.S",
     }
     missing = [str(p) for p in sources.values() if not p.exists()]
     if missing:
         print("sync_sdk: missing in the PeOS tree:\n  " + "\n  ".join(missing), file=sys.stderr)
-        print("Build the library first: make -C <peos> userland/libpeos.a", file=sys.stderr)
+        print("Build the libraries first: make -C <peos> userland/libpeos.a userland/libpeos-compat.a",
+              file=sys.stderr)
         return 1
 
     if (SDK / "include").exists():
@@ -67,6 +76,14 @@ def main() -> int:
     shutil.copy2(sources["lib"], SDK / "lib" / "libpeos.a")
     shutil.copy2(sources["crt0"], SDK / "crt0.S")
     shutil.copy2(sources["linker"], SDK / "linker.ld")
+    compat = SDK / "compat"
+    if compat.exists():
+        shutil.rmtree(compat)
+    shutil.copytree(sources["compat_include"], compat / "include",
+                    ignore=shutil.ignore_patterns(".DS_Store", "*.d", "*.o"))
+    (compat / "lib").mkdir(parents=True)
+    shutil.copy2(sources["compat_lib"], compat / "lib" / "libpeos-compat.a")
+    shutil.copy2(sources["compat_crt0"], compat / "crt0.S")
 
     version = slui_version(SDK / "include" / "peos" / "starlight_ui.h")
     (SDK / "SOURCE").write_text(
@@ -77,7 +94,8 @@ def main() -> int:
         encoding="utf-8",
     )
     headers = sum(1 for _ in (SDK / "include").rglob("*.h"))
-    print(f"sdk/ synced from {peos}: {headers} headers, libpeos.a, crt0.S, linker.ld (SLUI SDK {version})")
+    print(f"sdk/ synced from {peos}: {headers} headers, libpeos.a, crt0.S, linker.ld, "
+          f"compat/ (libpeos-compat.a) (SLUI SDK {version})")
     return 0
 
 
