@@ -87,7 +87,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--app-id", help="the app to publish (not with --init)")
     ap.add_argument("--init", action="store_true", help="only the catalog: an empty one if there is none, signed again")
-    ap.add_argument("--app-dir", type=pathlib.Path, help="examples/<id> (its bundle/, resources/, store/)")
+    ap.add_argument("--app-dir", type=pathlib.Path,
+                    help="examples/<id> (its bundle/, resources/, store/), or a built <id>.app")
     ap.add_argument("--tar", type=pathlib.Path, help="dist/<id>.app.tar")
     ap.add_argument("--store", type=pathlib.Path, required=True, help="the store folder to fill")
     ap.add_argument("--key", type=pathlib.Path, required=True, help="the private key (PEM)")
@@ -104,7 +105,14 @@ def main() -> int:
     if not re.fullmatch(r"[a-z0-9._-]+", app_id):
         return fail(f"the id {app_id!r} may hold only a-z 0-9 . _ -")
     app_dir = args.app_dir or pathlib.Path("examples") / app_id
-    ini, res = read_ini(app_dir / "bundle" / "app.ini")
+    # a project (examples/<id>: bundle/app.ini) or a built bundle (<id>.app:
+    # app.ini at its top, as an app built outside the kit, e.g. a port)
+    ini_path = app_dir / "bundle" / "app.ini"
+    if not ini_path.is_file():
+        ini_path = app_dir / "app.ini"
+    if not ini_path.is_file():
+        return fail(f"no bundle/app.ini or app.ini in {app_dir}")
+    ini, res = read_ini(ini_path)
     if not args.tar.is_file():
         return fail(f"{args.tar} is not there (make pack APP_ID={app_id})")
     if not args.key.is_file():
@@ -126,6 +134,9 @@ def main() -> int:
     rel_tar = f"apps/{app_id}/{version}/{app_id}.app.tar"
     tar_sha = sha256(args.tar)
     catalog_path = store / "catalog.json"
+    if not catalog_path.is_file():
+        print(f"publish: no catalog in {store}: a new one with only {app_id} "
+              "(to add to the online store, make store-pull first)", file=sys.stderr)
     catalog = json.loads(catalog_path.read_text(encoding="utf-8")) if catalog_path.is_file() else {
         "format": FORMAT, "updated": "", "featured": "", "apps": []}
     if catalog.get("format") != FORMAT:
