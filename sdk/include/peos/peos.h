@@ -12,6 +12,7 @@ extern "C" {
 #include "peos/proc_abi.h"
 #include "peos/path_scope_abi.h"
 #include "peos/event_abi.h"
+#include "peos/disks.h"
 
 typedef struct {
     uint32_t width;

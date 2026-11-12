@@ -120,6 +120,8 @@ enum {
     PEOS_SYS_thread_exit = 114,   // rdi=code: ends this thread only (exit ends the process) (no capability)
     PEOS_SYS_tls_set = 115,       // rdi=this thread's %fs base -> 0 or -1 (no capability)
     PEOS_SYS_wake = 116,          // rdi=addr, rsi=n: wakes up to n waiting on that word -> how many (no capability)
+    PEOS_SYS_disks = 117,         // rdi=peos_disk_info_t[], rsi=max, rdx=flags (PEOS_DISKS_SPACE) -> count or -1 (PEOS_CAP_MOUNT)
+    PEOS_SYS_disks_watch = 118,   // -> fd readable when the disks change, or -1 (PEOS_CAP_MOUNT)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED
