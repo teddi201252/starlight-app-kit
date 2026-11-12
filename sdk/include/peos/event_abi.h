@@ -117,7 +117,9 @@ typedef struct {
 /* Network card (peos_nic_open, needs the "nic" capability): every read is one
  * whole Ethernet frame (destination MAC first, no FCS), every write sends one.
  * Exclusive: while the descriptor is open, the kernel's own network stack
- * receives nothing. Wait for READ like any descriptor. */
+ * receives nothing. Wait for READ like any descriptor. It is also readable
+ * when the link may have changed (Wi-Fi: joined, dropped), with no frame to
+ * read, until peos_nic_info is called (0.16.0). */
 #define PEOS_NIC_FRAME_MAX 1536u
 
 typedef struct {

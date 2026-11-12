@@ -136,7 +136,7 @@ needs one it lacks fails (and the kernel logs `[CAP] denied`).
 | `shm` | Shared memory. |
 | `display` | The framebuffer directly (Starlight's own business: apps draw through SLUI). |
 | `input` | Raw keyboard and mouse (likewise: apps get keys as SLUI events). |
-| `mount` | Mounting file systems. |
+| `mount` | Mounting and unmounting file systems; the list of disks and its changes (`peos/disks.h`, SDK 1.15.0). |
 | `power` | Shutting down and restarting. |
 | `install` | Installing PeOS on a disk. |
 | `manage` | Ending other processes. |
@@ -661,6 +661,35 @@ peos_fclose((uint64_t)c);
 ```
 
 For the web, use HTTP below rather than TCP by hand.
+
+## libpeos: disks
+
+`peos/disks.h`, needs `mount` (SDK 1.15.0). Sticks are mounted by PeOS
+itself on `/media1`, `/media2`...; an app that only reads them needs those
+folders in its `paths`, not `mount`.
+
+| Call | |
+|---|---|
+| `peos_disks(out, max)` | Every disk and partition (`peos_disk_info_t`: name, parent, filesystem, volume name, where mounted, size, flags such as `PEOS_DISK_REMOVABLE`, `PEOS_DISK_SYSTEM`): the count, or -1. |
+| `peos_disks_ex(out, max, PEOS_DISKS_SPACE)` | The same, with total and free bytes of the mounted ones (slower). |
+| `peos_disks_watch()` | A descriptor readable (`PEOS_WAIT_READ`) when the disks change; reading 8 bytes quiets it until the next change. |
+| `peos_mount(dev, len, path, len, fs, len)`, `peos_umount(path, len)` | Mounting (an empty `fs`: found by itself) and unmounting; unmounting fails while a file is open on the disk. |
+
+## libpeos: Wi-Fi
+
+`peos/wifi.h`, needs `network` (SDK 1.15.0). `peos_wifi_status(&st)` (state,
+link, network, signal, last error), `peos_wifi_scan(&req)`, and
+`peos_wifi_watch()`, a descriptor readable when the Wi-Fi changes (joined,
+link up or down, an error). Joining and the saved networks belong to
+`wifid`: `peos/wifid.h` (join, disconnect, the saved list, forget, Wi-Fi on
+or off), as Settings does.
+
+## libpeos: themes
+
+`peos/petheme.h` (SDK 1.15.0): read and write a `.petheme`, the theme files
+Settings exports (an uncompressed tar with `theme.ini` and the images it
+names). `petheme_read` checks what comes from outside (plain names, sizes,
+values); it makes no system calls.
 
 ## libpeos: HTTP and HTTPS
 
