@@ -92,6 +92,15 @@ int64_t peos_wifi_scan(peos_wifi_scan_req_t *req);
 int64_t peos_wifi_connect(const peos_wifi_connect_params_t *params);
 int64_t peos_wifi_disconnect(void);
 int64_t peos_wifi_status(peos_wifi_status_t *status);
+/* A descriptor readable (PEOS_WAIT_READ) when the Wi-Fi changes: joined, link
+ * up or down, an error. peos_fread of 8 bytes makes it quiet until the next
+ * change. Needs "network". */
+int64_t peos_wifi_watch(void);
+
+/* The errors of connect/status (last_error), besides -1..-5 (unsupported,
+ * invalid, not ready, input/output, busy). */
+#define PEOS_WIFI_ERR_AUTH (-6)        /* the password was refused */
+#define PEOS_WIFI_ERR_NOT_FOUND (-7)   /* no such network in range */
 
 const char *peos_wifi_state_name(uint8_t state);
 const char *peos_wifi_security_name(uint8_t security);

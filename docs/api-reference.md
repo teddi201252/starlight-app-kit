@@ -209,6 +209,7 @@ out and ignores clicks). Text is UTF-8.
 | `slui_select(id, x, y, w, h, count, selected, "A\|B\|C")` | A drop-down list. | `SELECT` (index) |
 | `slui_text_input(id, x, y, w, h, max_chars, text)` | A one-line field. | `TEXT_INPUT` (text) |
 | `slui_text_hint(id, "Search")` | Before the field, each frame: what it shows while empty and not focused, in the secondary colour (SDK 1.0.14). | |
+| `slui_text_secret(id)` | Before the field, each frame: a password field, its text drawn as asterisks and never copied to the clipboard; the app still gets the real text (SDK 1.0.16). | |
 | `slui_text_menu(id, "Paste and go\|~Other")` | Before the field, each frame: the app's options after Starlight's own in the field's right-click menu (SDK 1.0.14). | `TEXT_MENU` (index) |
 | `slui_text_area(id, x, y, w, h, max_chars, text)` | A multi-line field. | `TEXT_AREA` (text) |
 | `slui_scroll_v(id, x, y, w, h, content_h, offset)` | A vertical scroll bar. | `SCROLL_V` (offset) |

@@ -122,6 +122,7 @@ enum {
     PEOS_SYS_wake = 116,          // rdi=addr, rsi=n: wakes up to n waiting on that word -> how many (no capability)
     PEOS_SYS_disks = 117,         // rdi=peos_disk_info_t[], rsi=max, rdx=flags (PEOS_DISKS_SPACE) -> count or -1 (PEOS_CAP_MOUNT)
     PEOS_SYS_disks_watch = 118,   // -> fd readable when the disks change, or -1 (PEOS_CAP_MOUNT)
+    PEOS_SYS_wifi_watch = 120,    // -> fd readable when the Wi-Fi changes (joined, link, errors), or -1 (PEOS_CAP_NETWORK)
     PEOS_SYS_watchdog = 119,      // rdi=PEOS_WATCHDOG_STATUS/ON/OFF -> 1 on, 0 off, -1 (PEOS_CAP_DEBUG)
 };
 
