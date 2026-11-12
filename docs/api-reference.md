@@ -214,6 +214,7 @@ out and ignores clicks). Text is UTF-8.
 | `slui_text_area(id, x, y, w, h, max_chars, text)` | A multi-line field. | `TEXT_AREA` (text) |
 | `slui_scroll_v(id, x, y, w, h, content_h, offset)` | A vertical scroll bar. | `SCROLL_V` (offset) |
 | `slui_list_item(id, x, y, w, h, enabled, title, subtitle)` | A row of a list. | `BUTTON`, `DOUBLE_CLICK` |
+| `slui_disclosure(id, x, y, w, open, enabled, label, detail)` | A row, 34 high, that opens and closes a section: the app flips `open` on the click and draws the section's rows after it only while open; `detail` says what is inside while closed (SDK 1.0.16). | `BUTTON` |
 | `slui_context_menu(id, x, y, w, h, count, "Copy\|Paste")` | A right-click menu over an area; an option starting with `~` is grey and cannot be chosen (`"Copy\|~Paste"`, SDK 1.0.13). | `CONTEXT_MENU` (index) |
 | `slui_panel_input(id, x, y, w, h, enabled)` | An invisible area that reports where it is pressed. | `PANEL_INPUT` |
 
