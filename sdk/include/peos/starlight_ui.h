@@ -464,6 +464,12 @@ void slui_list_item(uint32_t id,
                     uint8_t enabled,
                     const char *title,
                     const char *subtitle);
+// A row that opens and closes a section of the window (SLUI SDK 1.0.16):
+// the label, and under it detail (what is inside while closed, "hide"
+// while open). A click is SLUI_EVENT_BUTTON with id: the app flips open and
+// draws the section's rows after it only while open. 34 high.
+void slui_disclosure(uint32_t id, uint32_t x, uint32_t y, uint32_t w, uint8_t open, uint8_t enabled,
+                     const char *label, const char *detail);
 
 #define SLUI_DIALOG_MAX_TITLE_LINES 2u
 #define SLUI_DIALOG_MAX_MSG_LINES   8u
