@@ -30,6 +30,13 @@ typedef enum {
     PEOS_WIFI_BAND_5GHZ = 2,
 } peos_wifi_band_t;
 
+/* One step of the join at a time (wifi step, for diagnosis): see the kernel's wifi_types.h. */
+#define PEOS_WIFI_STEP_ALL      0u
+#define PEOS_WIFI_STEP_SECURITY 1u
+#define PEOS_WIFI_STEP_KEY      2u
+#define PEOS_WIFI_STEP_JOIN     3u
+/* A PSK of 64 hex digits is the PMK itself (peos_wifi_pmk_hex), not a passphrase. */
+
 typedef struct {
     uint8_t ssid[PEOS_WIFI_SSID_MAX_LEN];
     uint8_t ssid_len;
@@ -65,7 +72,8 @@ typedef struct {
     uint8_t psk[PEOS_WIFI_PSK_MAX_LEN];
     uint8_t bssid[PEOS_WIFI_BSSID_LEN];
     uint8_t use_bssid;
-    uint8_t reserved[3];
+    uint8_t step;      // PEOS_WIFI_STEP_*: 0 the whole join, or one step of it (diagnosis)
+    uint8_t reserved[2];
 } peos_wifi_connect_params_t;
 
 typedef struct {
