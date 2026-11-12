@@ -133,6 +133,10 @@ int64_t peos_proc_kill(uint64_t pid);
 #define PEOS_WATCHDOG_ON 1
 #define PEOS_WATCHDOG_OFF 2
 int64_t peos_watchdog(int op);
+// An ACPI table of the firmware, by index (SYS_ACPI_TABLE, needs
+// PEOS_CAP_DEBUG): the table's whole length (copies what fits in len), or -1
+// past the last one. The tables of the XSDT, then the DSDT.
+int64_t peos_acpi_table(uint32_t index, void *buf, size_t len);
 // Cryptographic random bytes from the kernel (SYS_RANDOM, any task): len or -1.
 int64_t peos_random(void *buf, size_t len);
 /* Path scope: narrow what this task (and its children) may touch. Never widens. */
