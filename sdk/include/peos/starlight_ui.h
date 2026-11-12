@@ -75,7 +75,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 15u
+#define SLUI_SDK_VERSION_PATCH 16u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -377,6 +377,10 @@ void slui_text_menu(uint32_t field_id, const char *options_pipe);
 // What a one-line field shows while it is empty and not focused, in the
 // secondary colour ("Cerca un'app"), each frame it is drawn (SLUI SDK 1.0.14).
 void slui_text_hint(uint32_t field_id, const char *hint);
+// A password field: its text shown as asterisks and never copied to the
+// clipboard, each frame it is drawn (SLUI SDK 1.0.16). The app still gets
+// the real text in SLUI_EVENT_TEXT_INPUT.
+void slui_text_secret(uint32_t field_id);
 
 void slui_text_input(uint32_t id,
                      uint32_t x, uint32_t y, uint32_t w, uint32_t h,
