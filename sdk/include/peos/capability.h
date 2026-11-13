@@ -22,7 +22,8 @@ typedef uint64_t peos_cap_mask_t;
 #define PEOS_CAP_MANAGE     (1ull << 12)
 #define PEOS_CAP_NIC        (1ull << 13)   /* raw frames from the network card (netd only) */
 #define PEOS_CAP_SERVICE    (1ull << 14)   /* register a name in the service registry */
-#define PEOS_CAP_ALL        ((1ull << 15) - 1ull)
+#define PEOS_CAP_GPU        (1ull << 15)   /* the GPU: buffers, address spaces, work (peos/gpu.h) */
+#define PEOS_CAP_ALL        ((1ull << 16) - 1ull)
 
 /* target_pid == 0 addresses the calling task. */
 int64_t peos_cap_query(uint64_t target_pid, peos_cap_mask_t *out_caps);

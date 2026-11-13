@@ -25,6 +25,8 @@ extern "C" {
 int clock_gettime(clockid_t clock, struct timespec *ts);
 int clock_getres(clockid_t clock, struct timespec *res);
 int nanosleep(const struct timespec *req, struct timespec *rem);
+/* flags 0 only (relative), any clock: a sleep of that long. */
+int clock_nanosleep(clockid_t clock, int flags, const struct timespec *req, struct timespec *rem);
 int timespec_get(struct timespec *ts, int base);
 void tzset(void);
 #ifdef __cplusplus

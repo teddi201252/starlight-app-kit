@@ -73,6 +73,9 @@ int fchmod(int fd, mode_t mode);
 mode_t umask(mode_t mask);
 int utimensat(int dirfd, const char *path, const struct timespec times[2], int flags);
 int futimens(int fd, const struct timespec times[2]);
+/* PeOS has no named pipes: both fail with ENOSYS. */
+int mkfifo(const char *path, mode_t mode);
+int mkfifoat(int dirfd, const char *path, mode_t mode);
 #ifdef __cplusplus
 }
 #endif

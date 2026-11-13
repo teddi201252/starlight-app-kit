@@ -38,6 +38,10 @@ int dprintf(int fd, const char *fmt, ...);
 int vdprintf(int fd, const char *fmt, va_list ap);
 ssize_t getline(char **line, size_t *cap, FILE *stream);
 ssize_t getdelim(char **line, size_t *cap, int delim, FILE *stream);
+int asprintf(char **out, const char *fmt, ...);
+int vasprintf(char **out, const char *fmt, va_list ap);
+/* PeOS's FILE is a descriptor's: no stream in memory (NULL, ENOSYS). */
+FILE *open_memstream(char **buf, size_t *size);
 #ifdef __cplusplus
 }
 #endif

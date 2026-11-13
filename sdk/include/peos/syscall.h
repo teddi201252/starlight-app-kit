@@ -125,6 +125,15 @@ enum {
     PEOS_SYS_wifi_watch = 120,    // -> fd readable when the Wi-Fi changes (joined, link, errors), or -1 (PEOS_CAP_NETWORK)
     PEOS_SYS_acpi_table = 121,    // rdi=index, rsi=buf, rdx=len -> the table's whole length (copies what fits), or -1 (PEOS_CAP_DEBUG)
     PEOS_SYS_watchdog = 119,      // rdi=PEOS_WATCHDOG_STATUS/ON/OFF -> 1 on, 0 off, -1 (PEOS_CAP_DEBUG)
+    /* The GPU (peos/gpu.h), all PEOS_CAP_GPU. */
+    PEOS_SYS_gpu_open = 122,         // -> fd of the GPU, or -1 (none, or not ready)
+    PEOS_SYS_gpu_info = 123,         // rdi=gpu fd, rsi=peos_gpu_info_t*, rdx=len -> 0/-1
+    PEOS_SYS_gpu_vm_create = 124,    // rdi=gpu fd -> fd of a new GPU address space, or -1
+    PEOS_SYS_gpu_bo_create = 125,    // rdi=gpu fd, rsi=size, rdx=flags -> fd of a new buffer, or -1
+    PEOS_SYS_gpu_bo_map = 126,       // rdi=buffer fd, rsi=peos_gpu_map_t*, rdx=len -> 0/-1
+    PEOS_SYS_gpu_vm_bind = 127,      // rdi=vm fd, rsi=peos_gpu_bind_t[], rdx=count -> 0/-1
+    PEOS_SYS_gpu_queue_create = 128, // rdi=vm fd, rsi=engine -> fd of a new work queue, or -1
+    PEOS_SYS_gpu_exec = 129,         // rdi=queue fd, rsi=peos_gpu_exec_t*, rdx=len -> fd "done", or -1
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED

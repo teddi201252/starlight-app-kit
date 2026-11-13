@@ -32,6 +32,13 @@ typedef struct { int unused; } pthread_rwlockattr_t;
 typedef volatile uint32_t pthread_once_t;
 typedef unsigned pthread_key_t;
 typedef volatile uint32_t pthread_spinlock_t;
+typedef struct {
+    pthread_mutex_t lock;
+    pthread_cond_t cond;
+    unsigned count, waiting, cycle;
+} pthread_barrier_t;
+typedef struct { int unused; } pthread_barrierattr_t;
+#define PTHREAD_BARRIER_SERIAL_THREAD (-1)
 
 #define PTHREAD_MUTEX_NORMAL 0
 #define PTHREAD_MUTEX_RECURSIVE 1
@@ -98,6 +105,11 @@ int pthread_rwlock_trywrlock(pthread_rwlock_t *l);
 int pthread_rwlock_timedrdlock(pthread_rwlock_t *l, const struct timespec *abstime);
 int pthread_rwlock_timedwrlock(pthread_rwlock_t *l, const struct timespec *abstime);
 int pthread_rwlock_unlock(pthread_rwlock_t *l);
+int pthread_barrier_init(pthread_barrier_t *b, const pthread_barrierattr_t *a, unsigned count);
+int pthread_barrier_destroy(pthread_barrier_t *b);
+int pthread_barrier_wait(pthread_barrier_t *b);
+int pthread_setname_np(pthread_t t, const char *name);   /* kept nowhere: 0 */
+int pthread_getcpuclockid(pthread_t t, clockid_t *clock);  /* not measured: ENOENT */
 int pthread_spin_init(pthread_spinlock_t *l, int pshared);
 int pthread_spin_destroy(pthread_spinlock_t *l);
 int pthread_spin_lock(pthread_spinlock_t *l);

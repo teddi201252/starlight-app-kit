@@ -28,6 +28,7 @@ static const struct {
     { "manage", PEOS_CAP_MANAGE },
     { "nic", PEOS_CAP_NIC },
     { "service", PEOS_CAP_SERVICE },
+    { "gpu", PEOS_CAP_GPU },
 };
 
 /* Returns 1 and sets *out when [name, name+len) is a known capability. */

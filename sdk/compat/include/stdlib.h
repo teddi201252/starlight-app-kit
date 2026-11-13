@@ -1,5 +1,6 @@
 /* libpeos-compat: the C stdlib a port expects, over the base's. */
 #pragma once
+#include <alloca.h>   /* glibc's stdlib.h has alloca too: ports count on it */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,6 +35,8 @@ int wctomb(char *s, wchar_t wc);
 size_t mbstowcs(wchar_t *dst, const char *src, size_t n);
 size_t wcstombs(char *dst, const wchar_t *src, size_t n);
 char *realpath(const char *path, char *resolved);
+int mkstemp(char *tmpl);
+int mkstemps(char *tmpl, int suffix_len);
 int setenv(const char *name, const char *value, int overwrite);
 int unsetenv(const char *name);
 char *secure_getenv(const char *name);
