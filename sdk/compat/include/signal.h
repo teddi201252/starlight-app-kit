@@ -22,7 +22,13 @@ typedef unsigned long sigset_t;
 #define SIGALRM 14
 #define SIGTERM 15
 #define SIGCHLD 17
+#define SIGSYS 31
+#define SIGUSR1 10
+#define SIGUSR2 12
 #define NSIG 32
+#define SIG_BLOCK 0
+#define SIG_UNBLOCK 1
+#define SIG_SETMASK 2
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,6 +38,10 @@ int kill(pid_t pid, int sig);
 int sigemptyset(sigset_t *set);
 int sigfillset(sigset_t *set);
 int sigaddset(sigset_t *set, int sig);
+int sigdelset(sigset_t *set, int sig);
+int sigismember(const sigset_t *set, int sig);
+/* No signals arrive on PeOS: the mask is kept, nothing else. */
+int sigprocmask(int how, const sigset_t *set, sigset_t *old);
 #ifdef __cplusplus
 }
 #endif

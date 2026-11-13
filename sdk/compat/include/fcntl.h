@@ -16,6 +16,8 @@ extern "C" {
 #define O_DIRECTORY 0x10000
 #define O_NOFOLLOW 0x20000
 #define O_CLOEXEC 0x80000
+#define F_DUPFD 0
+#define F_DUPFD_CLOEXEC 1030
 #define F_GETFD 1
 #define F_SETFD 2
 #define F_GETFL 3
@@ -30,6 +32,8 @@ extern "C" {
 #endif
 int fcntl(int fd, int cmd, ...);
 int creat(const char *path, mode_t mode);
+/* Relative to AT_FDCWD or an absolute path only (no directory descriptors). */
+int openat(int dirfd, const char *path, int flags, ...);
 #ifdef __cplusplus
 }
 #endif
