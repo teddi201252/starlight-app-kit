@@ -90,6 +90,8 @@ typedef struct {
  * PEOS_WAIT_READ on them like on any other. Timeouts are in nanoseconds,
  * 0 = do not wait. */
 int64_t net_udp_open(uint16_t port);
+/* The same, and the port netd gave (port 0: any free one). */
+int64_t net_udp_open_port(uint16_t port, uint16_t *out_port);
 int64_t net_udp_send(int64_t conn, const uint8_t ip[4], uint16_t port, const void *buf, size_t len);
 /* -> payload bytes, 0 on timeout, -1 on error. */
 int64_t net_udp_recv(int64_t conn, void *buf, size_t cap, uint8_t src_ip[4], uint16_t *src_port,
