@@ -66,6 +66,8 @@ typedef struct {
     uint64_t size;
 } peos_gpu_bind_t;
 
+/* GPU addresses: 48 bits, or "canonical" (bit 47 repeated above, as Mesa
+ * keeps them). */
 /* A batch to run: its address in the queue's space. The work starts after
  * the `done` descriptors in `waits` (n_waits of them, int32 each). */
 #define PEOS_GPU_EXEC_MAX_WAITS 16u

@@ -157,6 +157,8 @@ int64_t peos_path_scope_query(peos_path_scope_t *out);
 /* Event model. Every descriptor has rights (PEOS_FD_*) that can only shrink. */
 int64_t peos_fd_restrict(uint64_t fd, uint32_t keep_rights);
 int64_t peos_fd_rights(uint64_t fd);
+/* A second descriptor of the same object, with the same rights. */
+int64_t peos_fd_dup(uint64_t fd);
 /* Spawned children get only 0/1/2; list extra descriptors for the next spawnv here. */
 int64_t peos_spawn_set_fds(const peos_spawn_fd_t *fds, size_t count);
 /* Wait until one item is ready or timeout_ns passes (PEOS_WAIT_FOREVER, 0 = poll).
