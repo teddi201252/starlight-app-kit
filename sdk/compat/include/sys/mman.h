@@ -26,6 +26,9 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
 int munmap(void *addr, size_t len);
 int mprotect(void *addr, size_t len, int prot);
 int madvise(void *addr, size_t len, int advice);
+/* PeOS does not swap: memory is always locked in. */
+int mlock(const void *addr, size_t len);
+int munlock(const void *addr, size_t len);
 #ifdef __cplusplus
 }
 #endif

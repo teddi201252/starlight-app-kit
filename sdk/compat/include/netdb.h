@@ -23,6 +23,20 @@ struct hostent {
 };
 #define h_addr h_addr_list[0]
 
+struct servent {
+    char *s_name;
+    char **s_aliases;
+    int s_port;   /* network order */
+    char *s_proto;
+};
+
+/* gethostbyname's errors (one for the process) */
+extern int h_errno;
+#define HOST_NOT_FOUND 1
+#define TRY_AGAIN 2
+#define NO_RECOVERY 3
+#define NO_DATA 4
+
 #define AI_PASSIVE 0x01
 #define AI_CANONNAME 0x02
 #define AI_NUMERICHOST 0x04
@@ -60,6 +74,8 @@ int getnameinfo(const struct sockaddr *sa, socklen_t salen, char *host, socklen_
                 socklen_t servlen, int flags);
 struct hostent *gethostbyname(const char *name);
 struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type);
+/* A few well-known services only (no /etc/services). */
+struct servent *getservbyname(const char *name, const char *proto);
 #ifdef __cplusplus
 }
 #endif

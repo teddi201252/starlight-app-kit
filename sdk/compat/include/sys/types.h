@@ -20,3 +20,5 @@ typedef unsigned long fsfilcnt_t;
 typedef long suseconds_t;
 typedef unsigned int useconds_t;
 typedef int id_t;
+/* fd_set and select, as glibc gives them with sys/types.h (ENet counts on it) */
+#include <sys/select.h>

@@ -2,7 +2,8 @@
  * docs/rift-ascend-port-plan.md, phase A), over netd (peos/net.h): IPv4
  * only, UDP and outgoing TCP. A socket is a descriptor of its own; netd's
  * connection behind it is opened when the socket gets an address. No
- * listen/accept (netd has no TCP server side): EOPNOTSUPP. */
+ * listen/accept (netd has no TCP server side): EOPNOTSUPP. No AF_UNIX:
+ * its absence tells ports (OpenSSL) not to look for local sockets. */
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
@@ -39,11 +40,9 @@ struct linger {
 };
 
 #define AF_UNSPEC 0
-#define AF_UNIX 1
 #define AF_INET 2
 #define AF_INET6 10
 #define PF_UNSPEC AF_UNSPEC
-#define PF_UNIX AF_UNIX
 #define PF_INET AF_INET
 #define PF_INET6 AF_INET6
 
@@ -100,6 +99,8 @@ int getsockopt(int fd, int level, int name, void *val, socklen_t *len);
 int getsockname(int fd, struct sockaddr *addr, socklen_t *len);
 int getpeername(int fd, struct sockaddr *addr, socklen_t *len);
 int shutdown(int fd, int how);
+/* No local sockets on PeOS: EOPNOTSUPP (OpenSSL's QUIC thread mode asks). */
+int socketpair(int domain, int type, int protocol, int fds[2]);
 #ifdef __cplusplus
 }
 #endif
