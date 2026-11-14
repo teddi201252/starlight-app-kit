@@ -25,6 +25,7 @@ enum {
     PEOS_DISK_ESP = 1u << 2,             // an EFI system partition (MBR 0xEF, GPT's ESP)
     PEOS_DISK_HAS_PARTITIONS = 1u << 3,  // a whole disk with partitions
     PEOS_DISK_SYSTEM = 1u << 4,          // the disk of the root, or one of its partitions
+    PEOS_DISK_BOOT = 1u << 5,            // the EFI partition this system started from
 };
 
 typedef struct {
