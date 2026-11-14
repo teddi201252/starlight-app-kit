@@ -9,6 +9,19 @@ extern "C"
 int *__errno_location(void);
 #define errno (*__errno_location())
 
+/* glibc's: the program's name (argv[0], and after its last '/') */
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern char *program_invocation_name;
+extern char *program_invocation_short_name;
+/* PeOS: the program's arguments (there is no /proc/self/cmdline) */
+extern int __peos_argc;
+extern char **__peos_argv;
+#ifdef __cplusplus
+}
+#endif
+
 #define EPERM 1
 #define ENOENT 2
 #define ESRCH 3
