@@ -28,6 +28,21 @@ enum {
     PEOS_DISK_BOOT = 1u << 5,            // the EFI partition this system started from
 };
 
+/* A partition's type, from its GPT type GUID or MBR type byte (release
+ * 0.17.0): what it is for, even when PeOS cannot read what is on it. */
+enum {
+    PEOS_PART_NONE = 0,          // not a partition, or a type PeOS does not know
+    PEOS_PART_EFI = 1,           // EFI system partition
+    PEOS_PART_APFS = 2,          // Apple APFS (macOS)
+    PEOS_PART_HFS = 3,           // Apple HFS+
+    PEOS_PART_APPLE_BOOT = 4,    // Apple boot (Recovery)
+    PEOS_PART_MS_BASIC = 5,      // Microsoft basic data (NTFS, exFAT, FAT)
+    PEOS_PART_MS_RESERVED = 6,   // Microsoft reserved
+    PEOS_PART_MS_RECOVERY = 7,   // Windows recovery
+    PEOS_PART_LINUX = 8,         // Linux filesystem (also PeOS's root)
+    PEOS_PART_LINUX_SWAP = 9,    // Linux swap
+};
+
 typedef struct {
     char name[24];          // "usb0p1"
     char parent[24];        // the whole disk of a partition ("usb0"), "" otherwise
@@ -38,7 +53,8 @@ typedef struct {
     uint32_t sector_size;
     uint8_t type;           // PEOS_DISK_*
     uint8_t flags;          // PEOS_DISK_PARTITION | ...
-    uint8_t reserved[2];
+    uint8_t part_type;      // a partition's type in its table: PEOS_PART_* (0.17.0)
+    uint8_t reserved;
     uint64_t total_bytes;   // a mounted one, with PEOS_DISKS_SPACE: its filesystem's size
     uint64_t free_bytes;    // and what is free on it (0 and 0 otherwise)
 } peos_disk_info_t;
