@@ -135,6 +135,7 @@ enum {
     PEOS_SYS_gpu_queue_create = 128, // rdi=vm fd, rsi=engine -> fd of a new work queue, or -1
     PEOS_SYS_gpu_exec = 129,         // rdi=queue fd, rsi=peos_gpu_exec_t*, rdx=len -> fd "done", or -1
     PEOS_SYS_fd_dup = 130,           // rdi=fd -> a new descriptor of the same object, same rights, or -1 (no capability)
+    PEOS_SYS_install_list_places = 131, // rdi=disk_ptr, rsi=disk_len, rdx=out_ptr, rcx=max -> count or -1 (install)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED

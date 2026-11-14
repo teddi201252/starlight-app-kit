@@ -58,6 +58,31 @@ typedef struct {
     uint64_t sector_count;
 } peos_install_disk_t;
 
+// Where PeOS can be installed on a disk (release 0.17.0, phase 4): the whole
+// disk, a free space of its GPT, or one of its partitions put in place.
+enum {
+    PEOS_INSTALL_PLACE_DISK = 0,        // the whole disk: everything on it goes
+    PEOS_INSTALL_PLACE_FREE = 1,        // a free space: nothing else is touched
+    PEOS_INSTALL_PLACE_PARTITION = 2,   // a partition, erased and replaced
+};
+enum {
+    PEOS_INSTALL_WHY_OK = 0,
+    PEOS_INSTALL_WHY_SMALL = 1,         // under 8 GiB, or the system does not fit
+    PEOS_INSTALL_WHY_PROTECTED = 2,     // macOS (APFS, Recovery), an EFI partition, Windows's reserved/recovery
+    PEOS_INSTALL_WHY_IN_USE = 3,        // mounted, or the system started from it
+    PEOS_INSTALL_WHY_READ_ONLY = 4,     // the disk is not writable
+};
+typedef struct {
+    char target[32];        // what peos_install_run takes: "nvme0n1", "nvme0n1p3", "nvme0n1@2048"
+    uint8_t kind;           // PEOS_INSTALL_PLACE_*
+    uint8_t part_type;      // a partition's PEOS_PART_* (peos/disks.h)
+    uint8_t usable;         // 1 when the installer may use it
+    uint8_t why;            // PEOS_INSTALL_WHY_* when not
+    uint32_t sector_size;
+    uint64_t first_lba;     // where it starts and how long it is, in the disk's sectors
+    uint64_t lba_count;
+} peos_install_place_t;
+
 typedef struct {
     uint32_t status;
     uint32_t phase;
@@ -279,6 +304,11 @@ int peos_net_resolve_ipv4(const char *host_or_ip, uint8_t out_ip[4], uint32_t ti
 int64_t peos_audio_set_log_level(uint32_t level);
 int64_t peos_install_list_disks(peos_install_disk_t *out, size_t max_entries);
 int64_t peos_install_get_progress(peos_install_progress_t *out);
+/* The places of one disk ("nvme0n1"): the whole disk first, then in disk
+ * order its partitions and free spaces (1 GiB or more). Count, or -1. */
+int64_t peos_install_list_places(const char *disk, size_t len, peos_install_place_t *out, size_t max_entries);
+/* target: a disk (all of it), a partition (put in place: "nvme0n1p3") or a
+ * free space ("nvme0n1@<first LBA>"), as peos_install_list_places gives. */
 int64_t peos_install_run(const char *target, size_t len);
 
 size_t peos_strlen(const char *s);
