@@ -7,6 +7,9 @@
 #define RTLD_LOCAL 0x0
 #define RTLD_GLOBAL 0x100
 #define RTLD_DEFAULT ((void *)0)
+#define RTLD_NEXT ((void *)-1)
+#define RTLD_NOLOAD 0x4
+#define RTLD_NODELETE 0x1000
 
 typedef struct {
     const char *dli_fname;

@@ -75,6 +75,16 @@ int pthread_attr_setdetachstate(pthread_attr_t *a, int state);
 int pthread_attr_getdetachstate(const pthread_attr_t *a, int *state);
 int pthread_attr_setstacksize(pthread_attr_t *a, size_t size);
 int pthread_attr_getstacksize(const pthread_attr_t *a, size_t *size);
+/* Scheduling of a new thread: PeOS's user threads have no policies or
+ * priorities. Taken (0), no effect; the getters say SCHED_OTHER, 0. */
+#define PTHREAD_INHERIT_SCHED 0
+#define PTHREAD_EXPLICIT_SCHED 1
+int pthread_attr_setschedpolicy(pthread_attr_t *a, int policy);
+int pthread_attr_getschedpolicy(const pthread_attr_t *a, int *policy);
+int pthread_attr_setschedparam(pthread_attr_t *a, const struct sched_param *param);
+int pthread_attr_getschedparam(const pthread_attr_t *a, struct sched_param *param);
+int pthread_attr_setinheritsched(pthread_attr_t *a, int inherit);
+int pthread_attr_getinheritsched(const pthread_attr_t *a, int *inherit);
 int pthread_mutex_init(pthread_mutex_t *m, const pthread_mutexattr_t *attr);
 int pthread_mutex_destroy(pthread_mutex_t *m);
 int pthread_mutex_lock(pthread_mutex_t *m);

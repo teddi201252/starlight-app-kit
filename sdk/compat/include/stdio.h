@@ -27,6 +27,9 @@ FILE *freopen(const char *path, const char *mode, FILE *stream);
 void setbuf(FILE *stream, char *buf);
 int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 FILE *tmpfile(void);
+/* No shell on PeOS: popen fails with ENOSYS. */
+FILE *popen(const char *command, const char *mode);
+int pclose(FILE *stream);
 char *tmpnam(char *s);
 int getchar(void);
 int scanf(const char *fmt, ...);

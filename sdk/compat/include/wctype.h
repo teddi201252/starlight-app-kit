@@ -24,4 +24,25 @@ wctype_t wctype(const char *name);
 int iswctype(wint_t c, wctype_t t);
 #ifdef __cplusplus
 }
+/* libstdc++ is built without wchar_t: <cwctype> puts none of these in std::
+ * (Rift Ascend names std::towlower), so they come from here */
+namespace std {
+using ::iswalnum;
+using ::iswalpha;
+using ::iswblank;
+using ::iswcntrl;
+using ::iswctype;
+using ::iswdigit;
+using ::iswgraph;
+using ::iswlower;
+using ::iswprint;
+using ::iswpunct;
+using ::iswspace;
+using ::iswupper;
+using ::iswxdigit;
+using ::towlower;
+using ::towupper;
+using ::wctype;
+using ::wctype_t;
+}
 #endif
