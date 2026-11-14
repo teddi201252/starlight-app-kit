@@ -42,6 +42,8 @@ extern "C" {
 #endif
 __attribute__((noreturn)) void _exit(int status);
 pid_t getpid(void);
+extern char **environ;   /* empty: the environment is getenv's */
+pid_t gettid(void);   /* the thread's id (PeOS's task id) */
 uid_t getuid(void);
 uid_t geteuid(void);
 gid_t getgid(void);
@@ -58,6 +60,10 @@ int rmdir(const char *path);
 int truncate(const char *path, off_t length);
 int ftruncate(int fd, off_t length);
 int fsync(int fd);
+/* At a position, the file's own left where it was (one at a time in the
+ * process: they move it and put it back). */
+ssize_t pread(int fd, void *buf, size_t count, off_t offset);
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
 int dup(int fd);
 int dup2(int fd, int fd2);
 int pipe(int fds[2]);
