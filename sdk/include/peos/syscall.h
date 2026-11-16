@@ -129,13 +129,14 @@ enum {
     PEOS_SYS_gpu_open = 122,         // -> fd of the GPU, or -1 (none, or not ready)
     PEOS_SYS_gpu_info = 123,         // rdi=gpu fd, rsi=peos_gpu_info_t*, rdx=len -> 0/-1
     PEOS_SYS_gpu_vm_create = 124,    // rdi=gpu fd -> fd of a new GPU address space, or -1
-    PEOS_SYS_gpu_bo_create = 125,    // rdi=gpu fd, rsi=size, rdx=flags -> fd of a new buffer, or -1
-    PEOS_SYS_gpu_bo_map = 126,       // rdi=buffer fd, rsi=peos_gpu_map_t*, rdx=len -> 0/-1
+    PEOS_SYS_gpu_bo_create = 125,    // rdi=gpu fd, rsi=size, rdx=flags -> the new buffer's number in gpu, or 0
+    PEOS_SYS_gpu_bo_map = 126,       // rdi=gpu fd, rsi=buffer number, rdx=peos_gpu_map_t*, rcx=len -> 0/-1
     PEOS_SYS_gpu_vm_bind = 127,      // rdi=vm fd, rsi=peos_gpu_bind_t[], rdx=count -> 0/-1
     PEOS_SYS_gpu_queue_create = 128, // rdi=vm fd, rsi=engine -> fd of a new work queue, or -1
     PEOS_SYS_gpu_exec = 129,         // rdi=queue fd, rsi=peos_gpu_exec_t*, rdx=len -> fd "done", or -1
     PEOS_SYS_fd_dup = 130,           // rdi=fd -> a new descriptor of the same object, same rights, or -1 (no capability)
     PEOS_SYS_install_list_places = 131, // rdi=disk_ptr, rsi=disk_len, rdx=out_ptr, rcx=max -> count or -1 (install)
+    PEOS_SYS_gpu_bo_close = 132,     // rdi=gpu fd, rsi=buffer number -> 0/-1 (gpu)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED

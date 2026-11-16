@@ -1,14 +1,17 @@
-/* The GPU (the Intel GPU plan, phase 3): native calls on the xe model.
+/* The GPU (the Intel GPU plan, phases 3 and 4b): native calls on the xe model.
  *
- * Everything is a descriptor, closing it frees it; the end of a piece of
- * work is a descriptor too, waited for with peos_wait. All need "gpu"
- * (PEOS_CAP_GPU).
+ * The GPU, its address spaces and work queues are descriptors, closing one
+ * frees it; the end of a piece of work is a descriptor too, waited for with
+ * peos_wait. A buffer is a number in the GPU object it was made in (not a
+ * descriptor: a game makes thousands); closing that GPU object frees them
+ * all. All need "gpu" (PEOS_CAP_GPU).
  *
- *   gpu = peos_gpu_open()                      the GPU (the first one)
+ *   gpu = peos_gpu_open()                      a GPU object of its own (the first GPU)
  *   peos_gpu_info(gpu, &info)                  what it is
- *   vm = peos_gpu_vm_create(gpu)               an address space of the GPU
- *   bo = peos_gpu_bo_create(gpu, size, 0)      a buffer (RAM pages)
- *   peos_gpu_bo_map(bo, &map)                  ...in this program's memory
+ *   vm = peos_gpu_vm_create(gpu)               an address space of the GPU, for gpu's buffers
+ *   bo = peos_gpu_bo_create(gpu, size, 0)      a buffer (RAM pages): its number, 0 if none
+ *   peos_gpu_bo_map(gpu, bo, &map)             ...in this program's memory
+ *   peos_gpu_bo_close(gpu, bo)                 the number is free again
  *   peos_gpu_vm_bind(vm, ops, n)               buffers at addresses the
  *                                              program chooses (or gone)
  *   q = peos_gpu_queue_create(vm, ENGINE)      a work queue on that space
@@ -52,7 +55,8 @@ typedef struct {
 } peos_gpu_map_t;
 
 /* One change to an address space: bo_offset..+size of a buffer at gpu_va
- * (MAP), or nothing at gpu_va..+size (UNMAP: bo_fd ignored). All page
+ * (MAP; bo: the number of a buffer of the GPU object the space was made
+ * from), or nothing at gpu_va..+size (UNMAP: bo ignored). All page
  * aligned; gpu_va below 2^va_bits. vm_bind returns when the GPU sees it;
  * an UNMAP first waits for the work running on that space. */
 #define PEOS_GPU_BIND_MAP 1u
@@ -60,7 +64,7 @@ typedef struct {
 #define PEOS_GPU_BIND_MAX 64u
 typedef struct {
     uint32_t op;
-    int32_t bo_fd;
+    uint32_t bo;
     uint64_t bo_offset;
     uint64_t gpu_va;
     uint64_t size;

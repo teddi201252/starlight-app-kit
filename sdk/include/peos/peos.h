@@ -167,8 +167,10 @@ int64_t peos_acpi_table(uint32_t index, void *buf, size_t len);
 int64_t peos_gpu_open(void);
 int64_t peos_gpu_info(int64_t gpu, peos_gpu_info_t *out);
 int64_t peos_gpu_vm_create(int64_t gpu);
-int64_t peos_gpu_bo_create(int64_t gpu, uint64_t size, uint32_t flags);
-int64_t peos_gpu_bo_map(int64_t bo, peos_gpu_map_t *out);
+/* A buffer's number in gpu (from 1), or 0. */
+uint32_t peos_gpu_bo_create(int64_t gpu, uint64_t size, uint32_t flags);
+int64_t peos_gpu_bo_map(int64_t gpu, uint32_t bo, peos_gpu_map_t *out);
+int64_t peos_gpu_bo_close(int64_t gpu, uint32_t bo);
 int64_t peos_gpu_vm_bind(int64_t vm, const peos_gpu_bind_t *ops, uint32_t count);
 int64_t peos_gpu_queue_create(int64_t vm, uint32_t engine);
 int64_t peos_gpu_exec(int64_t queue, const peos_gpu_exec_t *exec);
