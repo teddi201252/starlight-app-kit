@@ -9,6 +9,7 @@ extern "C" {
 #include "peos/capability.h"
 #include "peos/metrics_abi.h"
 #include "peos/sysinfo_abi.h"
+#include "peos/power.h"
 #include "peos/proc_abi.h"
 #include "peos/path_scope_abi.h"
 #include "peos/event_abi.h"
@@ -263,7 +264,20 @@ __attribute__((noreturn)) void peos_exit(uint64_t code);
 uint64_t peos_poweroff(void);
 uint64_t peos_reboot(void);
 uint64_t peos_time(void);
+// The steady clock: unix nanoseconds from the boot's clock, never jumps (for
+// deadlines and measures). The wall clock may move (the network's time, the
+// user's): peos_time() and peos_time_wall_ns().
 uint64_t peos_time_ns(void);
+uint64_t peos_time_wall_ns(void);
+// Sets the wall clock (unix nanoseconds, UTC) and the computer's clock. 0, or
+// -1 (no "time" capability, or a time before 2020).
+int64_t peos_time_set(uint64_t unix_ns);
+// The screen's light in permille (PEOS_BACKLIGHT_MAX): -1 when PeOS does not
+// drive it. peos_backlight_set needs "power".
+int64_t peos_backlight_get(void);
+int64_t peos_backlight_set(uint32_t permille);
+// The battery: 0 and *out, or -1 (no battery PeOS can read).
+int64_t peos_battery(peos_battery_t *out);
 uint64_t peos_hwinfo(uint64_t *ram_total, uint64_t *ram_free,
                      uint64_t *disk_total, uint64_t *disk_free);
 int64_t peos_hwinfo_report(char *buf, size_t len);
@@ -408,6 +422,13 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_KEY_RALT   0xE038u
 #define PEOS_KEY_LSUPER 0xE05Bu
 #define PEOS_KEY_RSUPER 0xE05Cu
+// The media keys (set-1 codes, as a PS/2 keyboard sends them), and two of
+// PeOS's own for the screen's light (the Touch Bar's keys on a MacBook).
+#define PEOS_KEY_MUTE        0xE020u
+#define PEOS_KEY_VOLUME_DOWN 0xE02Eu
+#define PEOS_KEY_VOLUME_UP   0xE030u
+#define PEOS_KEY_LIGHT_DOWN  0xE070u
+#define PEOS_KEY_LIGHT_UP    0xE071u
 
 // Normalized extended keycodes (when E0 prefix is stripped).
 #define PEOS_KEY_UP_NORM      0x0048u

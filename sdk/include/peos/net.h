@@ -34,6 +34,7 @@ enum {
     NET_OP_PING = 7,         /* ip, timeout_ms -> value = round trip in ns */
     NET_OP_STATS = 8,        /* -> stats */
     NET_OP_CRASH = 9,        /* tests (needs "debug"): netd faults on purpose */
+    NET_OP_WAIT_ADDRESS = 10,/* timeout_ms: reply once there is an address (now, if there is) -> cfg */
 };
 
 enum {
@@ -117,6 +118,12 @@ int net_resolve(const char *name, uint8_t out_ip[4], uint64_t timeout_ns);
 int net_config_get(peos_netcfg_t *out);
 int net_config_set(const peos_netcfg_t *cfg);
 int net_dhcp(peos_netcfg_t *out, uint64_t timeout_ns);
+/* Waits (up to timeout_ns) until the card has an address, without asking for
+ * a new one. NET_OK, or NET_ERR_TIMEOUT. */
+int net_wait_address(peos_netcfg_t *out, uint64_t timeout_ns);
+/* The time from an NTP server (SNTP, UDP 123): unix nanoseconds, UTC, the
+ * network's delay taken off. NET_OK or a NET_ERR_* value. */
+int net_sntp(const char *server, uint64_t timeout_ns, uint64_t *unix_ns);
 /* -> round trip in ns, or a NET_ERR_* value. */
 int64_t net_ping(const uint8_t ip[4], uint64_t timeout_ns);
 int net_stats(net_stats_t *out);

@@ -137,6 +137,10 @@ enum {
     PEOS_SYS_fd_dup = 130,           // rdi=fd -> a new descriptor of the same object, same rights, or -1 (no capability)
     PEOS_SYS_install_list_places = 131, // rdi=disk_ptr, rsi=disk_len, rdx=out_ptr, rcx=max -> count or -1 (install)
     PEOS_SYS_gpu_bo_close = 132,     // rdi=gpu fd, rsi=buffer number -> 0/-1 (gpu)
+    PEOS_SYS_time_wall_ns = 133,     // -> the wall clock, unix nanoseconds (time_ns never jumps; this may)
+    PEOS_SYS_time_set = 134,         // rdi=unix nanoseconds (UTC) -> 0/-1 (time)
+    PEOS_SYS_backlight = 135,        // rdi=op (0 get, 1 set), rsi=permille -> permille, or -1 (no light) (power)
+    PEOS_SYS_battery = 136,          // rdi=peos_battery_t*, rsi=len -> 0, or -1 (no battery)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED
