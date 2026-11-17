@@ -2,6 +2,9 @@
 
 All notable changes to this module are documented in this file.
 
+## [1.16.0] - 2026-11-17
+- From PeOS 0.17.0: the GPU calls (peos/gpu.h: devices, buffers, address spaces, queues, virgl resources, transfers, capsets, command streams), the wall clock, time zones (peos/tz.h), SNTP, the screen's light and the battery; compat: BSD sockets and what OpenSSL, ENet, GLFW and Mesa need
+
 ## [1.14.0] - 2026-11-11
 - `compat/`: libpeos-compat, the C library ports of existing C and C++ programs are built with (POSIX-like files and directories, `pthread.h`, `stdio.h` in full, maths), with its headers and its program entry `crt0.S`; for the `x86_64-peos` cross compiler, not for the kit's own apps
 - New libpeos.a (PeOS 0.15.0's release commit)

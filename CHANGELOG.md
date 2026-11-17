@@ -2,6 +2,10 @@
 
 All notable changes to this module are documented in this file.
 
+## [0.17.0] - 2026-11-17
+- SDK 1.16.0, from PeOS 0.17.0 (SLUI SDK 1.0.16): the GPU calls, the wall clock and time zones, the light and the battery, BSD sockets in compat
+- The SDK's libpeos.a from PeOS 0.17.0's release commit
+
 ## [0.16.0] - 2026-11-12
 - SDK 1.15.0, from PeOS 0.16.0 (SLUI SDK 1.0.16): the disks (`peos/disks.h`: `peos_disks`, `peos_disks_watch`; capability `mount`) and `peos/automount.h`; the Wi-Fi's events (`peos_wifi_watch`), the saved networks (`peos/wifid.h`) and the WPA2 PMK; the watchdog; password fields (`slui_text_secret`); a row that opens a section (`slui_disclosure`); themes (`peos/petheme.h`)
 - The SDK's `libpeos.a` from PeOS 0.16.0's release commit
