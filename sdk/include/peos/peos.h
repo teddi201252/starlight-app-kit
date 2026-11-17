@@ -180,6 +180,9 @@ int64_t peos_gpu_exec(int64_t queue, const peos_gpu_exec_t *exec);
 uint32_t peos_gpu_res_create(int64_t gpu, const peos_gpu_res_t *res);
 int64_t peos_gpu_transfer(int64_t gpu, const peos_gpu_transfer_t *t);
 int64_t peos_gpu_capset(int64_t gpu, uint32_t id, uint32_t version, void *buf, uint32_t len);
+/* virgl: a command stream (len bytes, a multiple of 4) run in gpu's
+ * context: a "done" descriptor, or -1. */
+int64_t peos_gpu_submit(int64_t gpu, const void *cmd, uint32_t len);
 // Cryptographic random bytes from the kernel (SYS_RANDOM, any task): len or -1.
 int64_t peos_random(void *buf, size_t len);
 /* Path scope: narrow what this task (and its children) may touch. Never widens. */

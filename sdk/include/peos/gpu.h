@@ -24,6 +24,9 @@
  * is a virgl context; a buffer is a 3D resource of the host, its pages the
  * resource's memory in PeOS:
  *   bo = peos_gpu_res_create(gpu, &res)        a resource: its number, 0 if none
+ *                                              (res.handle: the host's id)
+ *   done = peos_gpu_submit(gpu, cmd, len)      a virgl command stream run in
+ *                                              the context; `done` as above
  *   peos_gpu_transfer(gpu, &t)                 its pages to the host or back
  *   peos_gpu_capset(gpu, id, version, buf, n)  what the host's renderer offers
  *   (peos_gpu_bo_map and peos_gpu_bo_close as for any buffer)
@@ -98,12 +101,16 @@ typedef struct {
 /* A virgl 3D resource (peos_gpu_res_create): the fields of the virtio-gpu
  * RESOURCE_CREATE_3D (target, format, bind are virgl's own values, as
  * Mesa's virgl_hw.h has them), and `size`, the bytes of its memory in
- * PeOS (what transfers copy from and to). */
+ * PeOS (what transfers copy from and to). `handle` is written back: the
+ * host's id of the resource, what command streams name it by (only the
+ * GPU object's own context can use it). */
 typedef struct {
     uint32_t target, format, bind;
     uint32_t width, height, depth, array_size;
     uint32_t last_level, nr_samples, flags;
     uint64_t size;
+    uint32_t handle;        /* out */
+    uint32_t reserved;
 } peos_gpu_res_t;
 
 /* A copy between a resource's pages and the host's copy of it: the box
