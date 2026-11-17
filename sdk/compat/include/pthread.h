@@ -4,6 +4,7 @@
  * std::mutex, std::condition_variable and std::async are built on. */
 #pragma once
 #include <sched.h>
+#include <signal.h>
 #include <stdint.h>
 #include <sys/types.h>
 #include <time.h>
@@ -53,6 +54,13 @@ typedef struct { int unused; } pthread_barrierattr_t;
 #define PTHREAD_CREATE_DETACHED 1
 #define PTHREAD_CANCEL_ENABLE 0
 #define PTHREAD_CANCEL_DISABLE 1
+#define PTHREAD_CANCEL_DEFERRED 0
+#define PTHREAD_CANCEL_ASYNCHRONOUS 1
+
+/* No thread is cancelled from outside on PeOS: a cleanup handler runs only
+ * when pthread_cleanup_pop(1) asks for it (or never, with 0). */
+#define pthread_cleanup_push(fn, arg) { void (*peos_cleanup_fn_)(void *) = (fn); void *peos_cleanup_arg_ = (arg);
+#define pthread_cleanup_pop(run) if (run) peos_cleanup_fn_(peos_cleanup_arg_); }
 #define PTHREAD_PROCESS_PRIVATE 0
 
 #ifdef __cplusplus
@@ -129,7 +137,7 @@ int pthread_setcancelstate(int state, int *old);
 int pthread_cancel(pthread_t t);
 int pthread_getschedparam(pthread_t t, int *policy, struct sched_param *param);
 int pthread_setschedparam(pthread_t t, int policy, const struct sched_param *param);
-int pthread_sigmask(int how, const void *set, void *old);
+int pthread_setcanceltype(int type, int *old);   /* deferred, as everything: 0 */
 #ifdef __cplusplus
 }
 #endif

@@ -97,6 +97,7 @@ extern char **__peos_argv;
 #define EHOSTUNREACH 113
 #define EALREADY 114
 #define EINPROGRESS 115
+#define EDQUOT 122   /* a user's disk quota: none on PeOS, never returned */
 #define ECANCELED 125
 #define EOWNERDEAD 130
 #define ENOTRECOVERABLE 131

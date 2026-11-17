@@ -292,6 +292,10 @@ int64_t peos_hwinfo_report(char *buf, size_t len);
 uint64_t peos_brk(uint64_t addr);
 uint64_t peos_mmap(uint64_t addr, uint64_t len, uint64_t prot, uint64_t flags);
 uint64_t peos_munmap(uint64_t addr, uint64_t len);
+/* Pages of this program's own memory (from peos_mmap) become PEOS_PROT_READ,
+ * READ|WRITE or READ|EXEC, never WRITE and EXEC together: 0, or -1 (needs
+ * the "jit" capability; shared memory refused). */
+int64_t peos_mprotect(uint64_t addr, uint64_t len, uint64_t prot);
 // Pages of an anonymous mapping (SYS_MRELEASE): PEOS_MRELEASE_OUT gives their
 // memory back but keeps the range reserved (touching it then is a fault);
 // PEOS_MRELEASE_IN maps zeroed pages there again. 0 or -1.

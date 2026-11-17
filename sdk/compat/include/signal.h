@@ -42,6 +42,7 @@ int sigdelset(sigset_t *set, int sig);
 int sigismember(const sigset_t *set, int sig);
 /* No signals arrive on PeOS: the mask is kept, nothing else. */
 int sigprocmask(int how, const sigset_t *set, sigset_t *old);
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *old);   /* the same, for one thread */
 #ifdef __cplusplus
 }
 #endif

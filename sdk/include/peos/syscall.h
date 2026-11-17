@@ -144,7 +144,8 @@ enum {
     PEOS_SYS_gpu_res_create = 137,   // rdi=gpu fd, rsi=peos_gpu_res_t*, rdx=len -> buffer number, or 0 (gpu; virgl)
     PEOS_SYS_gpu_transfer = 138,     // rdi=gpu fd, rsi=peos_gpu_transfer_t*, rdx=len -> 0/-1 (gpu; virgl)
     PEOS_SYS_gpu_capset = 139,       // rdi=gpu fd, rsi=id | version << 32, rdx=buf, rcx=len -> its size, or -1 (gpu; virgl)
-    PEOS_SYS_gpu_submit = 140,       // rdi=gpu fd, rsi=cmd, rdx=len (bytes) -> fd "done", or -1 (gpu; virgl)
+    PEOS_SYS_gpu_submit = 140,
+    PEOS_SYS_mprotect = 141,         // rdi=addr, rsi=len, rdx=PEOS_PROT_* (READ, READ|WRITE or READ|EXEC) -> 0/-1 (jit)       // rdi=gpu fd, rsi=cmd, rdx=len (bytes) -> fd "done", or -1 (gpu; virgl)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED
