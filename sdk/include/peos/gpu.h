@@ -19,6 +19,15 @@
  *                                              (PEOS_WAIT_READ) when it ended
  *   peos_fread(done, &status, 4)               PEOS_GPU_DONE_OK or _ERROR
  *
+ * The virtio-gpu 3D (virgl, docs/virgl-plan.md; info.kind VIRTIO) has no
+ * address spaces, queues or batches (those answer -1 there). The GPU object
+ * is a virgl context; a buffer is a 3D resource of the host, its pages the
+ * resource's memory in PeOS:
+ *   bo = peos_gpu_res_create(gpu, &res)        a resource: its number, 0 if none
+ *   peos_gpu_transfer(gpu, &t)                 its pages to the host or back
+ *   peos_gpu_capset(gpu, id, version, buf, n)  what the host's renderer offers
+ *   (peos_gpu_bo_map and peos_gpu_bo_close as for any buffer)
+ *
  * Shared by the kernel (kernel/abi/gpu_abi.h) and userland. */
 #pragma once
 
@@ -85,3 +94,33 @@ typedef struct {
 /* What a `done` descriptor reads (4 bytes, once it is ready). */
 #define PEOS_GPU_DONE_OK 0u
 #define PEOS_GPU_DONE_ERROR 1u   /* the work hung: the engine was reset, the work dropped */
+
+/* A virgl 3D resource (peos_gpu_res_create): the fields of the virtio-gpu
+ * RESOURCE_CREATE_3D (target, format, bind are virgl's own values, as
+ * Mesa's virgl_hw.h has them), and `size`, the bytes of its memory in
+ * PeOS (what transfers copy from and to). */
+typedef struct {
+    uint32_t target, format, bind;
+    uint32_t width, height, depth, array_size;
+    uint32_t last_level, nr_samples, flags;
+    uint64_t size;
+} peos_gpu_res_t;
+
+/* A copy between a resource's pages and the host's copy of it: the box
+ * (x, y, z, w, h, d) of mip `level`, at `offset` in the pages, rows of
+ * `stride` bytes, layers of `layer_stride` (0: worked out by the host). */
+#define PEOS_GPU_TRANSFER_TO_HOST 1u
+#define PEOS_GPU_TRANSFER_FROM_HOST 2u
+typedef struct {
+    uint32_t bo;
+    uint32_t dir;           /* PEOS_GPU_TRANSFER_* */
+    uint32_t level;
+    uint32_t stride;
+    uint32_t layer_stride;
+    uint32_t x, y, z, w, h, d;
+    uint64_t offset;
+} peos_gpu_transfer_t;
+
+/* The capsets a virtio-gpu host offers (peos_gpu_capset's id). */
+#define PEOS_GPU_CAPSET_VIRGL 1u
+#define PEOS_GPU_CAPSET_VIRGL2 2u

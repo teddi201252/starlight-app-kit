@@ -141,6 +141,9 @@ enum {
     PEOS_SYS_time_set = 134,         // rdi=unix nanoseconds (UTC) -> 0/-1 (time)
     PEOS_SYS_backlight = 135,        // rdi=op (0 get, 1 set), rsi=permille -> permille, or -1 (no light) (power)
     PEOS_SYS_battery = 136,          // rdi=peos_battery_t*, rsi=len -> 0, or -1 (no battery)
+    PEOS_SYS_gpu_res_create = 137,   // rdi=gpu fd, rsi=peos_gpu_res_t*, rdx=len -> buffer number, or 0 (gpu; virgl)
+    PEOS_SYS_gpu_transfer = 138,     // rdi=gpu fd, rsi=peos_gpu_transfer_t*, rdx=len -> 0/-1 (gpu; virgl)
+    PEOS_SYS_gpu_capset = 139,       // rdi=gpu fd, rsi=id | version << 32, rdx=buf, rcx=len -> its size, or -1 (gpu; virgl)
 };
 
 #ifndef PEOS_INPUT_EVENT_T_DEFINED

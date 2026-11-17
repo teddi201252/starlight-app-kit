@@ -175,6 +175,11 @@ int64_t peos_gpu_bo_close(int64_t gpu, uint32_t bo);
 int64_t peos_gpu_vm_bind(int64_t vm, const peos_gpu_bind_t *ops, uint32_t count);
 int64_t peos_gpu_queue_create(int64_t vm, uint32_t engine);
 int64_t peos_gpu_exec(int64_t queue, const peos_gpu_exec_t *exec);
+/* virgl (info.kind PEOS_GPU_KIND_VIRTIO): a 3D resource's number, or 0; a
+ * copy to or from the host, 0/-1; a capset into buf, its size or -1. */
+uint32_t peos_gpu_res_create(int64_t gpu, const peos_gpu_res_t *res);
+int64_t peos_gpu_transfer(int64_t gpu, const peos_gpu_transfer_t *t);
+int64_t peos_gpu_capset(int64_t gpu, uint32_t id, uint32_t version, void *buf, uint32_t len);
 // Cryptographic random bytes from the kernel (SYS_RANDOM, any task): len or -1.
 int64_t peos_random(void *buf, size_t len);
 /* Path scope: narrow what this task (and its children) may touch. Never widens. */
