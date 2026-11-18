@@ -14,7 +14,9 @@
 #define PEOS_PATH_WRITE  2u   /* create, write, truncate, mkdir, unlink, rmdir, rename */
 #define PEOS_PATH_RIGHTS_ALL (PEOS_PATH_READ | PEOS_PATH_WRITE)
 
-#define PEOS_PATH_MAX_GRANTS 8u
+/* 16 (was 8 until 2026-11-18): Settings has /starlight, /system/config, /esp,
+ * the update's folders and the sticks. */
+#define PEOS_PATH_MAX_GRANTS 16u
 #define PEOS_PATH_MAX_PREFIX 96u
 
 typedef struct {
