@@ -176,12 +176,10 @@ int main(void) {
             dirty = 0u;
         }
         slui_event_t ev;
-        uint8_t got = 0u;
         while (slui_poll_event(&ev)) {
-            got = 1u;
             on_event(&t, &ev);
             dirty = 1u;
         }
-        if (!got) peos_sleep(10u);
+        if (!dirty) slui_wait(SLUI_WAIT_FOREVER, NULL, 0);   // asleep until an event
     }
 }

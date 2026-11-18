@@ -65,14 +65,12 @@ int main(int argc, char **argv) {
             dirty = 0u;
         }
         slui_event_t ev;
-        uint8_t got = 0u;
         while (slui_poll_event(&ev)) {
-            got = 1u;
             if (ev.type == SLUI_EVENT_BUTTON && ev.id == ID_COUNT) state.clicks++;
             else if (ev.type == SLUI_EVENT_BUTTON && ev.id == ID_RESET) state.clicks = 0u;
             else if (ev.type == SLUI_EVENT_SELECT && ev.id == ID_MODE) state.mode = ev.value;
             dirty = 1u;   // SLUI_EVENT_RESIZE and _LANGUAGE included: draw again
         }
-        if (!got) peos_sleep(10u);
+        if (!dirty) slui_wait(SLUI_WAIT_FOREVER, NULL, 0);   // asleep until an event
     }
 }

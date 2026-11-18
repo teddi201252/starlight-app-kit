@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "peos/event_abi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,12 +63,18 @@ typedef enum {
     // One of the app's options in a text field's menu (slui_text_menu,
     // SLUI SDK 1.0.14): id the field, value the option's index.
     SLUI_EVENT_TEXT_MENU = 23,
+    // The window is being closed (its close button, Caps+W, Close in the
+    // dock) while the app said it has work not saved (slui_close_guard,
+    // SLUI SDK 1.0.18): the window stays; the app asks ("Don't save /
+    // Cancel / Save") and, to close, ends with peos_exit(0).
+    SLUI_EVENT_CLOSE_REQUEST = 24,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
 #define SLUI_CLIP_PASTE 2u
 #define SLUI_CLIP_UNDO 3u
 #define SLUI_CLIP_REDO 4u
+#define SLUI_CLIP_CUT 5u    /* Caps+D (SLUI SDK 1.0.18) */
 
 #define SLUI_POINTER_MOVE 1u
 #define SLUI_POINTER_DOWN 2u
@@ -75,7 +83,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 17u
+#define SLUI_SDK_VERSION_PATCH 18u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -377,6 +385,11 @@ void slui_text_menu(uint32_t field_id, const char *options_pipe);
 // What a one-line field shows while it is empty and not focused, in the
 // secondary colour ("Cerca un'app"), each frame it is drawn (SLUI SDK 1.0.14).
 void slui_text_hint(uint32_t field_id, const char *hint);
+// A tip under a control when the mouse rests on it (SLUI SDK 1.0.18): what an
+// icon-only button does ("Next picture"). Starlight shows it after a moment,
+// hides it at a click or when the mouse leaves. Declared in the frame, after
+// the control, every frame it should have it.
+void slui_tooltip(uint32_t id, const char *text);
 // A password field: its text shown as asterisks and never copied to the
 // clipboard, each frame it is drawn (SLUI SDK 1.0.16). The app still gets
 // the real text in SLUI_EVENT_TEXT_INPUT.
@@ -498,6 +511,7 @@ typedef enum {
     SLUI_DIALOG_RESULT_NONE = 0,
     SLUI_DIALOG_RESULT_CANCEL = 1,
     SLUI_DIALOG_RESULT_OK = 2,
+    SLUI_DIALOG_RESULT_DISCARD = 3,   /* the third button ("Don't save") */
 } slui_dialog_result_t;
 
 static inline uint32_t slui_dialog_max_u32(uint32_t a, uint32_t b) {
@@ -700,6 +714,31 @@ static inline slui_dialog_result_t slui_dialog_map_event_flags(const slui_event_
 static inline slui_dialog_result_t slui_dialog_map_event(const slui_event_t *ev,
                                                          uint32_t id_cancel,
                                                          uint32_t id_ok) {
+    return slui_dialog_map_event_flags(ev, id_cancel, id_ok, 0u);
+}
+
+/* The dialog of work not saved (SLUI SDK 1.0.18, the design "Finestre"):
+ * a third button on the left, "Don't save" (discard_label), with the red
+ * mark: what it throws away is lost. Cancel and Save (the main one) on the
+ * right. Enter saves, Esc cancels. */
+static inline void slui_dialog_draw_discard(const slui_dialog_t *dlg,
+                                            uint32_t id_cancel, uint32_t id_ok, uint32_t id_discard,
+                                            const char *cancel_label, const char *ok_label,
+                                            const char *discard_label) {
+    if (!dlg) return;
+    if (!discard_label) discard_label = "Don't save";
+    slui_dialog_draw_flags(dlg, id_cancel, id_ok, cancel_label, ok_label, 0u);
+    uint32_t w = dlg->cancel_w, x = dlg->x + 28u;
+    if (x + w + 12u > dlg->cancel_x) w = dlg->cancel_x > x + 12u ? dlg->cancel_x - x - 12u : 0u;
+    if (w == 0u) return;
+    slui_button_state(id_discard, x, dlg->btn_y, w, 44u, 1u, discard_label);
+    slui_rect_theme(x + 24u, dlg->btn_y + 44u + 6u, w > 48u ? w - 48u : w, 2u, SLUI_COLOR_DANGER);
+}
+
+static inline slui_dialog_result_t slui_dialog_map_event_discard(const slui_event_t *ev,
+                                                                 uint32_t id_cancel, uint32_t id_ok,
+                                                                 uint32_t id_discard) {
+    if (ev && ev->type == SLUI_EVENT_BUTTON && ev->id == id_discard) return SLUI_DIALOG_RESULT_DISCARD;
     return slui_dialog_map_event_flags(ev, id_cancel, id_ok, 0u);
 }
 
@@ -1019,6 +1058,22 @@ void slui_clipboard_manager(void);
 
 int slui_poll_event(slui_event_t *out);
 
+// Waiting for something to do (SLUI SDK 1.0.18; docs/system-apps-ux-plan.md
+// 1.7): no work while nothing happens. The app sleeps until Starlight sends
+// an event, one of its own descriptors in extra is ready (their revents are
+// set: a timer, a watch, a process), or timeout_ms passes
+// (SLUI_WAIT_FOREVER: no limit). 1 when something came, 0 at the timeout.
+// The loop of an app:
+//     for (;;) {
+//         if (dirty) draw();
+//         while (slui_poll_event(&ev)) handle(&ev);
+//         slui_wait(next_tick_ms, NULL, 0);
+//     }
+#define SLUI_WAIT_FOREVER 0xFFFFFFFFu
+int slui_wait(uint32_t timeout_ms, peos_wait_item_t *extra, size_t extra_count);
+// One event, waiting at most timeout_ms for it: 1 with *out filled, 0 if none.
+int slui_wait_event(slui_event_t *out, uint32_t timeout_ms);
+
 // Languages (SLUI SDK 1.0.6): the app's sentences in the language the user
 // chose, from its bundle's resources/<language>/String.lang (peos/lang.h for
 // the format), then from resources/en/, then the key itself.
@@ -1043,6 +1098,10 @@ void slui_open_app_bundle(const char *bundle_path);
 // Opens the app of bundle_path (started if it is not) and gives it file to
 // open, as SLUI_EVENT_OPEN_FILE (SLUI SDK 1.0.12).
 void slui_open_file_with(const char *bundle_path, const char *file);
+// Work not saved (SLUI SDK 1.0.18): while on, closing the window does not
+// end the app but sends it SLUI_EVENT_CLOSE_REQUEST. Sent to Starlight only
+// when it changes: call it after every change of the app's "dirty" state.
+void slui_close_guard(int on);
 void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
 void slui_set_accent_a(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_theme_reset_override(void);

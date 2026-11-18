@@ -54,13 +54,11 @@ int main(void) {
             dirty = 0;
         }
         slui_event_t ev;
-        uint8_t got = 0;
         while (slui_poll_event(&ev)) {
-            got = 1;
             dirty = 1;                       // a resize or a click: draw again
             if (ev.type == SLUI_EVENT_BUTTON && ev.id == ID_HELLO) clicks++;
         }
-        if (!got) peos_sleep(10);            // nothing to do: give the CPU back
+        if (!dirty) slui_wait(SLUI_WAIT_FOREVER, NULL, 0);   // nothing to do: asleep until an event
     }
 }
 ```
@@ -394,7 +392,24 @@ Prefer them to fixed RGB.
 
 ```c
 int slui_poll_event(slui_event_t *out);   // 1: one event in *out, 0: none left
+// SLUI SDK 1.0.18: asleep until an event, one of extra's descriptors (their
+// revents set), or timeout_ms (SLUI_WAIT_FOREVER: none). 1 when something came.
+int slui_wait(uint32_t timeout_ms, peos_wait_item_t *extra, size_t extra_count);
+int slui_wait_event(slui_event_t *out, uint32_t timeout_ms);   // one event, waiting at most timeout_ms
 ```
+
+An app never polls in a loop with `peos_sleep`: it draws, takes every event,
+then waits with `slui_wait` (a timeout only for what it has to do at a time:
+a clock, an animation). Its own descriptors (a timer, a watch, a child's
+pipe) go in `extra`.
+
+Work not saved: `slui_close_guard(1)` while there is some, `0` when there is
+none. Closing the window then sends `SLUI_EVENT_CLOSE_REQUEST` instead of
+ending the app: ask with `slui_dialog_draw_discard` ("Don't save / Cancel /
+Save") and close with `peos_exit(0)`.
+
+A tip on a control (an icon-only button): `slui_tooltip(id, text)` in the
+frame, after the control. Starlight shows it when the mouse rests there.
 
 | `type` | `id` | `value` / `value2` / `text` |
 |---|---|---|
@@ -405,7 +420,8 @@ int slui_poll_event(slui_event_t *out);   // 1: one event in *out, 0: none left
 | `SLUI_EVENT_SELECT` | select or segment | `value`: the chosen index |
 | `SLUI_EVENT_CONTEXT_MENU` | the menu | `value`: the chosen index |
 | `SLUI_EVENT_TEXT_MENU` | the field | `value`: the index of the app's option (`slui_text_menu`) |
-| `SLUI_EVENT_CLIPCMD` | | `value`: `SLUI_CLIP_COPY`, `PASTE`, `UNDO` or `REDO` |
+| `SLUI_EVENT_CLIPCMD` | | `value`: `SLUI_CLIP_COPY`, `CUT` (Caps+D, SDK 1.0.18), `PASTE`, `UNDO` or `REDO` |
+| `SLUI_EVENT_CLOSE_REQUEST` | | the window is closing while `slui_close_guard(1)` (SDK 1.0.18) |
 | `SLUI_EVENT_TEXT_INPUT` | the field | `text`, `text_len`: the whole text now |
 | `SLUI_EVENT_TEXT_AREA` | the field | `text`, `text_len` |
 | `SLUI_EVENT_SCROLL_V` | the bar | `value`: the new offset |

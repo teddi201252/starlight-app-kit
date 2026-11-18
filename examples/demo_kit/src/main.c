@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
         }
 
         slui_event_t ev;
-        if (slui_poll_event(&ev)) {
+        if (slui_wait_event(&ev, SLUI_WAIT_FOREVER)) {   // asleep until an event
             if (ev.type == SLUI_EVENT_BUTTON && ev.id == 1u) {
                 state.clicks++;
                 (void)state.clicks;
@@ -111,8 +111,6 @@ int main(int argc, char **argv) {
                 }
                 state.dirty = 1u;
             }
-        } else {
-            peos_sleep(1u);
         }
     }
 }
