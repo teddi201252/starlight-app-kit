@@ -75,7 +75,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 16u
+#define SLUI_SDK_VERSION_PATCH 17u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -566,60 +566,97 @@ static inline uint32_t slui_dialog_wrap_lines(const char *src,
     return lines;
 }
 
+// The confirmation dialog (SLUI SDK 1.0.17, docs/system-apps-ux-plan.md
+// 1.2): Starlight's veil over the whole window, a raised surface, the title
+// (large) and the message, two buttons at the bottom right. The labels say
+// what the buttons do ("Elimina", "Riavvia": never "OK"), from the app's
+// String.lang. Keys (slui_dialog_map_event): Esc cancels; Enter presses the
+// main button, except in a dangerous dialog (SLUI_DIALOG_DANGER: deleting,
+// ending a process, erasing a disk), where Enter is Cancel: the action that
+// cannot be undone takes a click on it.
+#define SLUI_DIALOG_DANGER 1u   /* the action cannot be undone */
+
 static inline void slui_dialog_prepare(slui_dialog_t *dlg,
                                        uint32_t viewport_w, uint32_t viewport_h,
                                        const char *title, const char *message,
                                        uint32_t min_w, uint32_t max_w) {
-    uint32_t content_chars = 0u;
-    uint32_t wanted_w = 0u;
-    uint32_t text_max_chars = 0u;
-    uint32_t content_lines_n = 0u;
-    uint32_t margins = 18u;
+    const uint32_t margin = 28u, btn_w = 132u, btn_h = 44u, gap = 12u;
     if (!dlg) return;
 
-    if (min_w < 180u) min_w = 180u;
+    if (min_w < 360u) min_w = 360u;
+    if (max_w < 460u) max_w = 460u;
     if (max_w < min_w) max_w = min_w;
-    if (viewport_w < min_w) min_w = viewport_w;
-    if (max_w > viewport_w) max_w = viewport_w;
+    if (viewport_w > 40u && max_w > viewport_w - 40u) max_w = viewport_w - 40u;
+    if (min_w > max_w) min_w = max_w;
 
-    content_chars = slui_dialog_max_u32(slui_dialog_strlen(title), slui_dialog_strlen(message));
-    wanted_w = 36u + (content_chars * 8u);
-    if (wanted_w < min_w) wanted_w = min_w;
-    if (wanted_w > max_w) wanted_w = max_w;
-
-    dlg->w = wanted_w;
+    /* the title 22 px (~12 px a character), the message 14 px (~7.5) */
+    {
+        uint32_t want = slui_dialog_strlen(message) * 15u / 2u + margin * 2u;
+        uint32_t want_title = slui_dialog_strlen(title) * 12u + margin * 2u;
+        if (want_title > want) want = want_title;
+        if (want < min_w) want = min_w;
+        if (want > max_w) want = max_w;
+        dlg->w = want;
+    }
     dlg->x = (viewport_w > dlg->w) ? ((viewport_w - dlg->w) / 2u) : 0u;
-    dlg->text_x = dlg->x + 18u;
+    dlg->text_x = dlg->x + margin;
 
-    text_max_chars = (dlg->w > 36u) ? ((dlg->w - 36u) / 8u) : 1u;
-    dlg->title_lines_n = slui_dialog_wrap_lines(title, text_max_chars,
+    dlg->title_lines_n = slui_dialog_wrap_lines(title, (dlg->w - 2u * margin) / 12u,
                                                 dlg->title_lines, SLUI_DIALOG_MAX_TITLE_LINES);
-    dlg->msg_lines_n = slui_dialog_wrap_lines(message, text_max_chars,
+    dlg->msg_lines_n = slui_dialog_wrap_lines(message, (dlg->w - 2u * margin) * 2u / 15u,
                                               dlg->msg_lines, SLUI_DIALOG_MAX_MSG_LINES);
-    content_lines_n = dlg->title_lines_n + dlg->msg_lines_n;
-    if (content_lines_n < 2u) content_lines_n = 2u;
 
-    dlg->h = 92u + (content_lines_n * 12u);
-    if (dlg->h < 160u) dlg->h = 160u;
+    dlg->h = 20u + dlg->title_lines_n * 30u + 14u + dlg->msg_lines_n * 20u + 24u + btn_h + margin;
+    if (dlg->h < 190u) dlg->h = 190u;
     if (dlg->h > viewport_h) dlg->h = viewport_h;
     dlg->y = (viewport_h > dlg->h) ? ((viewport_h - dlg->h) / 2u) : 0u;
 
-    dlg->title_y = dlg->y + 20u;
-    dlg->msg_y = dlg->title_y + (dlg->title_lines_n * 12u) + 8u;
-    dlg->btn_y = dlg->y + dlg->h - 40u;
+    dlg->title_y = dlg->y + 26u;
+    dlg->msg_y = dlg->title_y + dlg->title_lines_n * 30u + 14u;
+    dlg->btn_y = dlg->y + dlg->h - margin - btn_h;
 
-    dlg->cancel_w = 90u;
-    dlg->ok_w = 82u;
-    {
-        uint32_t gap = 12u;
-        uint32_t total = dlg->cancel_w + gap + dlg->ok_w + (margins * 2u);
-        if (total > dlg->w) {
-            dlg->cancel_w = 74u;
-            dlg->ok_w = 74u;
-            gap = 8u;
-        }
-        dlg->cancel_x = dlg->x + dlg->w - margins - dlg->ok_w - gap - dlg->cancel_w;
-        dlg->ok_x = dlg->x + dlg->w - margins - dlg->ok_w;
+    dlg->ok_w = btn_w;
+    dlg->cancel_w = btn_w;
+    if (2u * btn_w + gap + 2u * margin > dlg->w) {
+        dlg->ok_w = dlg->cancel_w = (dlg->w - 2u * margin - gap) / 2u;
+    }
+    dlg->ok_x = dlg->x + dlg->w - margin - dlg->ok_w;
+    dlg->cancel_x = dlg->ok_x - gap - dlg->cancel_w;
+}
+
+/* The dialog with flags (SLUI_DIALOG_DANGER: the main button is Cancel,
+ * the action an ordinary one). */
+static inline void slui_dialog_draw_flags(const slui_dialog_t *dlg,
+                                          uint32_t id_cancel, uint32_t id_ok,
+                                          const char *cancel_label,
+                                          const char *ok_label,
+                                          uint32_t flags) {
+    if (!dlg) return;
+    /* labels are the app's (String.lang); an app that forgets them gets
+     * English, never a fixed language */
+    if (!cancel_label) cancel_label = "Cancel";
+    if (!ok_label) ok_label = "OK";
+
+    slui_veil(87u);
+    slui_surface(SLUI_SURF_RAISED, dlg->x, dlg->y, dlg->w, dlg->h, 28u);
+    slui_face("ui-22-mid");
+    /* a dangerous dialog's title in the danger colour (red) */
+    for (uint32_t i = 0u; i < dlg->title_lines_n; i++) {
+        slui_label_theme(dlg->text_x, dlg->title_y + i * 30u,
+                         (flags & SLUI_DIALOG_DANGER) ? SLUI_COLOR_DANGER : SLUI_COLOR_TEXT_PRIMARY, dlg->title_lines[i]);
+    }
+    slui_face("ui-14");
+    for (uint32_t i = 0u; i < dlg->msg_lines_n; i++) {
+        slui_label_theme(dlg->text_x, dlg->msg_y + i * 20u, SLUI_COLOR_TEXT_SECONDARY, dlg->msg_lines[i]);
+    }
+    if (flags & SLUI_DIALOG_DANGER) {
+        slui_button_primary(id_cancel, dlg->cancel_x, dlg->btn_y, dlg->cancel_w, 44u, 1u, cancel_label);
+        slui_button_state(id_ok, dlg->ok_x, dlg->btn_y, dlg->ok_w, 44u, 1u, ok_label);
+        /* a red mark under the action that cannot be undone */
+        slui_rect_theme(dlg->ok_x + 24u, dlg->btn_y + 44u + 6u, dlg->ok_w - 48u, 2u, SLUI_COLOR_DANGER);
+    } else {
+        slui_button_state(id_cancel, dlg->cancel_x, dlg->btn_y, dlg->cancel_w, 44u, 1u, cancel_label);
+        slui_button_primary(id_ok, dlg->ok_x, dlg->btn_y, dlg->ok_w, 44u, 1u, ok_label);
     }
 }
 
@@ -630,35 +667,40 @@ static inline void slui_dialog_draw(const slui_dialog_t *dlg,
                                     const char *msg_color_tag,
                                     const char *cancel_label,
                                     const char *ok_label) {
+    (void)viewport_w;
+    (void)viewport_h;
     (void)title_color_tag;
     (void)msg_color_tag;
-    if (!dlg) return;
-    if (!cancel_label) cancel_label = "Annulla";
-    if (!ok_label) ok_label = "OK";
+    slui_dialog_draw_flags(dlg, id_cancel, id_ok, cancel_label, ok_label, 0u);
+}
 
-    slui_rect_a(0u, 0u, viewport_w, viewport_h, 15u, 18u, 24u, 160u);
-    slui_rect(dlg->x, dlg->y, dlg->w, dlg->h, 46u, 50u, 62u);
-    slui_separator(dlg->x, dlg->y, dlg->w);
-    slui_separator(dlg->x, dlg->y + dlg->h - 1u, dlg->w);
-
-    for (uint32_t i = 0u; i < dlg->title_lines_n; i++) {
-        slui_label(dlg->text_x, dlg->title_y + (i * 12u), dlg->title_lines[i], 230u, 230u, 230u);
+/* Buttons and keys: Esc cancels, Enter presses the main button (Cancel in a
+ * dangerous dialog). The app shows the dialog while it is open and gives it
+ * every event first. */
+static inline slui_dialog_result_t slui_dialog_map_event_flags(const slui_event_t *ev,
+                                                               uint32_t id_cancel,
+                                                               uint32_t id_ok,
+                                                               uint32_t flags) {
+    if (!ev) return SLUI_DIALOG_RESULT_NONE;
+    if (ev->type == SLUI_EVENT_BUTTON) {
+        if (ev->id == id_cancel) return SLUI_DIALOG_RESULT_CANCEL;
+        if (ev->id == id_ok) return SLUI_DIALOG_RESULT_OK;
+        return SLUI_DIALOG_RESULT_NONE;
     }
-    for (uint32_t i = 0u; i < dlg->msg_lines_n; i++) {
-        slui_label(dlg->text_x, dlg->msg_y + (i * 12u), dlg->msg_lines[i], 180u, 180u, 180u);
+    if (ev->type == SLUI_EVENT_KEY_DOWN) {
+        uint32_t k = ev->keycode & 0xFFu;   /* PC set-1: 0x01 Esc, 0x1C Enter (and the keypad's) */
+        if (k == 0x01u) return SLUI_DIALOG_RESULT_CANCEL;
+        if (k == 0x1Cu) {
+            return (flags & SLUI_DIALOG_DANGER) ? SLUI_DIALOG_RESULT_CANCEL : SLUI_DIALOG_RESULT_OK;
+        }
     }
-
-    slui_button(id_cancel, dlg->cancel_x, dlg->btn_y, dlg->cancel_w, 24u, cancel_label);
-    slui_button_primary(id_ok, dlg->ok_x, dlg->btn_y, dlg->ok_w, 24u, 1u, ok_label);
+    return SLUI_DIALOG_RESULT_NONE;
 }
 
 static inline slui_dialog_result_t slui_dialog_map_event(const slui_event_t *ev,
                                                          uint32_t id_cancel,
                                                          uint32_t id_ok) {
-    if (!ev || ev->type != SLUI_EVENT_BUTTON) return SLUI_DIALOG_RESULT_NONE;
-    if (ev->id == id_cancel) return SLUI_DIALOG_RESULT_CANCEL;
-    if (ev->id == id_ok) return SLUI_DIALOG_RESULT_OK;
-    return SLUI_DIALOG_RESULT_NONE;
+    return slui_dialog_map_event_flags(ev, id_cancel, id_ok, 0u);
 }
 
 typedef struct {
@@ -848,6 +890,9 @@ static inline slui_color_picker_result_t slui_color_picker_handle_event(const sl
     if (!ev || !h || !s || !v) return SLUI_COLOR_PICKER_NONE;
     if (ev->type == SLUI_EVENT_BUTTON && ev->id == id_cancel) return SLUI_COLOR_PICKER_CANCEL;
     if (ev->type == SLUI_EVENT_BUTTON && ev->id == id_ok) return SLUI_COLOR_PICKER_CONFIRM;
+    /* Esc cancels, Enter keeps the colour (SLUI SDK 1.0.17) */
+    if (ev->type == SLUI_EVENT_KEY_DOWN && (ev->keycode & 0xFFu) == 0x01u) return SLUI_COLOR_PICKER_CANCEL;
+    if (ev->type == SLUI_EVENT_KEY_DOWN && (ev->keycode & 0xFFu) == 0x1Cu) return SLUI_COLOR_PICKER_CONFIRM;
     if (ev->type == SLUI_EVENT_SLIDER && ev->id == id_slider_h) {
         *h = (ev->value > 359u) ? 359u : ev->value;
         return SLUI_COLOR_PICKER_CHANGED;

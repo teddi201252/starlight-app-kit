@@ -434,6 +434,12 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_KEY_RALT   0xE038u
 #define PEOS_KEY_LSUPER 0xE05Bu
 #define PEOS_KEY_RSUPER 0xE05Cu
+#define PEOS_KEY_DELETE 0xE053u   /* Canc: deletes (to the right in a field; a list's item, asked first) */
+#define PEOS_KEY_PGUP   0xE049u
+#define PEOS_KEY_PGDN   0xE051u
+#define PEOS_KEY_F2     0x003Cu   /* renames, in lists */
+#define PEOS_KEY_F5     0x003Fu   /* reloads */
+#define PEOS_KEY_KP_ENTER 0xE01Cu
 // The media keys (set-1 codes, as a PS/2 keyboard sends them), and two of
 // PeOS's own for the screen's light (the Touch Bar's keys on a MacBook).
 #define PEOS_KEY_MUTE        0xE020u
@@ -451,6 +457,8 @@ void *peos_memcpy(void *dst, const void *src, size_t n);
 #define PEOS_KEY_END_NORM     0x004Fu
 #define PEOS_KEY_PGUP_NORM    0x0049u
 #define PEOS_KEY_PGDN_NORM    0x0051u
+#define PEOS_KEY_DELETE_NORM  0x0053u
+#define PEOS_KEY_KP_ENTER_NORM 0x001Cu
 #define PEOS_KEY_RCTRL_NORM   0x001Du
 #define PEOS_KEY_RALT_NORM    0x0038u
 #define PEOS_KEY_LSUPER_NORM  0x005Bu
