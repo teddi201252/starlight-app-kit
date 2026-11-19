@@ -73,6 +73,11 @@ typedef enum {
     // caret's byte in the text, value2 the other end of the selection
     // (the same as value when nothing is selected). When it moves.
     SLUI_EVENT_TEXT_CARET = 25,
+    // Files dragged from another app and let go over this window (SLUI SDK
+    // 1.0.21, slui_drag_files): one event per file, text the path, id its
+    // place in the group (0 first), keycode how many files the group has,
+    // value x value2 where the pointer was let go, from the body's top left.
+    SLUI_EVENT_DROP_FILE = 26,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
@@ -88,7 +93,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 20u
+#define SLUI_SDK_VERSION_PATCH 21u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -134,6 +139,11 @@ typedef enum {
 #define SLUI_MOD_CTRL  (1u << 1)
 #define SLUI_MOD_ALT   (1u << 2)
 #define SLUI_MOD_SUPER (1u << 3)
+// The key is on the numeric keypad (SLUI SDK 1.0.21): keycode 0x48 with it
+// is the keypad's 8, without it the arrow up (and so for 0x47..0x53, the
+// keypad's * 0x37, / 0x35 and Enter 0x1C). The keypad writes its digits
+// (SLUI_EVENT_CHAR, text fields) as the main keys do.
+#define SLUI_MOD_KEYPAD (1u << 4)
 
 typedef struct {
     slui_event_type_t type;
@@ -1126,6 +1136,16 @@ void slui_open_file_with(const char *bundle_path, const char *file);
 // end the app but sends it SLUI_EVENT_CLOSE_REQUEST. Sent to Starlight only
 // when it changes: call it after every change of the app's "dirty" state.
 void slui_close_guard(int on);
+// Dragging files out of the app (SLUI SDK 1.0.21): call it while the left
+// button is held, when the drag starts (a press on a file, then a move of a
+// few pixels). Starlight shows the files by the pointer from then on, also
+// outside the window, and when the button is let go over another app's
+// window that app gets SLUI_EVENT_DROP_FILE for each. Esc cancels; let go
+// anywhere else nothing happens. The app keeps getting the mouse as before
+// (the release too): it should only not take the moves for its own use
+// until the button is up. At most SLUI_DRAG_MAX files; paths are absolute.
+#define SLUI_DRAG_MAX 16u
+void slui_drag_files(const char *const *paths, uint32_t count);
 void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
 void slui_set_accent_a(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_theme_reset_override(void);

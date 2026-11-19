@@ -61,6 +61,16 @@ const char *peos_fileop_result(const peos_fileop_t *op);
 /* Frees it; one still running stops, and what it wrote goes away. */
 void peos_fileop_end(peos_fileop_t *op);
 
+/* What it wrote is not taken away by this library (a failure, an end
+ * before the end): the caller does it, a piece at a time, from
+ * peos_fileop_part. A folder half copied taken away in one call holds the
+ * file system for every program until it is gone (fileopd, the file
+ * operations service, system apps UX plan phase 4 point 7). */
+void peos_fileop_keep_part(peos_fileop_t *op);
+/* The provisional name it writes under ("" once it has its own, or when
+ * nothing was written): what to take away after a failure or an end. */
+const char *peos_fileop_part(const peos_fileop_t *op);
+
 /* A name not yet in dir for name: name itself, else "stem (word).ext",
  * "stem (word 2).ext"... (a folder: no extension). 0, or -1 if too long. */
 int peos_fileop_free_name(const char *dir, const char *name, int is_dir, const char *word, char *out, size_t cap);

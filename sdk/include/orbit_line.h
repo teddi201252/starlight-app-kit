@@ -15,6 +15,23 @@
 
 typedef void (*orbit_line_write_fn)(const char *text, size_t len, void *ctx);
 
+// Tab completes the word before the cursor. The completer gets that word
+// (its quotes taken away) and whether it is the line's first word (a
+// command), and adds every word it could become with orbit_line_match_add
+// (a folder ends with '/', so the next Tab goes on inside it).
+#define ORBIT_MATCH_LIST 4096u
+typedef struct {
+    size_t count;
+    char common[ORBIT_LINE_MAX];     // what every match starts with
+    size_t common_len;
+    char list[ORBIT_MATCH_LIST];     // the matches, each ending with a NUL
+    size_t list_len;
+    size_t dropped;                  // matches that did not fit in list
+} orbit_line_matches_t;
+
+typedef void (*orbit_line_complete_fn)(const char *word, int command, orbit_line_matches_t *m, void *ctx);
+void orbit_line_match_add(orbit_line_matches_t *m, const char *word);
+
 typedef enum {
     ORBIT_LINE_EDITING = 0,
     ORBIT_LINE_DONE,                 // Enter: orbit_line_text() is the command
@@ -45,12 +62,21 @@ typedef struct {
     size_t query_len;
     size_t match;                    // index in hist, or hist_count: none
 
+    uint8_t tabs;                    // Tabs in a row that completed nothing more
+
     orbit_line_write_fn write;
     void *ctx;
+    orbit_line_complete_fn complete;
+    void *complete_ctx;
+    const char *prompt;              // written again after a list of matches
 } orbit_line_t;
 
 void orbit_line_init(orbit_line_t *ol, orbit_line_write_fn write, void *ctx);
 void orbit_line_free(orbit_line_t *ol);
+// Without a completer Tab does nothing. The prompt is the text the caller
+// writes before each line (shown again under a list of matches).
+void orbit_line_set_completion(orbit_line_t *ol, orbit_line_complete_fn fn, void *ctx);
+void orbit_line_set_prompt(orbit_line_t *ol, const char *prompt);
 
 // A new, empty line (the caller has written the prompt).
 void orbit_line_begin(orbit_line_t *ol);

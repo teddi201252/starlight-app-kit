@@ -48,6 +48,13 @@ int peos_trash_restore(const char *root, const char *name, const char *word, cha
  * written in out). */
 uint32_t peos_trash_list(const char *root, peos_trash_item_t *out, uint32_t cap);
 uint32_t peos_trash_count(const char *root);
+/* Where <name> of the bin of root is: what was deleted (file) and its info.
+ * For taking it away a piece at a time (fileopd, peos/fileopd.h): the file
+ * first, then the info. 0, or -1. */
+int peos_trash_paths(const char *root, const char *name, char *file, size_t file_cap, char *info, size_t info_cap);
+/* The bin's two folders (what was deleted, the infos): emptying it a piece
+ * at a time is taking both away, files first. 0, or -1. */
+int peos_trash_dirs(const char *root, char *files, size_t files_cap, char *infos, size_t infos_cap);
 /* Gone for good: one of the bin, or all of it. 0, or -1. */
 int peos_trash_remove(const char *root, const char *name);
 int peos_trash_empty(const char *root);
