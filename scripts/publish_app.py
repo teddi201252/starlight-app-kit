@@ -16,7 +16,9 @@ bundle/app.ini and its resources/<lang>/String.lang, and in STORE:
 What it reads from app.ini: title, version, author, store_category
 (strumenti, giochi, media, sviluppo, internet...), capabilities, min_peos
 (default 0.14.0, the first PeOS with PeStore). From String.lang (it and en):
-store.summary, one line, and store.description, longer ("\\n" for a new line).
+store.summary, one line, and store.description, longer ("\\n" for a new line);
+store.news, optional, one line on what this version changes (PeStore shows
+it under an app to update).
 
 The key: `make store-keys` makes the pair once; the private key stays on the
 publisher's machine, never in git; the public one goes in PeOS, in
@@ -160,6 +162,7 @@ def main() -> int:
         "category": category,
         "summary": {lang: texts[lang]["store.summary"] for lang in ("it", "en")},
         "description": {lang: texts[lang].get("store.description", "") for lang in ("it", "en")},
+        "news": {lang: texts[lang].get("store.news", "") for lang in ("it", "en")},
         "capabilities": caps,
         "min_peos": args.min_peos or ini.get("min_peos", "0.14.0"),
         "date": datetime.date.today().isoformat(),

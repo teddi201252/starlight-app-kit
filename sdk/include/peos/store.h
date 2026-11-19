@@ -48,6 +48,7 @@ typedef struct {
     char category[24];          /* store_category: strumenti, giochi, media, sviluppo, internet... */
     char summary_it[160], summary_en[160];
     char description_it[1024], description_en[1024];
+    char news_it[160], news_en[160];   /* what this version changes ("news", optional) */
     char capabilities[160];     /* "fs.read, fs.write, shm" */
     char min_peos[16];
     char date[16];
