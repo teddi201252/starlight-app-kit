@@ -16,6 +16,7 @@ extern "C" {
 #include "peos/disks.h"
 #include "peos/gpu.h"
 #include "peos/display.h"
+#include "peos/audio_info.h"
 
 typedef struct {
     uint32_t width;
@@ -321,6 +322,8 @@ int64_t peos_fbmap(peos_fb_map_t *out, uint64_t flags);
 int64_t peos_fb_set_mode(uint32_t width, uint32_t height);
 // The screen's modes: the one PeOS started in, the live driver's, the firmware's (peos/display.h).
 int64_t peos_fb_modes(peos_fb_modes_t *out);
+// The sound card: whether there is one, its name, its outputs, the volume (peos/audio_info.h).
+int64_t peos_audio_info(peos_audio_info_t *out);
 int64_t peos_cursor_set_visible(uint64_t visible);
 int64_t peos_cursor_move_abs(uint32_t x, uint32_t y);
 int64_t peos_cursor_set_image_rgba(const void *rgba, uint32_t width, uint32_t height,
