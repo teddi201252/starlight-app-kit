@@ -411,6 +411,14 @@ Save") and close with `peos_exit(0)`.
 A tip on a control (an icon-only button): `slui_tooltip(id, text)` in the
 frame, after the control. Starlight shows it when the mouse rests there.
 
+A text area as an editor (SDK 1.0.19), in the frame after the area:
+`slui_text_area_options(id, SLUI_TA_LINE_NUMBERS | SLUI_TA_CURRENT_LINE |
+SLUI_TA_CARET_EVENTS)` (numbers, the caret's line marked, and
+`SLUI_EVENT_TEXT_CARET` with the caret's byte in `value` and the other end
+of the selection in `value2`); `slui_text_area_marks(id, pairs, n,
+current)` for what a search found; `slui_text_area_select(id, start, end)`
+to select and show a part (go to line).
+
 | `type` | `id` | `value` / `value2` / `text` |
 |---|---|---|
 | `SLUI_EVENT_BUTTON` | the control | |
@@ -422,6 +430,7 @@ frame, after the control. Starlight shows it when the mouse rests there.
 | `SLUI_EVENT_TEXT_MENU` | the field | `value`: the index of the app's option (`slui_text_menu`) |
 | `SLUI_EVENT_CLIPCMD` | | `value`: `SLUI_CLIP_COPY`, `CUT` (Caps+D, SDK 1.0.18), `PASTE`, `UNDO` or `REDO` |
 | `SLUI_EVENT_CLOSE_REQUEST` | | the window is closing while `slui_close_guard(1)` (SDK 1.0.18) |
+| `SLUI_EVENT_TEXT_CARET` | the area | `value`: the caret (a byte), `value2`: the selection's other end (SDK 1.0.19) |
 | `SLUI_EVENT_TEXT_INPUT` | the field | `text`, `text_len`: the whole text now |
 | `SLUI_EVENT_TEXT_AREA` | the field | `text`, `text_len` |
 | `SLUI_EVENT_SCROLL_V` | the bar | `value`: the new offset |

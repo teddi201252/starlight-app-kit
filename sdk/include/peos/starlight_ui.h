@@ -68,6 +68,11 @@ typedef enum {
     // SLUI SDK 1.0.18): the window stays; the app asks ("Don't save /
     // Cancel / Save") and, to close, ends with peos_exit(0).
     SLUI_EVENT_CLOSE_REQUEST = 24,
+    // Where the caret is in a text area that asked for it
+    // (SLUI_TA_CARET_EVENTS, SLUI SDK 1.0.19): id the area, value the
+    // caret's byte in the text, value2 the other end of the selection
+    // (the same as value when nothing is selected). When it moves.
+    SLUI_EVENT_TEXT_CARET = 25,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
@@ -83,7 +88,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 18u
+#define SLUI_SDK_VERSION_PATCH 19u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -385,6 +390,20 @@ void slui_text_menu(uint32_t field_id, const char *options_pipe);
 // What a one-line field shows while it is empty and not focused, in the
 // secondary colour ("Cerca un'app"), each frame it is drawn (SLUI SDK 1.0.14).
 void slui_text_hint(uint32_t field_id, const char *hint);
+// A text area's extras (SLUI SDK 1.0.19, Voyager), in the frame after the
+// area: SLUI_TA_* flags.
+#define SLUI_TA_LINE_NUMBERS 1u   // the lines' numbers in a column on the left
+#define SLUI_TA_CURRENT_LINE 2u   // the caret's line marked while it has the keyboard
+#define SLUI_TA_CARET_EVENTS 4u   // SLUI_EVENT_TEXT_CARET when the caret moves
+void slui_text_area_options(uint32_t id, uint32_t flags);
+// What a search found in the area: count ranges of bytes [start, end), as
+// pairs in ranges (at most 256 are shown); current is the one shown
+// stronger, and the view goes to it when it changes. In the frame, after
+// the area; count 0 or no call: none.
+void slui_text_area_marks(uint32_t id, const uint32_t *ranges, uint32_t count, uint32_t current);
+// The area takes the keyboard and selects [start, end) (bytes; start ==
+// end: the caret there), brought into view: "go to line", a search ended.
+void slui_text_area_select(uint32_t id, uint32_t start, uint32_t end);
 // A tip under a control when the mouse rests on it (SLUI SDK 1.0.18): what an
 // icon-only button does ("Next picture"). Starlight shows it after a moment,
 // hides it at a click or when the mouse leaves. Declared in the frame, after
