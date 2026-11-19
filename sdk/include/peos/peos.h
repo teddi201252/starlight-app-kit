@@ -156,6 +156,10 @@ int64_t peos_sysinfo(peos_sysinfo_t *out);
 int64_t peos_proc_list(peos_proc_info_t *out, size_t max);
 // End a process (SYS_PROC_KILL, needs PEOS_CAP_MANAGE): 0 or -1.
 int64_t peos_proc_kill(uint64_t pid);
+/* The memory a process holds (pid from peos_proc_list): the bytes of RAM its
+ * address space maps, shared ones (a window's pixels) included; -1 when it
+ * is gone. */
+int64_t peos_proc_memory(uint64_t pid);
 // The kernel watchdog (SYS_WATCHDOG, needs PEOS_CAP_DEBUG): a CPU stuck for
 // 5 s says where on the screen. Off by default. 1 on, 0 off, or -1.
 #define PEOS_WATCHDOG_STATUS 0
