@@ -35,6 +35,7 @@ enum {
     NET_OP_STATS = 8,        /* -> stats */
     NET_OP_CRASH = 9,        /* tests (needs "debug"): netd faults on purpose */
     NET_OP_WAIT_ADDRESS = 10,/* timeout_ms: reply once there is an address (now, if there is) -> cfg */
+    NET_OP_HOSTNAME = 11,    /* name: the computer's name, in DHCP (option 12); a lease again now */
 };
 
 enum {
@@ -129,6 +130,12 @@ int64_t net_ping(const uint8_t ip[4], uint64_t timeout_ns);
 int net_stats(net_stats_t *out);
 /* Tests only (needs "debug"): netd faults on purpose; init starts it again. */
 int net_debug_crash(void);
+/* The computer's name (Settings): netd sends it in DHCP and asks for the
+ * address again, so the router knows it now. NET_OK or a NET_ERR_* value. */
+int net_set_hostname(const char *name);
+/* The name as it goes on the network: letters, digits and '-', at most 63
+ * (spaces become '-'); empty when nothing of it is left. */
+void net_hostname_clean(const char *in, char *out, size_t cap);
 int net_parse_ipv4(const char *s, uint8_t out[4]);
 #ifdef __cplusplus
 }
