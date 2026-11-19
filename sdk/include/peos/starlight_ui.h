@@ -168,6 +168,9 @@ typedef enum {
     SLUI_COLOR_SHADOW_DARK,
     SLUI_COLOR_SHADOW_LIGHT,
     SLUI_COLOR_NEON,
+    // The line around surfaces when the shadows are faint (theme.cfg outline):
+    // drawn as strong as the shadows are weak, times its own alpha.
+    SLUI_COLOR_OUTLINE,
     SLUI_COLOR_COUNT
 } slui_color_token_t;
 
