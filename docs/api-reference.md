@@ -417,7 +417,9 @@ SLUI_TA_CARET_EVENTS)` (numbers, the caret's line marked, and
 `SLUI_EVENT_TEXT_CARET` with the caret's byte in `value` and the other end
 of the selection in `value2`); `slui_text_area_marks(id, pairs, n,
 current)` for what a search found; `slui_text_area_select(id, start, end)`
-to select and show a part (go to line).
+to select and show a part (go to line). Since SDK 1.0.20 it selects in a
+one-line field too (`slui_text_input`): Ctrl+L in a browser selects the
+whole address.
 
 | `type` | `id` | `value` / `value2` / `text` |
 |---|---|---|

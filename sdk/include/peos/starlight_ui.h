@@ -88,7 +88,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 19u
+#define SLUI_SDK_VERSION_PATCH 20u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -403,6 +403,8 @@ void slui_text_area_options(uint32_t id, uint32_t flags);
 void slui_text_area_marks(uint32_t id, const uint32_t *ranges, uint32_t count, uint32_t current);
 // The area takes the keyboard and selects [start, end) (bytes; start ==
 // end: the caret there), brought into view: "go to line", a search ended.
+// A one-line field (slui_text_input) takes it too: Ctrl+L in a browser
+// selects the whole address (Starlight of SLUI SDK 1.0.20).
 void slui_text_area_select(uint32_t id, uint32_t start, uint32_t end);
 // A tip under a control when the mouse rests on it (SLUI SDK 1.0.18): what an
 // icon-only button does ("Next picture"). Starlight shows it after a moment,
