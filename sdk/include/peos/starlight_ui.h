@@ -104,7 +104,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 23u
+#define SLUI_SDK_VERSION_PATCH 24u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -1153,6 +1153,13 @@ const char *slui_text_n(const char *key, uint32_t n);
 const char *slui_resource(const char *name);
 // The chosen language's code ("en" until Starlight says one).
 const char *slui_language(void);
+// The app's bundle folder ("/system/apps/voyager.app"), as Starlight said
+// it; "" until it does or for a program without one (SLUI SDK 1.0.24).
+const char *slui_app_bundle(void);
+// A folder the app's "Choose a file" was used in: Starlight keeps the last
+// few for this app, in /starlight/config/recent/<bundle>.cfg (newest
+// first), which the picker shows as Recent (SLUI SDK 1.0.24).
+void slui_recent_dir(const char *dir);
 uint32_t slui_sdk_version_u32(void);
 uint32_t slui_protocol_version(void);
 uint32_t slui_host_protocol_version(void);
