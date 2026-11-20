@@ -104,7 +104,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 24u
+#define SLUI_SDK_VERSION_PATCH 25u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -438,6 +438,10 @@ void slui_text_area_select(uint32_t id, uint32_t start, uint32_t end);
 // hides it at a click or when the mouse leaves. Declared in the frame, after
 // the control, every frame it should have it.
 void slui_tooltip(uint32_t id, const char *text);
+// The same tip over a part of the body that is no control: a button the app
+// draws in its own pixels (Orfeus's player). Declared in the frame, every
+// frame it should have it, in the same order (SLUI SDK 1.0.25).
+void slui_tip_zone(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const char *text);
 // A password field: its text shown as asterisks and never copied to the
 // clipboard, each frame it is drawn (SLUI SDK 1.0.16). The app still gets
 // the real text in SLUI_EVENT_TEXT_INPUT.
