@@ -148,6 +148,7 @@ enum {
     PEOS_SYS_fb_modes = 142,         // rdi=peos_fb_modes_t*, rsi=its size -> 0/-1 (display; peos/display.h)
     PEOS_SYS_proc_memory = 144,      // rdi=pid -> bytes of memory its address space holds, or -1 (no capability)
     PEOS_SYS_audio_info = 143,       // rdi=peos_audio_info_t*, rsi=its size -> 0/-1 (peos/audio_info.h)
+    PEOS_SYS_audio_set_output = 145, // rdi=PEOS_AUDIO_OUT_SPEAKER or 0 (the headphones when in) -> 0/-1 (audio)
     PEOS_SYS_mprotect = 141,         // rdi=addr, rsi=len, rdx=PEOS_PROT_* (READ, READ|WRITE or READ|EXEC) -> 0/-1 (jit)       // rdi=gpu fd, rsi=cmd, rdx=len (bytes) -> fd "done", or -1 (gpu; virgl)
 };
 

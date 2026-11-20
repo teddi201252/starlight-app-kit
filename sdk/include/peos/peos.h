@@ -328,6 +328,10 @@ int64_t peos_fb_set_mode(uint32_t width, uint32_t height);
 int64_t peos_fb_modes(peos_fb_modes_t *out);
 // The sound card: whether there is one, its name, its outputs, the volume (peos/audio_info.h).
 int64_t peos_audio_info(peos_audio_info_t *out);
+// The output (peos/audio_info.h): PEOS_AUDIO_OUT_SPEAKER, the speakers even
+// with the headphones in (until they come out); 0, the headphones when they
+// are in. 0, or -1 (no "audio" capability, no card that can choose).
+int64_t peos_audio_set_output(uint32_t which);
 int64_t peos_cursor_set_visible(uint64_t visible);
 int64_t peos_cursor_move_abs(uint32_t x, uint32_t y);
 int64_t peos_cursor_set_image_rgba(const void *rgba, uint32_t width, uint32_t height,
