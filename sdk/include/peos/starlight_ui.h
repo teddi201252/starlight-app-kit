@@ -40,6 +40,7 @@ typedef enum {
     // held (bit 0 left, 1 right, 2 middle), mods the modifiers, wheel the
     // notches (up positive). A press there gives the pixels the keyboard
     // (SLUI_EVENT_CHAR) and is followed until it is let go, also outside.
+    // A press in a slui_press_zone comes as these too (SLUI SDK 1.0.26).
     SLUI_EVENT_POINTER = 18,
     // A character typed while the pixels have the keyboard (or, in an app
     // without pixels, while no control has it: SLUI SDK 1.0.11): text
@@ -104,7 +105,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 25u
+#define SLUI_SDK_VERSION_PATCH 26u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -442,6 +443,14 @@ void slui_tooltip(uint32_t id, const char *text);
 // draws in its own pixels (Orfeus's player). Declared in the frame, every
 // frame it should have it, in the same order (SLUI SDK 1.0.25).
 void slui_tip_zone(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const char *text);
+// A part of the body where a press with the left button on no control is
+// the app's (SLUI SDK 1.0.26): Curiosity's rectangle, pressing under the
+// last row and dragging. The app then gets SLUI_EVENT_POINTER (DOWN, MOVE,
+// UP; value x value2 from the body's top left, 0 when out of it on that
+// side; mods the modifiers) until the button is let go, also outside the
+// window. A press on a control there is the control's, as always. Declared
+// in the frame, every frame it should have it.
+void slui_press_zone(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 // A password field: its text shown as asterisks and never copied to the
 // clipboard, each frame it is drawn (SLUI SDK 1.0.16). The app still gets
 // the real text in SLUI_EVENT_TEXT_INPUT.
@@ -502,6 +511,9 @@ typedef enum {
     SLUI_SURF_NEON_FLAT = 9,
     SLUI_SURF_DROP_EDGE = 10,
     SLUI_SURF_DROP_FILL = 11,
+    // SLUI SDK 1.0.26: the rectangle that chooses (design/curiosity/,
+    // "Scegliere con un rettangolo"): see-through neon, a 1.5 px neon edge.
+    SLUI_SURF_BAND = 12,
 } slui_surface_kind_t;
 
 typedef enum {
