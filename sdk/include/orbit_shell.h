@@ -10,11 +10,16 @@ typedef uint64_t (*orbit_shell_execv_fn)(const char *path, const char *arg_str, 
 // `history` lists the commands, `history -c` forgets them (the editor keeps them).
 typedef void (*orbit_shell_history_fn)(int clear, void *ctx);
 
+// `open <file>`: the desktop opens file (absolute) with the app bundle
+// (peos/openwith.h chose it); NULL where there is no desktop.
+typedef void (*orbit_shell_open_fn)(const char *bundle, const char *file, void *ctx);
+
 typedef struct {
     orbit_shell_write_fn write;
     orbit_shell_execv_fn execv;
     orbit_shell_history_fn history;
     void *ctx;
+    orbit_shell_open_fn open_file;   // last: older callers leave it NULL
 } orbit_shell_io_t;
 
 const char *orbit_shell_prompt(void);

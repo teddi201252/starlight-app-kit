@@ -9,10 +9,9 @@ extern "C" {
  * also leaves the file system to the other programs between two pieces
  * (a folder removed in one call held it for everybody until it was gone).
  *
- * Started by init; it owns the name "fileop". Only a client with both
- * "fs.write" and "mount" may connect: the apps that see whole disks
- * (Curiosity, Settings, the Installer, the Terminal), since fileopd works
- * on any path.
+ * Started by init; it owns the name "fileop". Only a client with the
+ * capability "fileop" may connect (Curiosity and its window of the
+ * operations; system apps plan, phase 5), since fileopd works on any path.
  *
  * Every request is one connection to "fileop": one fileop_req_t, then for
  * FILEOP_OP_ADD its `count` paths, '\n' after each, in messages of at most

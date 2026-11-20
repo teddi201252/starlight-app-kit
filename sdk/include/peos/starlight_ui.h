@@ -83,6 +83,12 @@ typedef enum {
     // is still held: answer with slui_drag_files (the row's files, or the
     // chosen ones). The row's click is cancelled.
     SLUI_EVENT_DRAG_BEGIN = 27,
+    // Files dragged over this window (SLUI SDK 1.0.23): id 1 and value x
+    // value2 the pointer, from the body's top left, as it moves; id 0 once
+    // when they leave (let go, Esc, or elsewhere). Where they would land can
+    // light up (design/curiosity/, "Trascinare dentro Curiosity"). Only to an
+    // app that takes files and gave slui_drag_rows.
+    SLUI_EVENT_DRAG_OVER = 28,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
@@ -98,7 +104,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 22u
+#define SLUI_SDK_VERSION_PATCH 23u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -351,6 +357,9 @@ void slui_button_state(uint32_t id,
 void slui_button_primary(uint32_t id,
                          uint32_t x, uint32_t y, uint32_t w, uint32_t h,
                          uint8_t enabled, const char *text);
+// The lit key of a group (the = of the Calculator): neon, its label night;
+// whiter under the mouse. Answered with SLUI_EVENT_BUTTON (SLUI SDK 1.0.23).
+void slui_button_neon(uint32_t id, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const char *text);
 // A colour to choose (an accent): a round raised button of size x size with
 // a dot of r,g,b, larger and glowing when chosen. Answered with
 // SLUI_EVENT_BUTTON.
@@ -482,6 +491,13 @@ typedef enum {
     SLUI_SURF_NIGHT_GLOW = 5,
     SLUI_SURF_NEON = 6,       // a lit dot or bar
     SLUI_SURF_NIGHT_FLAT = 7, // night with no shadow
+    // SLUI SDK 1.0.23 (an older Starlight refuses them): the neon key under
+    // the mouse and pressed, and where a dragged file lands: DROP_EDGE, then
+    // DROP_FILL 2 px inside it (design/curiosity/, "Trascinare dentro Curiosity").
+    SLUI_SURF_NEON_HI = 8,
+    SLUI_SURF_NEON_FLAT = 9,
+    SLUI_SURF_DROP_EDGE = 10,
+    SLUI_SURF_DROP_FILL = 11,
 } slui_surface_kind_t;
 
 typedef enum {
@@ -1154,6 +1170,10 @@ void slui_open_file_with(const char *bundle_path, const char *file);
 // end the app but sends it SLUI_EVENT_CLOSE_REQUEST. Sent to Starlight only
 // when it changes: call it after every change of the app's "dirty" state.
 void slui_close_guard(int on);
+// The app's window to the dock, as its "-" (SLUI SDK 1.0.23): the answer
+// to a SLUI_EVENT_CLOSE_REQUEST of an app whose work goes on (the window of
+// the file operations).
+void slui_minimize(void);
 // Dragging files out of the app (SLUI SDK 1.0.21): call it while the left
 // button is held, when the drag starts (a press on a file, then a move of a
 // few pixels). Starlight shows the files by the pointer from then on, also

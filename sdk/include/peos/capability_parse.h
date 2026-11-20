@@ -31,6 +31,7 @@ static const struct {
     { "gpu", PEOS_CAP_GPU },
     { "time", PEOS_CAP_TIME },
     { "jit", PEOS_CAP_JIT },
+    { "fileop", PEOS_CAP_FILEOP },
 };
 
 /* Returns 1 and sets *out when [name, name+len) is a known capability. */
