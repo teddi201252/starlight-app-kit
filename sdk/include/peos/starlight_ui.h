@@ -78,6 +78,11 @@ typedef enum {
     // place in the group (0 first), keycode how many files the group has,
     // value x value2 where the pointer was let go, from the body's top left.
     SLUI_EVENT_DROP_FILE = 26,
+    // A drag starts from one of the rows given to slui_drag_rows (SLUI SDK
+    // 1.0.22): id the row's list item, mods the modifiers. The left button
+    // is still held: answer with slui_drag_files (the row's files, or the
+    // chosen ones). The row's click is cancelled.
+    SLUI_EVENT_DRAG_BEGIN = 27,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
@@ -93,7 +98,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 21u
+#define SLUI_SDK_VERSION_PATCH 22u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -495,6 +500,19 @@ void slui_label_align(uint32_t x, uint32_t y, slui_align_t align, const char *te
                       uint8_t r, uint8_t g, uint8_t b);
 void slui_label_align_theme(uint32_t x, uint32_t y, slui_align_t align, slui_color_token_t token,
                             const char *text);
+// A label in the box x, y, w, h (SLUI SDK 1.0.22), in the face of slui_face:
+// in the middle of its height by the rule of the SLUI controls (a button's
+// text: its capitals centred), on the left, in the middle or on the right
+// of w. For any text that belongs to a box (a number in its circle, a
+// button's label, a row by its icon): no guessed "y + 10" (AGENTS.md, the
+// design is the implementation).
+void slui_label_in(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_align_t align, const char *text,
+                   uint8_t r, uint8_t g, uint8_t b);
+void slui_label_in_theme(uint32_t x, uint32_t y, uint32_t w, uint32_t h, slui_align_t align,
+                         slui_color_token_t token, const char *text);
+// Where a label's y goes for its capitals to sit in the middle of y .. y + h
+// (the face of slui_face, as slui_label_in).
+uint32_t slui_text_center_y(uint32_t y, uint32_t h);
 // A ring of outer diameter size and width thick: the track, then the fill
 // clockwise from the top to permille (0..1000), with round ends.
 void slui_ring(uint32_t x, uint32_t y, uint32_t size, uint32_t thick, uint32_t permille,
@@ -1146,6 +1164,12 @@ void slui_close_guard(int on);
 // until the button is up. At most SLUI_DRAG_MAX files; paths are absolute.
 #define SLUI_DRAG_MAX 16u
 void slui_drag_files(const char *const *paths, uint32_t count);
+// The list items a drag can start from (SLUI SDK 1.0.22): ids first ..
+// first + count - 1. A press on one and a move of a few pixels with the
+// button held gives SLUI_EVENT_DRAG_BEGIN instead of the row's click. Once
+// is enough (0, 0: none). Files let go on the app's own window come back to
+// it as SLUI_EVENT_DROP_FILE (a folder of its own).
+void slui_drag_rows(uint32_t first_id, uint32_t count);
 void slui_set_accent(uint8_t r, uint8_t g, uint8_t b);
 void slui_set_accent_a(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void slui_theme_reset_override(void);
