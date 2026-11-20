@@ -36,7 +36,28 @@ enum {
     NET_OP_CRASH = 9,        /* tests (needs "debug"): netd faults on purpose */
     NET_OP_WAIT_ADDRESS = 10,/* timeout_ms: reply once there is an address (now, if there is) -> cfg */
     NET_OP_HOSTNAME = 11,    /* name: the computer's name, in DHCP (option 12); a lease again now */
+    /* More cards at once (docs/multi-netif-plan.md, SLUI SDK 1.0.28). The
+     * other operations are about the interface in use (the default route). */
+    NET_OP_IF_GET = 12,      /* port = index -> net_if_rep_t (not net_rep_t); NET_ERR past the last */
+    NET_OP_IF_CONFIG_SET = 13,/* port = index, reserved = 1: DHCP, 0: cfg by hand */
 };
+
+/* A network interface: one card, its link and its address. */
+typedef struct {
+    uint32_t index;          /* 0, 1...: the card's (peos_nic_open) */
+    uint8_t media;           /* 1 cable, 2 Wi-Fi, 0 unknown (peos_nic_info_t) */
+    uint8_t link_up;
+    uint8_t in_use;          /* the default route goes out of it */
+    uint8_t dhcp;            /* 1: the address by DHCP; 0: by hand */
+    char name[16];           /* the driver: "e1000", "rtl8169", "bcm4364" */
+    peos_netcfg_t cfg;       /* ip (0.0.0.0: none yet), netmask, gateway, dns, mac */
+} net_iface_t;
+
+typedef struct {
+    uint32_t op;
+    int32_t status;
+    net_iface_t iface;
+} net_if_rep_t;
 
 enum {
     NET_OK = 0,
@@ -133,6 +154,10 @@ int net_debug_crash(void);
 /* The computer's name (Settings): netd sends it in DHCP and asks for the
  * address again, so the router knows it now. NET_OK or a NET_ERR_* value. */
 int net_set_hostname(const char *name);
+/* Interface index (0, 1...): NET_OK and *out, or NET_ERR past the last one. */
+int net_if_get(uint32_t index, net_iface_t *out);
+/* An interface's address: by DHCP (dhcp 1; cfg not used), or cfg by hand. */
+int net_if_config_set(uint32_t index, const peos_netcfg_t *cfg, int dhcp);
 /* The name as it goes on the network: letters, digits and '-', at most 63
  * (spaces become '-'); empty when nothing of it is left. */
 void net_hostname_clean(const char *in, char *out, size_t cap);
