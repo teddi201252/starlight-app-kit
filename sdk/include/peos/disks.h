@@ -9,7 +9,9 @@ extern "C" {
 #endif
 #include <stdint.h>
 
-#define PEOS_DISKS_MAX 16u
+/* Disks and partitions listed at most (64 since 2026-11-21: 16 left out the
+ * sticks of a PC with four internal disks; the kernel lists USB ones first). */
+#define PEOS_DISKS_MAX 64u
 
 enum {
     PEOS_DISK_OTHER = 0,

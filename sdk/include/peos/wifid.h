@@ -28,6 +28,7 @@ enum {
     WIFID_OP_SAVED = 3,        /* -> the saved networks (names only), enabled */
     WIFID_OP_FORGET = 4,       /* ssid */
     WIFID_OP_SET_ENABLED = 5,  /* enabled: Wi-Fi on or off (off: disconnected, kept off) */
+    WIFID_OP_SET_BAND = 6,     /* ssid, band (PEOS_WIFI_BAND_AUTO/_2G/_5G) of a saved network; joined: joins again on it */
 };
 
 enum {
@@ -47,12 +48,14 @@ typedef struct {
     uint8_t save;
     uint8_t enabled;
     char password[64];  /* NUL-terminated */
+    uint8_t band;       /* SET_BAND: PEOS_WIFI_BAND_AUTO/_2G/_5G */
 } wifid_req_t;
 
 typedef struct {
     uint8_t ssid_len;
     uint8_t ssid[PEOS_WIFI_SSID_MAX_LEN];
     uint8_t security;
+    uint8_t band;       /* the band chosen for it: PEOS_WIFI_BAND_AUTO/_2G/_5G */
 } wifid_net_t;
 
 typedef struct {
@@ -70,6 +73,9 @@ int wifid_disconnect(void);
 int wifid_saved(wifid_rep_t *out);
 int wifid_forget(const uint8_t *ssid, size_t ssid_len);
 int wifid_set_enabled(int enabled);
+/* The band to join a saved network on (PEOS_WIFI_BAND_AUTO/_2G/_5G),
+ * remembered; if it is the network joined now, wifid joins it again. */
+int wifid_set_band(const uint8_t *ssid, size_t ssid_len, uint8_t band);
 
 /* The saved networks, as wifid keeps them (libpeos/wifi_saved.c: plain C,
  * tested on the host). */
@@ -78,6 +84,7 @@ typedef struct {
     uint8_t ssid[PEOS_WIFI_SSID_MAX_LEN];
     uint8_t security;
     char pmk[65];       /* 64 hex digits, or "" for an open network */
+    uint8_t band;       /* PEOS_WIFI_BAND_AUTO/_2G/_5G */
 } wifi_saved_net_t;
 
 typedef struct {
@@ -86,13 +93,19 @@ typedef struct {
     wifi_saved_net_t nets[WIFID_SAVED_MAX];   /* the oldest first */
 } wifi_saved_t;
 
-/* networks.cfg: "enabled=1" and one "net=<ssid in hex> <security> <pmk|->"
- * per network. Unknown or broken lines are skipped. */
+/* networks.cfg: "enabled=1" and one "net=<ssid in hex> <security> <pmk|->
+ * [band]" per network (band 0 automatic, 1 2.4 GHz, 2 5 GHz; without it,
+ * automatic: files written before the band still read). Unknown or broken
+ * lines are skipped. */
 void wifi_saved_parse(wifi_saved_t *out, const char *text, size_t len);
 size_t wifi_saved_format(const wifi_saved_t *in, char *out, size_t cap);
 int wifi_saved_find(const wifi_saved_t *s, const uint8_t *ssid, size_t ssid_len);
-/* Adds or replaces (it becomes the newest); a full list drops the oldest. */
+/* Adds or replaces (it becomes the newest, keeping the band chosen for it);
+ * a full list drops the oldest. */
 void wifi_saved_put(wifi_saved_t *s, const uint8_t *ssid, size_t ssid_len, uint8_t security, const char *pmk);
+/* Sets the band of a saved network: 1, or 0 if it is not saved or the band
+ * is not one of PEOS_WIFI_BAND_AUTO/_2G/_5G. */
+int wifi_saved_set_band(wifi_saved_t *s, const uint8_t *ssid, size_t ssid_len, uint8_t band);
 int wifi_saved_forget(wifi_saved_t *s, const uint8_t *ssid, size_t ssid_len);
 /* The strongest saved network among those in range (supported security, the
  * same as saved): its index in aps, *saved_index its place in s; -1 if none. */

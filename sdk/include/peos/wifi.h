@@ -73,8 +73,16 @@ typedef struct {
     uint8_t bssid[PEOS_WIFI_BSSID_LEN];
     uint8_t use_bssid;
     uint8_t step;      // PEOS_WIFI_STEP_*: 0 the whole join, or one step of it (diagnosis)
-    uint8_t reserved[2];
+    uint8_t band;      // PEOS_WIFI_BAND_AUTO/_2G/_5G: which band to join on (was reserved: 0 = automatic)
+    uint8_t reserved[1];
 } peos_wifi_connect_params_t;
+
+/* The band asked for in peos_wifi_connect_params_t.band. If no access point
+ * of that name is heard on the asked band, the driver falls back to its
+ * automatic choice. */
+#define PEOS_WIFI_BAND_AUTO 0u
+#define PEOS_WIFI_BAND_2G   1u
+#define PEOS_WIFI_BAND_5G   2u
 
 typedef struct {
     uint8_t state;

@@ -17,6 +17,7 @@ extern "C" {
 #include "peos/gpu.h"
 #include "peos/display.h"
 #include "peos/audio_info.h"
+#include "peos/mic.h"
 
 typedef struct {
     uint32_t width;
@@ -332,6 +333,34 @@ int64_t peos_audio_info(peos_audio_info_t *out);
 // with the headphones in (until they come out); 0, the headphones when they
 // are in. 0, or -1 (no "audio" capability, no card that can choose).
 int64_t peos_audio_set_output(uint32_t which);
+// A capture stream (peos/mic.h; needs "microphone"): PEOS_MIC_DEFAULT,
+// PEOS_MIC_USB or PEOS_MIC_BUILTIN -> a descriptor that reads 48 kHz S16
+// stereo frames (peos_fread waits for 10 ms, peos_fread_nb does not), waited
+// on with PEOS_WAIT_READ; or -1 (no right, no such microphone).
+int64_t peos_mic_open(uint32_t which);
+// The microphones there, the one recording, the counts (peos/mic.h).
+int64_t peos_mic_info(peos_mic_info_t *out);
+// A descriptor readable (8 bytes, a change counter) when a sound device or
+// microphone comes or goes, or a choice or the microphone's volume changes;
+// readable at once the first time (peos/audio_info.h). -1: none.
+int64_t peos_audio_watch(void);
+// The output or the microphone to use (PEOS_AUDIO_CHOOSE_OUTPUT, _INPUT) by
+// its name (peos_audio_info_t's controller or usb_name; peos_mic_info_t's
+// usb_name or PEOS_MIC_BUILTIN_NAME); "" or NULL: automatic (the USB device
+// when one is in). Kept until the next restart: Settings writes it in
+// /system/config/audio.cfg (output=, input=). 0, or -1 (no "audio").
+int64_t peos_audio_choose(uint32_t what, const char *name);
+// How loud the microphones record, 0..100 (PEOS_MIC_VOLUME_UNITY: as they
+// come). 0, or -1 (no "audio").
+int64_t peos_mic_set_volume(uint32_t volume);
+// Every output and microphone, by name (peos/audio_info.h): at most max
+// written into out; how many there are, or -1.
+int64_t peos_audio_devices(peos_audio_device_t *out, uint32_t max);
+// /system/config/audio.cfg as the kernel has it now: the volume, the output
+// and the microphone chosen by hand, the microphone's volume (the kernel
+// reads it at boot). Whoever changes one of them calls it, so that none of
+// the others is lost. 0, or -1 (not written: the live ISO).
+int64_t peos_audio_save_config(void);
 int64_t peos_cursor_set_visible(uint64_t visible);
 int64_t peos_cursor_move_abs(uint32_t x, uint32_t y);
 int64_t peos_cursor_set_image_rgba(const void *rgba, uint32_t width, uint32_t height,
