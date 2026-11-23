@@ -78,6 +78,8 @@ typedef struct {
     uint8_t secure;
     uint8_t host_only;          /* no Domain=: only that host */
     uint8_t http_only;          /* HttpOnly: not for the page's scripts */
+    uint8_t same_site;          /* SameSite: 0 not said, 1 Strict, 2 Lax, 3 None (kept, not
+                                   applied yet); in the padding before expires: same size */
     int64_t expires;            /* Unix seconds, 0: for the session */
 } http_cookie_t;
 
