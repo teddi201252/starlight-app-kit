@@ -27,6 +27,11 @@ tls_conn_t *tls_open(int64_t tcp, const char *host, uint64_t timeout_ns, char *e
 int64_t tls_write(tls_conn_t *t, const void *buf, size_t len);
 /* -> bytes, 0 at the end, NET_ERR_TIMEOUT, or -1 (broken, or not authentic). */
 int64_t tls_read(tls_conn_t *t, void *buf, size_t cap, uint64_t timeout_ns);
+/* The same, offering HTTP/2 too (ALPN "h2", then "http/1.1"): tls_alpn says
+ * which the server chose. */
+tls_conn_t *tls_open_h2(int64_t tcp, const char *host, uint64_t timeout_ns, char *err, size_t err_cap);
+/* The protocol agreed in the handshake: "h2", "http/1.1", or "" (none said). */
+const char *tls_alpn(const tls_conn_t *t);
 /* "TLSv1.3", "TLSv1.2"; the cipher suite's name. */
 const char *tls_version(const tls_conn_t *t);
 const char *tls_cipher(const tls_conn_t *t);
