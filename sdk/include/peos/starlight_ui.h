@@ -110,7 +110,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 29u
+#define SLUI_SDK_VERSION_PATCH 31u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -366,6 +366,41 @@ void slui_button_primary(uint32_t id,
 // The lit key of a group (the = of the Calculator): neon, its label night;
 // whiter under the mouse. Answered with SLUI_EVENT_BUTTON (SLUI SDK 1.0.23).
 void slui_button_neon(uint32_t id, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const char *text);
+// A tab of a row of tabs (SLUI SDK 1.0.30; design/pegasus-barra/): a pill of
+// w x h, its title on the left (cut with an ellipsis when it does not fit),
+// a x at its right. The open one (current) is night with a neon dot, the
+// others raised. A click sends SLUI_EVENT_BUTTON with id, a click on the x
+// with close_id. An older Starlight draws nothing.
+void slui_tab(uint32_t id, uint32_t close_id, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t current,
+              uint8_t enabled, const char *text);
+// An item of a menu's panel (SLUI SDK 1.0.31; design/pegasus-barra/, the
+// plancia, on a SLUI_SURF_PANEL): by day raised like a button, higher under
+// the mouse; at night #1C2440, under the mouse #26305A with a neon hairline.
+//   SLUI_MENU_ROW     text (15 px) on the left, hint (a shortcut, mono 12) on
+//                     the right: 40 high in the design;
+//   SLUI_MENU_TILE    text (12 px) under the app's 22 px icon, drawn after
+//                     it at x + (w - 22) / 2, y + (h - 45) / 2;
+//   SLUI_MENU_ROUND   a round button, the app's icon in it;
+//   SLUI_MENU_DANGER  text (14 px) centred, in the danger colour;
+//   SLUI_MENU_SWITCH  text (15 px) on the left, a 40 x 24 switch at the right
+//                     (on with SLUI_MENU_ON); the whole row is the switch;
+//   SLUI_MENU_OPEN    the bar's button while its panel is open (night, at
+//                     night with a neon ring), the app's icon in it.
+// SLUI_MENU_CHOSEN draws it as under the mouse: the app's keyboard choice
+// (its arrows). A click sends SLUI_EVENT_BUTTON with id. An older Starlight
+// draws nothing.
+typedef enum {
+    SLUI_MENU_ROW = 0,
+    SLUI_MENU_TILE = 1,
+    SLUI_MENU_ROUND = 2,
+    SLUI_MENU_DANGER = 3,
+    SLUI_MENU_SWITCH = 4,
+    SLUI_MENU_OPEN = 5,
+} slui_menu_kind_t;
+#define SLUI_MENU_CHOSEN 1u
+#define SLUI_MENU_ON 2u
+void slui_menu_item(uint32_t id, slui_menu_kind_t kind, uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                    uint32_t flags, uint8_t enabled, const char *text, const char *hint);
 // A colour to choose (an accent): a round raised button of size x size with
 // a dot of r,g,b, larger and glowing when chosen. Answered with
 // SLUI_EVENT_BUTTON.
@@ -519,6 +554,12 @@ typedef enum {
     // SLUI SDK 1.0.26: the rectangle that chooses (design/curiosity/,
     // "Scegliere con un rettangolo"): see-through neon, a 1.5 px neon edge.
     SLUI_SURF_BAND = 12,
+    // SLUI SDK 1.0.31: a menu's panel over the window (design/pegasus-barra/,
+    // the plancia): by day pearl raised like a window (9/20), at night night
+    // with a neon hairline; and a group of rows in it, by day inset, at night
+    // #1C2440.
+    SLUI_SURF_PANEL = 13,
+    SLUI_SURF_PANEL_WELL = 14,
 } slui_surface_kind_t;
 
 typedef enum {
