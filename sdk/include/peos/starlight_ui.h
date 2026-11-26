@@ -90,6 +90,11 @@ typedef enum {
     // light up (design/curiosity/, "Trascinare dentro Curiosity"). Only to an
     // app that takes files and gave slui_drag_rows.
     SLUI_EVENT_DRAG_OVER = 28,
+    // The app's window became the active one or stopped being it (SLUI SDK
+    // 1.0.29): value 1 active (it gets the keyboard), 0 not; value2 1 when
+    // it is minimized in the dock. Once when the window opens, then at each
+    // change. A browser's document.hasFocus() and visibilityState.
+    SLUI_EVENT_ACTIVE = 29,
 } slui_event_type_t;
 
 #define SLUI_CLIP_COPY 1u
@@ -105,7 +110,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 28u
+#define SLUI_SDK_VERSION_PATCH 29u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
