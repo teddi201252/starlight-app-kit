@@ -27,7 +27,8 @@ typedef uint64_t peos_cap_mask_t;
 #define PEOS_CAP_JIT        (1ull << 17)   /* writes code and runs it: pages RW, then RX (never both) */
 #define PEOS_CAP_FILEOP     (1ull << 18)   /* ask fileopd to copy, move, delete (no system call: fileopd checks it) */
 #define PEOS_CAP_MICROPHONE (1ull << 19)   /* record from a microphone (peos/mic.h) */
-#define PEOS_CAP_ALL        ((1ull << 20) - 1ull)
+#define PEOS_CAP_NET_LISTEN (1ull << 20)   /* accept TCP connections (net_tcp_listen; no system call: netd checks it) */
+#define PEOS_CAP_ALL        ((1ull << 21) - 1ull)
 
 /* target_pid == 0 addresses the calling task. */
 int64_t peos_cap_query(uint64_t target_pid, peos_cap_mask_t *out_caps);

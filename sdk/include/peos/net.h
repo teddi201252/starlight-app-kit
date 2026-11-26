@@ -15,6 +15,13 @@ extern "C" {
  *   TCP connection: messages are pieces of the stream. An empty message from
  *     netd is the end of the stream; the channel closing without it is an
  *     error (reset, timeout). Closing it closes the connection.
+ * TCP_LISTEN (docs/pegasus-devtools-plan.md, phase 1; needs "net.listen")
+ * answers with a listener, a channel of its own too: every connection that
+ * finishes its handshake on that port comes on it as one net_tcp_accepted_t
+ * message with the connection attached (the same kind of channel as
+ * TCP_CONNECT's). NET_OP_TCP_UNLISTEN goes on the listener itself; netd
+ * then closes its end. Closing the listener (or the process ending) stops
+ * the listening too; connections already accepted stay.
  * The functions below wrap all of it. */
 
 #include <stddef.h>
@@ -40,7 +47,17 @@ enum {
      * other operations are about the interface in use (the default route). */
     NET_OP_IF_GET = 12,      /* port = index -> net_if_rep_t (not net_rep_t); NET_ERR past the last */
     NET_OP_IF_CONFIG_SET = 13,/* port = index, reserved = 1: DHCP, 0: cfg by hand */
+    NET_OP_TCP_LISTEN = 14,  /* port (needs "net.listen") -> listener */
+    NET_OP_TCP_UNLISTEN = 15,/* sent on the listener, not on "net": stop listening */
 };
+
+/* On a listener: a connection came, attached as fds[0]. */
+typedef struct {
+    uint32_t op;             /* NET_OP_TCP_LISTEN */
+    uint8_t ip[4];           /* the peer */
+    uint16_t port;           /* the peer's port */
+    uint16_t local_port;     /* the port listened on */
+} net_tcp_accepted_t;
 
 /* A network interface: one card, its link and its address. */
 typedef struct {
@@ -63,12 +80,13 @@ enum {
     NET_OK = 0,
     NET_ERR = -1,            /* bad request */
     NET_ERR_TIMEOUT = -2,
-    NET_ERR_REFUSED = -3,    /* TCP reset, port in use */
+    NET_ERR_REFUSED = -3,    /* TCP reset, port in use (also a port already listened on) */
     NET_ERR_NO_ADDRESS = -4, /* no IPv4 address yet (DHCP not done) */
     NET_ERR_UNREACHABLE = -5,/* ARP gave no answer */
     NET_ERR_NOT_FOUND = -6,  /* DNS: no such name */
     NET_ERR_BUSY = -7,       /* netd has no room for another connection */
-    NET_ERR_DENIED = -8,
+    NET_ERR_DENIED = -8,     /* a capability is missing ("debug", "net.listen") */
+    NET_ERR_AGAIN = -9,      /* net_tcp_accept: no connection waiting now */
 };
 
 #define NET_NAME_MAX 128u
@@ -135,6 +153,40 @@ typedef struct {
 } net_tcp_reader_t;
 void net_tcp_reader_init(net_tcp_reader_t *r, int64_t conn);
 int64_t net_tcp_read(net_tcp_reader_t *r, void *out, size_t cap, uint64_t timeout_ns);
+/* Closes a connection (the same as peos_fclose): what was sent still goes,
+ * then the end of the stream. */
+void net_tcp_close(int64_t conn);
+
+/* Listening (needs the "net.listen" capability, besides "network").
+ *
+ * net_tcp_listen -> a listener for that port on every interface, or
+ *   NET_ERR_DENIED (no "net.listen"), NET_ERR_REFUSED (the port is already
+ *   listened on), NET_ERR_BUSY (netd has no room), NET_ERR (port 0).
+ *   The listener is a descriptor: peos_wait on it with PEOS_WAIT_READ is
+ *   ready when a connection is waiting to be accepted (or when netd is gone:
+ *   then net_tcp_accept returns -1). Up to 16 finished connections wait
+ *   there, and up to 4 handshakes at once per port; beyond that new ones are
+ *   reset.
+ * net_tcp_accept -> a connection (net_tcp_send, net_tcp_reader_init +
+ *   net_tcp_read, net_tcp_close, exactly like net_tcp_connect's), or
+ *   NET_ERR_AGAIN when none is waiting (it never blocks), or -1 when the
+ *   listener is broken (netd restarted: listen again).
+ *   net_tcp_accept_peer also gives the peer's address and port.
+ * net_tcp_unlisten: stops listening and closes the listener; connections
+ *   not accepted yet are reset, those accepted stay. When it returns the
+ *   port can be listened on again. Ending the process does the same.
+ *
+ * Waiting for a connection's data without polling: the connection is a
+ * descriptor too. peos_wait on it with PEOS_WAIT_READ is ready when a piece
+ * of the stream, the end of the stream, or the break is there; then call
+ * net_tcp_read(r, ..., 0) until it returns NET_ERR_TIMEOUT (nothing more
+ * now), 0 (the end) or -1 (broken). Do not wait while the reader still holds
+ * bytes of a piece (r->pos < r->len): read them first. So one peos_wait can
+ * hold the listener and every connection, with the window's own events. */
+int64_t net_tcp_listen(uint16_t port);
+int64_t net_tcp_accept(int64_t listener);
+int64_t net_tcp_accept_peer(int64_t listener, uint8_t peer_ip[4], uint16_t *peer_port);
+void net_tcp_unlisten(int64_t listener);
 
 int net_resolve(const char *name, uint8_t out_ip[4], uint64_t timeout_ns);
 int net_config_get(peos_netcfg_t *out);

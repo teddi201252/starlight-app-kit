@@ -33,6 +33,7 @@ static const struct {
     { "jit", PEOS_CAP_JIT },
     { "fileop", PEOS_CAP_FILEOP },
     { "microphone", PEOS_CAP_MICROPHONE },
+    { "net.listen", PEOS_CAP_NET_LISTEN },
 };
 
 /* Returns 1 and sets *out when [name, name+len) is a known capability. */
