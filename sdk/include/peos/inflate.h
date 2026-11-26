@@ -47,6 +47,11 @@ typedef struct {
 
 /* Decompresses the whole stream: INFLATE_OK or an INFLATE_ERR_*. */
 int inflate_run(inflate_t *z, inflate_wrap_t wrap, inflate_read_fn read, inflate_write_fn write, void *user);
+/* The same for an HTTP body: one with no bytes at all is empty, not broken
+ * (INFLATE_OK, nothing written). A 304, a 204 or a HEAD's answer says
+ * "Content-Encoding: gzip" with nothing after it (Wikipedia's load.php
+ * does, 2026-11-26). */
+int inflate_body(inflate_t *z, inflate_wrap_t wrap, inflate_read_fn read, inflate_write_fn write, void *user);
 #ifdef __cplusplus
 }
 #endif

@@ -1,4 +1,9 @@
 #pragma once
+/* A named guard too: the compat build sees this header from two places
+ * (userland/include and its copy under peos-base/), and #pragma once
+ * treats them as two files. */
+#ifndef PEOS_ALLOC_H
+#define PEOS_ALLOC_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,3 +30,4 @@ void peos_alloc_stats(peos_alloc_stats_t *out);
 #ifdef __cplusplus
 }
 #endif
+#endif /* PEOS_ALLOC_H */
