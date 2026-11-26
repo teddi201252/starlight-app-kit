@@ -110,7 +110,7 @@ typedef enum {
 
 #define SLUI_SDK_VERSION_MAJOR 1u
 #define SLUI_SDK_VERSION_MINOR 0u
-#define SLUI_SDK_VERSION_PATCH 31u
+#define SLUI_SDK_VERSION_PATCH 32u
 #define SLUI_SDK_VERSION_U32 ((SLUI_SDK_VERSION_MAJOR << 16) | (SLUI_SDK_VERSION_MINOR << 8) | SLUI_SDK_VERSION_PATCH)
 
 #define SLUI_PROTOCOL_VERSION 1u
@@ -463,6 +463,11 @@ void slui_text_hint(uint32_t field_id, const char *hint);
 #define SLUI_TA_LINE_NUMBERS 1u   // the lines' numbers in a column on the left
 #define SLUI_TA_CURRENT_LINE 2u   // the caret's line marked while it has the keyboard
 #define SLUI_TA_CARET_EVENTS 4u   // SLUI_EVENT_TEXT_CARET when the caret moves
+// A one-line field as a browser's address bar (SLUI SDK 1.0.32, Pegasus):
+// a click into it while it does not have the keyboard selects all its text
+// (typing replaces it), a click while it has it places the caret, a double
+// click selects a word, a press dragged selects that range.
+#define SLUI_TA_SELECT_ON_FOCUS 8u
 void slui_text_area_options(uint32_t id, uint32_t flags);
 // What a search found in the area: count ranges of bytes [start, end), as
 // pairs in ranges (at most 256 are shown); current is the one shown
