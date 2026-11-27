@@ -156,6 +156,7 @@ enum {
     PEOS_SYS_mic_set_volume = 150,   // rdi=0..100 (50: as it comes) -> 0/-1 (audio; peos/mic.h)
     PEOS_SYS_audio_devices = 151,    // rdi=peos_audio_device_t*, rsi=max -> how many there are, or -1 (peos/audio_info.h)
     PEOS_SYS_gamepad_open = 152,     // -> fd: read peos_gamepad_record_t, write peos_gamepad_cmd_t, wait READ; or -1 (gamepad; peos/gamepad.h)
+    PEOS_SYS_bt_open = 153,          // rdi=adapter index or PEOS_BT_WATCH -> fd: HCI packets (H4) / peos_bt_info_t records, wait READ; or -1 (bluetooth; peos/bluetooth.h)
     PEOS_SYS_mprotect = 141,         // rdi=addr, rsi=len, rdx=PEOS_PROT_* (READ, READ|WRITE or READ|EXEC) -> 0/-1 (jit)       // rdi=gpu fd, rsi=cmd, rdx=len (bytes) -> fd "done", or -1 (gpu; virgl)
 };
 

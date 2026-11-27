@@ -343,6 +343,13 @@ int64_t peos_mic_open(uint32_t which);
 // change), takes peos_gamepad_cmd_t (vibration) and is waited on with
 // PEOS_WAIT_READ. Only the newest open one gets records. -1: no right.
 int64_t peos_gamepad_open(void);
+// A Bluetooth adapter (peos/bluetooth.h; needs "bluetooth", bluetoothd's):
+// index 0..PEOS_BT_MAX-1 -> a descriptor that reads and writes whole HCI
+// packets in H4 form (type byte first), one opener at a time; index
+// PEOS_BT_WATCH -> a descriptor that reads peos_bt_info_t records (the
+// adapters there, then each one that comes or goes). Waited on with
+// PEOS_WAIT_READ. -1: no right, no such adapter, already open.
+int64_t peos_bt_open(uint32_t index);
 // The microphones there, the one recording, the counts (peos/mic.h).
 int64_t peos_mic_info(peos_mic_info_t *out);
 // A descriptor readable (8 bytes, a change counter) when a sound device or

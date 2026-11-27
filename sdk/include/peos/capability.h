@@ -29,7 +29,8 @@ typedef uint64_t peos_cap_mask_t;
 #define PEOS_CAP_MICROPHONE (1ull << 19)   /* record from a microphone (peos/mic.h) */
 #define PEOS_CAP_NET_LISTEN (1ull << 20)   /* accept TCP connections (net_tcp_listen; no system call: netd checks it) */
 #define PEOS_CAP_GAMEPAD    (1ull << 21)   /* game controllers: buttons and vibration (peos/gamepad.h) */
-#define PEOS_CAP_ALL        ((1ull << 22) - 1ull)
+#define PEOS_CAP_BLUETOOTH  (1ull << 22)   /* Bluetooth adapters: raw HCI packets (peos/bluetooth.h; bluetoothd only) */
+#define PEOS_CAP_ALL        ((1ull << 23) - 1ull)
 
 /* target_pid == 0 addresses the calling task. */
 int64_t peos_cap_query(uint64_t target_pid, peos_cap_mask_t *out_caps);

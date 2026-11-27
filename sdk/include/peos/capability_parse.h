@@ -35,6 +35,7 @@ static const struct {
     { "microphone", PEOS_CAP_MICROPHONE },
     { "net.listen", PEOS_CAP_NET_LISTEN },
     { "gamepad", PEOS_CAP_GAMEPAD },
+    { "bluetooth", PEOS_CAP_BLUETOOTH },
 };
 
 /* Returns 1 and sets *out when [name, name+len) is a known capability. */
