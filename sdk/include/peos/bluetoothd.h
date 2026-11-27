@@ -31,6 +31,17 @@ extern "C" {
  * (the oldest replaced); entries not seen for BTD_DEVICE_FORGET_S are
  * dropped when the next search starts.
  *
+ * Connections and pairing (phase 3): PAIR connects to a device of the list
+ * (or a bonded one) and pairs with it, "Just Works" (LE Secure Connections
+ * when both sides have it, else legacy pairing); its keys are saved in
+ * BTD_BONDS_PATH and the link is encrypted; the connection stays. CONNECT
+ * connects to a bonded device and encrypts with its saved keys; DISCONNECT
+ * ends a connection; FORGET deletes the keys (and disconnects). While the
+ * radio is on and nothing else runs, the controller itself waits for the
+ * bonded devices (its filter accept list): one that turns on and
+ * advertises is connected and encrypted without anybody asking, with no
+ * work for the system meanwhile.
+ *
  * RELEASE is for diagnostic tools that talk HCI themselves (btcheck): while
  * the asking client's channel stays open bluetoothd closes the adapter and
  * reports it removed; when that channel closes, it takes the adapter back.
@@ -40,6 +51,9 @@ extern "C" {
 #define BTD_SERVICE_NAME "bluetooth"
 #define BTD_CONFIG_DIR "/system/config/bluetooth"
 #define BTD_POWER_PATH "/system/config/bluetooth/power.cfg"
+#define BTD_BONDS_PATH "/system/config/bluetooth/bonds.cfg"
+#define BTD_BONDS_MAX 8u
+#define BTD_CONNS_MAX 4u
 
 #define BTD_SCAN_DEFAULT_S 10u
 #define BTD_SCAN_MAX_S 30u
@@ -56,10 +70,12 @@ enum {
     BTD_OP_SCAN_START = 3,   /* arg: seconds (0: BTD_SCAN_DEFAULT_S, capped at BTD_SCAN_MAX_S) */
     BTD_OP_SCAN_STOP = 4,
     BTD_OP_LIST = 5,         /* arg: the first device; -> count devices in u.devices, total */
-    BTD_OP_PAIR = 6,         /* addr, addr_type: BTD_ERR_NOT_YET (phase 3) */
-    BTD_OP_FORGET = 7,       /* addr, addr_type: BTD_ERR_NOT_YET (phase 3) */
+    BTD_OP_PAIR = 6,         /* addr, addr_type: connect, pair, save the keys, encrypt; -> u.device */
+    BTD_OP_FORGET = 7,       /* addr, addr_type: delete its keys (and disconnect) */
     BTD_OP_STATS = 8,        /* -> u.stats */
     BTD_OP_RELEASE = 9,      /* let go of the adapter while this client stays connected */
+    BTD_OP_CONNECT = 10,     /* addr, addr_type: a bonded device: connect and encrypt; -> u.device */
+    BTD_OP_DISCONNECT = 11,  /* addr, addr_type */
 };
 
 /* Events (btd_msg_t.op when kind is BTD_MSG_EVENT) */
@@ -71,6 +87,10 @@ enum {
     BTD_EV_SCAN_STOPPED = 5,      /* u.status; total: the devices in the list */
     BTD_EV_DEVICE_FOUND = 6,      /* u.device: first seen in this search */
     BTD_EV_DEVICE_UPDATED = 7,    /* u.device: its name or appearance changed, or its signal (at most every 2 s) */
+    BTD_EV_CONNECTED = 8,         /* u.device */
+    BTD_EV_DISCONNECTED = 9,      /* u.device; count: the HCI reason */
+    BTD_EV_PAIRED = 10,           /* u.device (BTD_DEV_BONDED, BTD_DEV_SC) */
+    BTD_EV_ENCRYPTED = 11,        /* u.device: the link is encrypted (pairing, or the saved keys) */
 };
 
 /* btd_msg_t.status */
@@ -81,7 +101,11 @@ enum {
     BTD_ERR_OFF = -3,         /* the radio is off */
     BTD_ERR_BUSY = -4,        /* another command is under way: ask again */
     BTD_ERR_HCI = -5,         /* the controller refused or did not answer */
-    BTD_ERR_NOT_YET = -6,     /* defined, not done yet (pairing: phase 3) */
+    BTD_ERR_NOT_YET = -6,     /* defined, not done yet */
+    BTD_ERR_CONNECT = -7,     /* the connection did not come (the device away, off) */
+    BTD_ERR_PAIR = -8,        /* pairing failed (refused, a check that did not match, no answer) */
+    BTD_ERR_NOT_FOUND = -9,   /* not in the list, not bonded */
+    BTD_ERR_ENCRYPT = -10,    /* the device refused the saved keys (it forgot us) */
 };
 
 #define BTD_MSG_REPLY 1u
@@ -98,6 +122,10 @@ enum {
 #define BTD_DEV_NAME_COMPLETE 0x1u   /* the name came whole (AD type 0x09), not shortened (0x08) */
 #define BTD_DEV_CONNECTABLE 0x2u
 #define BTD_DEV_HAS_APPEARANCE 0x4u
+#define BTD_DEV_BONDED 0x8u       /* its keys are saved */
+#define BTD_DEV_CONNECTED 0x10u
+#define BTD_DEV_ENCRYPTED 0x20u
+#define BTD_DEV_SC 0x40u          /* paired with LE Secure Connections (else legacy) */
 
 typedef struct {
     uint32_t op;           /* BTD_OP_* */
