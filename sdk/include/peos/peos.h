@@ -338,6 +338,11 @@ int64_t peos_audio_set_output(uint32_t which);
 // stereo frames (peos_fread waits for 10 ms, peos_fread_nb does not), waited
 // on with PEOS_WAIT_READ; or -1 (no right, no such microphone).
 int64_t peos_mic_open(uint32_t which);
+// The game controllers (peos/gamepad.h; needs "gamepad"): a descriptor that
+// reads whole peos_gamepad_record_t (the controllers there, then every
+// change), takes peos_gamepad_cmd_t (vibration) and is waited on with
+// PEOS_WAIT_READ. Only the newest open one gets records. -1: no right.
+int64_t peos_gamepad_open(void);
 // The microphones there, the one recording, the counts (peos/mic.h).
 int64_t peos_mic_info(peos_mic_info_t *out);
 // A descriptor readable (8 bytes, a change counter) when a sound device or
