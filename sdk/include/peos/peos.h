@@ -350,6 +350,14 @@ int64_t peos_gamepad_open(void);
 // adapters there, then each one that comes or goes). Waited on with
 // PEOS_WAIT_READ. -1: no right, no such adapter, already open.
 int64_t peos_bt_open(uint32_t index);
+// A virtual HID device (peos/hid.h; needs "bluetooth", bluetoothd's): the
+// report descriptor of a device the kernel cannot reach (HID over GATT) ->
+// a descriptor that takes its input reports (report ID first), reads the
+// peos_hid_output_t reports for it (vibration) and is waited on with
+// PEOS_WAIT_READ; closing it removes the device. -1: no right, nothing
+// the kernel can use in the descriptor, no room.
+struct peos_hid_create_info;
+int64_t peos_hid_create(const struct peos_hid_create_info *info);
 // The microphones there, the one recording, the counts (peos/mic.h).
 int64_t peos_mic_info(peos_mic_info_t *out);
 // A descriptor readable (8 bytes, a change counter) when a sound device or
