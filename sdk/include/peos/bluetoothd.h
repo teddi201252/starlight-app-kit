@@ -8,7 +8,8 @@ extern "C" {
  * the adapter watch, the adapter, its service name and its clients' channels.
  *
  * Clients (Settings, tools) connect to the service name "bluetooth"; the
- * kernel lets only a program with the "bluetooth" capability connect. A
+ * kernel lets only a program with the "bluetooth.devices" capability
+ * connect (the raw radio, "bluetooth", stays bluetoothd's). A
  * connection stays open as long as the client wants: it sends btd_req_t
  * requests (each with its own seq) and reads btd_msg_t messages, fixed
  * size: the answer to each request (kind BTD_MSG_REPLY, the same op and
@@ -29,7 +30,9 @@ extern "C" {
  * BTD_SCAN_MAX_S) and stops by itself (BTD_EV_SCAN_STOPPED); only then does
  * the radio listen. The devices seen stay in a list of BTD_DEVICES_MAX
  * (the oldest replaced); entries not seen for BTD_DEVICE_FORGET_S are
- * dropped when the next search starts.
+ * dropped when the next search starts. LIST gives them, then the bonded
+ * devices not seen (BTD_DEV_BONDED: their name and appearance as they were
+ * when paired; connected ones with their battery, BTD_DEV_BATTERY).
  *
  * Connections and pairing (phase 3): PAIR connects to a device of the list
  * (or a bonded one) and pairs with it, "Just Works" (LE Secure Connections
@@ -60,7 +63,7 @@ extern "C" {
 #define BTD_DEVICES_MAX 32u
 #define BTD_DEVICE_FORGET_S 300u
 #define BTD_LIST_PAGE 24u       /* devices in one LIST answer */
-#define BTD_NAME_MAX 44u        /* device names, NUL-terminated (longer ones cut) */
+#define BTD_NAME_MAX 43u        /* device names, NUL-terminated (longer ones cut) */
 #define BTD_CLIENTS_MAX 8u
 
 /* Requests (btd_req_t.op) */
@@ -86,7 +89,8 @@ enum {
     BTD_EV_SCAN_STARTED = 4,      /* u.status (scan_left_ms) */
     BTD_EV_SCAN_STOPPED = 5,      /* u.status; total: the devices in the list */
     BTD_EV_DEVICE_FOUND = 6,      /* u.device: first seen in this search */
-    BTD_EV_DEVICE_UPDATED = 7,    /* u.device: its name or appearance changed, or its signal (at most every 2 s) */
+    BTD_EV_DEVICE_UPDATED = 7,    /* u.device: its name or appearance changed, or its signal (at most every 2 s);
+                                   * or, connected, its services were read (the battery) */
     BTD_EV_CONNECTED = 8,         /* u.device */
     BTD_EV_DISCONNECTED = 9,      /* u.device; count: the HCI reason */
     BTD_EV_PAIRED = 10,           /* u.device (BTD_DEV_BONDED, BTD_DEV_SC) */
@@ -126,6 +130,7 @@ enum {
 #define BTD_DEV_CONNECTED 0x10u
 #define BTD_DEV_ENCRYPTED 0x20u
 #define BTD_DEV_SC 0x40u          /* paired with LE Secure Connections (else legacy) */
+#define BTD_DEV_BATTERY 0x80u     /* connected, and battery holds its level (Battery Service) */
 
 typedef struct {
     uint32_t op;           /* BTD_OP_* */
@@ -146,6 +151,7 @@ typedef struct {
     uint32_t age_ms;       /* since it was last seen */
     uint32_t reports;      /* advertising reports received from it */
     char name[BTD_NAME_MAX];
+    uint8_t battery;       /* 0..100 % when BTD_DEV_BATTERY (read when it connects) */
 } btd_device_t;            /* 64 bytes */
 
 typedef struct {

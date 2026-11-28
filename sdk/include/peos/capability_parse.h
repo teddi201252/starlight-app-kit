@@ -36,6 +36,7 @@ static const struct {
     { "net.listen", PEOS_CAP_NET_LISTEN },
     { "gamepad", PEOS_CAP_GAMEPAD },
     { "bluetooth", PEOS_CAP_BLUETOOTH },
+    { "bluetooth.devices", PEOS_CAP_BT_DEVICES },
 };
 
 /* Returns 1 and sets *out when [name, name+len) is a known capability. */
